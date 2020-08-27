@@ -4,10 +4,13 @@ import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterEnroll
 import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgramming
+import com.bioMetanoRevenge.flow.RawMaterialFlow.IssuerRawMaterial
 import com.bioMetanoRevenge.schema.EnrollSchemaV1
 import com.bioMetanoRevenge.schema.ProgrammingSchemaV1
+import com.bioMetanoRevenge.schema.RawMaterialSchemaV1
 import com.bioMetanoRevenge.state.EnrollState
 import com.bioMetanoRevenge.state.ProgrammingState
+import com.bioMetanoRevenge.state.RawMaterialState
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.startTrackedFlow
 import net.corda.core.messaging.vaultQueryBy
@@ -411,6 +414,74 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateProgramming = proxy.startTrackedFlow(::UpdaterProgramming, updateProgrammingPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Programming with bioAgreementCode: $bioAgreementCode update correctly." + "New ProgrammingState with id: ${updateProgramming.linearId.id} created.. ledger updated.", data = updateProgramming))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * RAW MATERIAL API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all Raw Material that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastRawMaterial" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastRawMaterial() : ResponseEntity<ResponsePojo> {
+        var foundLastRawMaterialStates = proxy.vaultQueryBy<RawMaterialState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Raw Material list", data = foundLastRawMaterialStates))
+    }
+
+    /**
+     * Displays last RawMaterialStates that exist in the node's vault for selected CERCode.
+     */
+    @GetMapping(value = [ "getLastRawMaterialByCERCode/{CERCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastRawMaterialByCERCode(
+            @PathVariable("CERCode")
+            CERCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for hostname
+        var CERCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {RawMaterialSchemaV1.PersistentRawMaterial::CERCode.equal(CERCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(RawMaterialState::class.java))
+
+        val foundCERCodeRawMaterial = proxy.vaultQueryBy<RawMaterialState>(
+                CERCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.hostname == hostname }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last Raw Material by CERCode $CERCode .", data = foundCERCodeRawMaterial))
+    }
+
+    /**
+     * Initiates a flow to agree an RawMaterial between two nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-rawMaterial" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueRawMaterial(
+            @RequestBody
+            issueRawMaterialPojo : RawMaterialPojo): ResponseEntity<ResponsePojo> {
+
+        val CERCode = issueRawMaterialPojo.CERCode
+
+        if(CERCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "CERCode cannot be empty", data = null))
+        }
+
+        return try {
+            val rawMaterial = proxy.startTrackedFlow(::IssuerRawMaterial, issueRawMaterialPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${rawMaterial.linearId.id} committed to ledger.\n", data = rawMaterial))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
