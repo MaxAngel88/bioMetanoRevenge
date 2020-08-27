@@ -1,9 +1,9 @@
 package com.bioMetanoRevenge.flow
 
 import co.paralleluniverse.fibers.Suspendable
-import com.bioMetanoRevenge.contract.EnrollContract
-import com.bioMetanoRevenge.schema.EnrollSchemaV1
-import com.bioMetanoRevenge.state.EnrollState
+import com.bioMetanoRevenge.contract.ProgrammingContract
+import com.bioMetanoRevenge.schema.ProgrammingSchemaV1
+import com.bioMetanoRevenge.state.ProgrammingState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
@@ -17,27 +17,27 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
-import pojo.EnrollPojo
-import pojo.EnrollUpdatePojo
+import pojo.ProgrammingPojo
+import pojo.ProgrammingUpdatePojo
 import java.time.Instant
 import java.util.*
 
-object EnrollFlow {
+object ProgrammingFlow {
 
     /**
      *
-     * Issue Enroll Flow ------------------------------------------------------------------------------------
+     * Issue Programming Flow ------------------------------------------------------------------------------------
      *
      * */
     @InitiatingFlow
     @StartableByRPC
-    class IssuerEnroll(val enrollProperty: EnrollPojo) : FlowLogic<EnrollState>() {
+    class IssuerProgramming(val programmingProperty: ProgrammingPojo) : FlowLogic<ProgrammingState>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : Step("Generating transaction based on new Enroll.")
+            object GENERATING_TRANSACTION : Step("Generating transaction based on new Programming.")
             object VERIFYING_TRANSACTION : Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : Step("Signing transaction with our private key.")
             object GATHERING_SIGS : Step("Gathering the other Party signature.") {
@@ -63,7 +63,7 @@ object EnrollFlow {
          * The flow logic is encapsulated within the call() method.
          */
         @Suspendable
-        override fun call(): EnrollState {
+        override fun call(): ProgrammingState {
 
             // Obtain a reference from a notary we wish to use.
             /**
@@ -78,38 +78,29 @@ object EnrollFlow {
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
 
-            val owner : Party = serviceHub.myInfo.legalIdentities.first()
+            val produttore : Party = serviceHub.myInfo.legalIdentities.first()
 
             var GSEX500Name = CordaX500Name(organisation = "GSE", locality = "Milan", country = "IT")
             var GSEParty = serviceHub.networkMapCache.getPeerByLegalName(GSEX500Name)!!
 
             // Generate an unsigned transaction.
-            val enrollState = EnrollState(
+            val programmingState = ProgrammingState(
                     GSEParty,
-                    owner,
-                    enrollProperty.enrollType,
-                    enrollProperty.businessName,
-                    enrollProperty.PIVA,
-                    enrollProperty.birthPlace,
-                    enrollProperty.idPlant,
-                    enrollProperty.plantAddress,
-                    enrollProperty.username,
-                    enrollProperty.role,
-                    enrollProperty.partner,
-                    enrollProperty.docRefAutodichiarazione,
-                    enrollProperty.docRefAttestazioniTecniche,
-                    enrollProperty.docDeadLine,
-                    enrollProperty.enrollStatus,
-                    Instant.now(),
-                    0.0,
-                    0.0,
-                    enrollProperty.uuid,
+                    produttore,
+                    programmingProperty.sendDate,
+                    programmingProperty.monthYear,
+                    programmingProperty.programmingType,
+                    programmingProperty.versionFile,
+                    programmingProperty.bioAgreementCode,
+                    programmingProperty.remiCode,
+                    programmingProperty.docRef,
+                    programmingProperty.docName,
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID()))
 
-            val txCommand = Command(EnrollContract.Commands.Issue(), enrollState.participants.map { it.owningKey })
+            val txCommand = Command(ProgrammingContract.Commands.Issue(), programmingState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(enrollState, EnrollContract.ID)
+                    .addOutputState(programmingState, ProgrammingContract.ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -134,21 +125,21 @@ object EnrollFlow {
             // Notarise and record the transaction in both parties' vaults.
             subFlow(FinalityFlow(fullySignedTx, setOf(GSESession), FINALISING_TRANSACTION.childProgressTracker()))
 
-            return enrollState
+            return programmingState
         }
     }
 
-    @InitiatedBy(IssuerEnroll::class)
-    class ReceiverEnroll(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+    @InitiatedBy(IssuerProgramming::class)
+    class ReceiverProgramming(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
             val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val output = stx.tx.outputs.single().data
-                    "This must be an enroll transaction." using (output is EnrollState)
-                    val enroll = output as EnrollState
-                    /* "other rule enroll" using (enroll is new rule) */
-                    "uuid cannot be empty" using (enroll.uuid.isNotEmpty())
+                    "This must be an programming transaction." using (output is ProgrammingState)
+                    val programming = output as ProgrammingState
+                    /* "other rule programming" using (programming is new rule) */
+                    "bioAgreementCode cannot be empty" using (programming.bioAgreementCode.isNotEmpty())
                 }
             }
             val txId = subFlow(signTransactionFlow).id
@@ -159,18 +150,18 @@ object EnrollFlow {
 
     /***
      *
-     * Update Enroll Flow -----------------------------------------------------------------------------------
+     * Update Programming Flow -----------------------------------------------------------------------------------
      *
      * */
     @InitiatingFlow
     @StartableByRPC
-    class UpdaterEnroll(val enrollUpdateProperty: EnrollUpdatePojo) : FlowLogic<EnrollState>() {
+    class UpdaterProgramming(val programmingUpdateProperty: ProgrammingUpdatePojo) : FlowLogic<ProgrammingState>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update Enroll.")
+            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update Programming.")
             object VERIFYIGN_TRANSACTION : ProgressTracker.Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : ProgressTracker.Step("Signing transaction with our private key.")
             object GATHERING_SIGS : ProgressTracker.Step("Gathering the other Party signature.") {
@@ -196,7 +187,7 @@ object EnrollFlow {
          * The flow logic is encapsulated within the call() method.
          */
         @Suspendable
-        override fun call(): EnrollState {
+        override fun call(): ProgrammingState {
 
             // Obtain a reference from a notary we wish to use.
             /**
@@ -208,7 +199,7 @@ object EnrollFlow {
             val notary = serviceHub.networkMapCache.notaryIdentities.single() // METHOD 1
             // val notary = serviceHub.networkMapCache.getNotary(CordaX500Name.parse("O=Notary,L=London,C=GB")) // METHOD 2
 
-            val owner : Party = serviceHub.myInfo.legalIdentities.first()
+            val produttore : Party = serviceHub.myInfo.legalIdentities.first()
 
             var GSEX500Name = CordaX500Name(organisation = "GSE", locality = "Milan", country = "IT")
             var GSEParty = serviceHub.networkMapCache.getPeerByLegalName(GSEX500Name)!!
@@ -216,49 +207,40 @@ object EnrollFlow {
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
 
-            // setting the criteria for retrive UNCONSUMED state AND filter it for uuid
-            var uuidCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {EnrollSchemaV1.PersistentEnroll::uuid.equal(enrollUpdateProperty.uuid)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
+            // setting the criteria for retrive UNCONSUMED state AND filter it for bioAgreementCode
+            var bioAgreementCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ProgrammingSchemaV1.PersistentProgramming::bioAgreementCode.equal(programmingUpdateProperty.bioAgreementCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ProgrammingState::class.java))
 
-            val oldEnrollStateList = serviceHub.vaultService.queryBy<EnrollState>(
-                    uuidCriteria,
+            val oldProgrammingStateList = serviceHub.vaultService.queryBy<ProgrammingState>(
+                    bioAgreementCodeCriteria,
                     PageSpecification(1, MAX_PAGE_SIZE),
                     Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
             ).states
 
-            if (oldEnrollStateList.size > 1 || oldEnrollStateList.isEmpty()) throw FlowException("No enroll state with uuid: ${enrollUpdateProperty.uuid} found.")
+            if (oldProgrammingStateList.size > 1 || oldProgrammingStateList.isEmpty()) throw FlowException("No programming state with bioAgreementCode: ${programmingUpdateProperty.bioAgreementCode} found.")
 
-            val oldEnrollStateRef = oldEnrollStateList[0]
-            val oldEnrollState = oldEnrollStateRef.state.data
+            val oldProgrammingStateRef = oldProgrammingStateList[0]
+            val oldProgrammingState = oldProgrammingStateRef.state.data
 
             // Generate an unsigned transaction.
-            val newEnrollState = EnrollState(
+            val newProgrammingState = ProgrammingState(
                     GSEParty,
-                    owner,
-                    oldEnrollState.enrollType,
-                    oldEnrollState.businessName,
-                    oldEnrollState.PIVA,
-                    oldEnrollState.birthPlace,
-                    oldEnrollState.idPlant,
-                    oldEnrollState.plantAddress,
-                    oldEnrollState.username,
-                    oldEnrollState.role,
-                    oldEnrollState.partner,
-                    oldEnrollState.docRefAutodichiarazione,
-                    oldEnrollState.docRefAttestazioniTecniche,
-                    oldEnrollState.docDeadLine,
-                    enrollUpdateProperty.enrollStatus,
-                    oldEnrollState.enrollDate,
-                    enrollUpdateProperty.bioGasAmount,
-                    enrollUpdateProperty.gasAmount,
-                    oldEnrollState.uuid,
+                    produttore,
+                    oldProgrammingState.sendDate,
+                    oldProgrammingState.monthYear,
+                    oldProgrammingState.programmingType,
+                    programmingUpdateProperty.versionFile,
+                    oldProgrammingState.bioAgreementCode,
+                    oldProgrammingState.remiCode,
+                    programmingUpdateProperty.docRef,
+                    programmingUpdateProperty.docName,
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID())
             )
 
-            val txCommand = Command(EnrollContract.Commands.Update(), newEnrollState.participants.map { it.owningKey })
+            val txCommand = Command(ProgrammingContract.Commands.Update(), newProgrammingState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addInputState(oldEnrollStateRef)
-                    .addOutputState(newEnrollState, EnrollContract.ID)
+                    .addInputState(oldProgrammingStateRef)
+                    .addOutputState(newProgrammingState, ProgrammingContract.ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -283,20 +265,20 @@ object EnrollFlow {
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
             subFlow(FinalityFlow(fullySignedTx, setOf(GSESession), FINALISING_TRANSACTION.childProgressTracker()))
-            return newEnrollState
+            return newProgrammingState
         }
 
-        @InitiatedBy(UpdaterEnroll::class)
-        class UpdateAcceptorEnroll(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+        @InitiatedBy(UpdaterProgramming::class)
+        class UpdateAcceptorProgramming(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
             @Suspendable
             override fun call(): SignedTransaction {
                 val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                         val output = stx.tx.outputs.single().data
-                        "This must be an enroll transaction." using (output is EnrollState)
-                        val enroll = output as EnrollState
-                        /* "other rule enroll" using (output is new rule) */
-                        "uuid cannot be empty on update" using (enroll.uuid.isNotEmpty())
+                        "This must be an programming transaction." using (output is ProgrammingState)
+                        val programming = output as ProgrammingState
+                        /* "other rule programming" using (output is new rule) */
+                        "bioAgreementCode cannot be empty on update" using (programming.bioAgreementCode.isNotEmpty())
                     }
                 }
                 val txId = subFlow(signTransactionFlow).id

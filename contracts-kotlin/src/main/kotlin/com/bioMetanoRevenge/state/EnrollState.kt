@@ -2,7 +2,6 @@ package com.bioMetanoRevenge.state
 
 import com.bioMetanoRevenge.contract.EnrollContract
 import com.bioMetanoRevenge.schema.EnrollSchemaV1
-import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.UniqueIdentifier
