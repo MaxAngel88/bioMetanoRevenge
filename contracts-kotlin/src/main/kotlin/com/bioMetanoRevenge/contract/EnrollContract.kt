@@ -44,6 +44,7 @@ class EnrollContract : Contract {
             "docRefAutodichiarazione cannot be empty." using (enroll.docRefAutodichiarazione.isNotEmpty())
             "docRefAttestazioniTecniche cannot be empty." using (enroll.docRefAttestazioniTecniche.isNotEmpty())
             "enrollStatus cannot be empty." using (enroll.enrollStatus.isNotEmpty())
+            "enrollStatus must be \"Pending\"." using (enroll.enrollStatus.equals("Pending", ignoreCase = true))
             "uuid cannot be empty." using (enroll.uuid.isNotEmpty())
         }
     }
@@ -63,6 +64,7 @@ class EnrollContract : Contract {
             // Generic constraints around the new Enroll transaction
             "GSE from old and new Enroll cannot change." using (oldEnrollState.GSE == newEnrollState.GSE)
             "owner from old and new Enroll cannot change." using (oldEnrollState.owner == newEnrollState.owner)
+            "enrollStatus must be \"Pending\" or \"Approved\"." using (newEnrollState.enrollStatus.equals("Pending", ignoreCase = true) || newEnrollState.enrollStatus.equals("Approved", ignoreCase = true))
             "uuid cannot be update." using (oldEnrollState.uuid == newEnrollState.uuid)
         }
     }
