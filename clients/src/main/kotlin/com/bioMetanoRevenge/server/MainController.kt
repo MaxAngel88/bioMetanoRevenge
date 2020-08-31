@@ -1,13 +1,17 @@
 package com.bioMetanoRevenge.server
 
+import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
+import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
 import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterEnroll
 import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgramming
 import com.bioMetanoRevenge.flow.RawMaterialFlow.IssuerRawMaterial
+import com.bioMetanoRevenge.schema.BatchSchemaV1
 import com.bioMetanoRevenge.schema.EnrollSchemaV1
 import com.bioMetanoRevenge.schema.ProgrammingSchemaV1
 import com.bioMetanoRevenge.schema.RawMaterialSchemaV1
+import com.bioMetanoRevenge.state.BatchState
 import com.bioMetanoRevenge.state.EnrollState
 import com.bioMetanoRevenge.state.ProgrammingState
 import com.bioMetanoRevenge.state.RawMaterialState
@@ -227,7 +231,7 @@ class MainController(rpc: NodeRPCConnection) {
 
         return try {
             val updateEnroll = proxy.startTrackedFlow(::UpdaterEnroll, updateEnrollPojo).returnValue.getOrThrow()
-            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Enroll with id: $uuid update correctly." + "New EnrollState with id: ${updateEnroll.linearId.id} created.. ledger updated.", data = updateEnroll))
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Enroll with id: $uuid update correctly. New EnrollState with id: ${updateEnroll.linearId.id} created.. ledger updated.", data = updateEnroll))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
@@ -488,4 +492,282 @@ class MainController(rpc: NodeRPCConnection) {
         }
     }
 
+    /**
+     *
+     * BATCH API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all BatchStates that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastBatch" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatch() : ResponseEntity<ResponsePojo> {
+        var foundLastBatchStates = proxy.vaultQueryBy<BatchState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Batch list", data = foundLastBatchStates))
+    }
+
+    /**
+     * Displays last BacthStates that exist in the node's vault for selected batchStatus.
+     */
+    @GetMapping(value = [ "getLastBatchByStatus/{batchStatus}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchByStatus(
+            @PathVariable("batchStatus")
+            batchStatus : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for hostname
+        var batchStatusCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::batchStatus.equal(batchStatus)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
+
+        val foundBatchStatus = proxy.vaultQueryBy<BatchState>(
+                batchStatusCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.hostname == hostname }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last Batch by batchStatus $batchStatus .", data = foundBatchStatus))
+    }
+
+    /**
+     * Displays last BatchState that exist in the node's vault for selected produttore (organization name).
+     */
+    @GetMapping(value = [ "getLastBatchStateByProducer/{producerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchStateByProducer(
+            @PathVariable("producerName")
+            producerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for producer organization name
+        val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundProducerBatch = proxy.vaultQueryBy<BatchState>(
+                generalUnconsumedStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.produttore.name.organisation == producerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last BatchState by produttore $producerName .", data = foundProducerBatch))
+    }
+
+    /**
+     * Displays History BatchState that exist in the node's vault for selected produttore (organization name).
+     */
+    @GetMapping(value = [ "getHistoryBatchStateByProducer/{producerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByProducer(
+            @PathVariable("producerName")
+            producerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for producer organization name
+        val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundProducerBatchHistory = proxy.vaultQueryBy<BatchState>(
+                generalAllStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.produttore.name.organisation == producerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $producerName", data = foundProducerBatchHistory))
+    }
+
+    /**
+     * Displays last BatchState that exist in the node's vault for selected shipper (organization name).
+     */
+    @GetMapping(value = [ "getLastBatchStateByShipper/{shipperName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchStateByShipper(
+            @PathVariable("shipperName")
+            shipperName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for shipper organization name
+        val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundShipperBatch = proxy.vaultQueryBy<BatchState>(
+                generalUnconsumedStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.shipper.name.organisation == shipperName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last BatchState by shipper $shipperName .", data = foundShipperBatch))
+    }
+
+    /**
+     * Displays History BatchState that exist in the node's vault for selected shipper (organization name).
+     */
+    @GetMapping(value = [ "getHistoryBatchStateByShipper/{shipperName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByShipper(
+            @PathVariable("shipperName")
+            shipperName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for producer organization name
+        val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundShipperBatchHistory = proxy.vaultQueryBy<BatchState>(
+                generalAllStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.shipper.name.organisation == shipperName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $shipperName", data = foundShipperBatchHistory))
+    }
+
+    /**
+     * Displays last BatchState that exist in the node's vault for selected batchID.
+     */
+    @GetMapping(value = [ "getLastBatchByID/{batchID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchByID(
+            @PathVariable("batchID")
+            batchID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for batchID
+        var batchIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::batchID.equal(batchID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundBatchID = proxy.vaultQueryBy<BatchState>(
+                batchIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last batch by batchID $batchID .", data = foundBatchID))
+    }
+
+    /**
+     * Displays History BatchState that exist in the node's vault for selected batchID.
+     */
+    @GetMapping(value = [ "getHistoryBatchStateByID/{batchID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByID(
+            @PathVariable("batchID")
+            batchID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for batchID
+        var batchIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::batchID.equal(batchID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundBatchIDHistory = proxy.vaultQueryBy<BatchState>(
+                batchIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $batchID", data = foundBatchIDHistory))
+    }
+
+    /**
+     * Displays History BatchState that exist in the node's vault for selected producer (organization name) and month.
+     */
+    @GetMapping(value = [ "getHistoryBatchStateByMonthProducer/{month}/{producerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByMonthProducer(
+            @PathVariable("month")
+            month : String,
+            @PathVariable("producerName")
+            producerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for producer organization name and month
+        var monthCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::month.equal(month)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundMonthProducerBatchHistory = proxy.vaultQueryBy<BatchState>(
+                monthCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.produttore.name.organisation == producerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $producerName in $month." , data = foundMonthProducerBatchHistory))
+    }
+
+    /**
+     * Displays History BatchState that exist in the node's vault for selected shipper (organization name) and month.
+     */
+    @GetMapping(value = [ "getHistoryBatchStateByMonthShipper/{month}/{shipperName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByMonthShipper(
+            @PathVariable("month")
+            month : String,
+            @PathVariable("shipperName")
+            shipperName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for producer organization name and month
+        var monthCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::month.equal(month)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundMonthShipperBatchHistory = proxy.vaultQueryBy<BatchState>(
+                monthCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.shipper.name.organisation == shipperName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $shipperName in $month.", data = foundMonthShipperBatchHistory))
+    }
+
+    /**
+     * Initiates a flow to agree an Batch between nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-batch" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueBatch(
+            @RequestBody
+            issueBatchPojo : BatchPojo): ResponseEntity<ResponsePojo> {
+
+        val produttore = issueBatchPojo.produttore
+        val shipper = issueBatchPojo.shipper
+        val batchID = issueBatchPojo.batchID
+        val month = issueBatchPojo.month
+
+        if(produttore.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "produttore (organization name) cannot be empty", data = null))
+        }
+
+        if(shipper.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "shipper (organization name) cannot be empty", data = null))
+        }
+
+        if(batchID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchID cannot be empty", data = null))
+        }
+
+        if(month.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "month cannot be empty", data = null))
+        }
+
+        return try {
+            val batch = proxy.startTrackedFlow(::IssuerBatch, issueBatchPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${batch.linearId.id} committed to ledger.\n", data = batch))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update Batch
+     *
+     */
+    @PostMapping(value = [ "update-batch" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateBatch(
+            @RequestBody
+            updateBatchPojo: BatchUpdatePojo): ResponseEntity<ResponsePojo> {
+
+        val batchId = updateBatchPojo.batchID
+        val batchStatus = updateBatchPojo.batchStatus
+
+        if(batchId.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchId cannot be empty", data = null))
+        }
+
+        if(batchStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updateBatch = proxy.startTrackedFlow(::UpdaterBatch, updateBatchPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Batch with id: $batchId update correctly. New BatchState with id: ${updateBatch.linearId.id} created.. ledger updated.", data = updateBatch))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
 }
