@@ -51,7 +51,7 @@ class BatchContract : Contract {
             "averageProductionCapacity must be greater than zero." using (batch.averageProductionCapacity > 0.0)
             "maxProductionCapacity must be greater than zero." using (batch.maxProductionCapacity > 0.0)
             "annualEstimate must be greater than zero." using (batch.annualEstimate > 0.0)
-            "docRefcannot be empty." using (batch.docRef.isNotEmpty())
+            "docRef cannot be empty." using (batch.docRef.isNotEmpty())
             "batchStatus cannot be empty." using (batch.batchStatus.isNotEmpty())
             "batchStatus must be \"open\", \"toVerify\" or \"closed\"." using (batch.batchStatus.equals("open", ignoreCase = true) || batch.batchStatus.equals("toVerify", ignoreCase = true) || batch.batchStatus.equals("closed", ignoreCase = true))
         }

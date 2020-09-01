@@ -4,17 +4,13 @@ import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
 import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterEnroll
+import com.bioMetanoRevenge.flow.ExchangeFlow.IssuerExchange
+import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchange
 import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgramming
 import com.bioMetanoRevenge.flow.RawMaterialFlow.IssuerRawMaterial
-import com.bioMetanoRevenge.schema.BatchSchemaV1
-import com.bioMetanoRevenge.schema.EnrollSchemaV1
-import com.bioMetanoRevenge.schema.ProgrammingSchemaV1
-import com.bioMetanoRevenge.schema.RawMaterialSchemaV1
-import com.bioMetanoRevenge.state.BatchState
-import com.bioMetanoRevenge.state.EnrollState
-import com.bioMetanoRevenge.state.ProgrammingState
-import com.bioMetanoRevenge.state.RawMaterialState
+import com.bioMetanoRevenge.schema.*
+import com.bioMetanoRevenge.state.*
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.startTrackedFlow
 import net.corda.core.messaging.vaultQueryBy
@@ -89,7 +85,7 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("username")
             username : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive UNCONSUMED state AND filter it for hostname
+        // setting the criteria for retrive UNCONSUMED state AND filter it for username
         var usernameCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {EnrollSchemaV1.PersistentEnroll::username.equal(username)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
 
         val foundUsernameEnroll = proxy.vaultQueryBy<EnrollState>(
@@ -132,7 +128,7 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("uuid")
             uuid : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive UNCONSUMED state AND filter it for macAddress
+        // setting the criteria for retrive UNCONSUMED state AND filter it for uuid
         var uuidCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {EnrollSchemaV1.PersistentEnroll::uuid.equal(uuid)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
 
         val foundUuidEnroll = proxy.vaultQueryBy<EnrollState>(
@@ -262,7 +258,7 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("bioAgreementCode")
             bioAgreementCode : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive UNCONSUMED state AND filter it for hostname
+        // setting the criteria for retrive UNCONSUMED state AND filter it for bioAgreementCode
         var bioAgreementCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ProgrammingSchemaV1.PersistentProgramming::bioAgreementCode.equal(bioAgreementCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ProgrammingState::class.java))
 
         val foundBioAgreementProgramming = proxy.vaultQueryBy<ProgrammingState>(
@@ -448,7 +444,7 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("CERCode")
             CERCode : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive UNCONSUMED state AND filter it for hostname
+        // setting the criteria for retrive UNCONSUMED state AND filter it for CERCode
         var CERCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {RawMaterialSchemaV1.PersistentRawMaterial::CERCode.equal(CERCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(RawMaterialState::class.java))
 
         val foundCERCodeRawMaterial = proxy.vaultQueryBy<RawMaterialState>(
@@ -516,8 +512,8 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("batchStatus")
             batchStatus : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive UNCONSUMED state AND filter it for hostname
-        var batchStatusCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::batchStatus.equal(batchStatus)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
+        // setting the criteria for retrive UNCONSUMED state AND filter it for batchStatus
+        var batchStatusCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::batchStatus.equal(batchStatus)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
 
         val foundBatchStatus = proxy.vaultQueryBy<BatchState>(
                 batchStatusCriteria,
@@ -597,7 +593,7 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("shipperName")
             shipperName : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for producer organization name
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for shipper organization name
         val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
 
         val foundShipperBatchHistory = proxy.vaultQueryBy<BatchState>(
@@ -683,7 +679,7 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("shipperName")
             shipperName : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for producer organization name and month
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for shipper organization name and month
         var monthCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::month.equal(month)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
 
         val foundMonthShipperBatchHistory = proxy.vaultQueryBy<BatchState>(
@@ -765,6 +761,334 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateBatch = proxy.startTrackedFlow(::UpdaterBatch, updateBatchPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Batch with id: $batchId update correctly. New BatchState with id: ${updateBatch.linearId.id} created.. ledger updated.", data = updateBatch))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * EXCHANGE API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all ExchangeStates that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastExchange" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastExchange() : ResponseEntity<ResponsePojo> {
+        var foundLastExchangeStates = proxy.vaultQueryBy<ExchangeState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Exchange list", data = foundLastExchangeStates))
+    }
+
+    /**
+     * Displays last ExchangeStates that exist in the node's vault for selected exchangeStatus.
+     */
+    @GetMapping(value = [ "getLastExchangeByStatus/{exchangeStatus}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastExchangeByStatus(
+            @PathVariable("exchangeStatus")
+            exchangeStatus : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for exchangeStatus
+        var exchangeStatusCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::exchangeStatus.equal(exchangeStatus)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundExchangeStatus = proxy.vaultQueryBy<BatchState>(
+                exchangeStatusCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.hostname == hostname }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last Exchange by exchangeStatus $exchangeStatus .", data = foundExchangeStatus))
+    }
+
+    /**
+     * Displays last ExchangeState that exist in the node's vault for selected seller (organization name).
+     */
+    @GetMapping(value = [ "getLastExchangeStateBySeller/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastExchangeStateBySeller(
+            @PathVariable("sellerName")
+            sellerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for seller organization name
+        val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundSellerExchange = proxy.vaultQueryBy<ExchangeState>(
+                generalUnconsumedStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.seller.name.organisation == sellerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last ExchangeState by seller $sellerName .", data = foundSellerExchange))
+    }
+
+    /**
+     * Displays History ExchangeState that exist in the node's vault for selected seller (organization name).
+     */
+    @GetMapping(value = [ "getHistoryExchangeStateBySeller/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryExchangeStateBySeller(
+            @PathVariable("sellerName")
+            sellerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for seller organization name
+        val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundSellerExchangeHistory = proxy.vaultQueryBy<ExchangeState>(
+                generalAllStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.seller.name.organisation == sellerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of exchange state for $sellerName", data = foundSellerExchangeHistory))
+    }
+
+    /**
+     * Displays last ExchangeState that exist in the node's vault for selected buyer (organization name).
+     */
+    @GetMapping(value = [ "getLastExchangeStateByBuyer/{buyerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastExchangeStateByBuyer(
+            @PathVariable("buyerName")
+            buyerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for buyer organization name
+        val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundBuyerExchange = proxy.vaultQueryBy<ExchangeState>(
+                generalUnconsumedStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.buyer.name.organisation == buyerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last ExchangeState by buyer $buyerName .", data = foundBuyerExchange))
+    }
+
+    /**
+     * Displays History ExchangeState that exist in the node's vault for selected buyer (organization name).
+     */
+    @GetMapping(value = [ "getHistoryExchangeStateByBuyer/{buyerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryExchangeStateByBuyer(
+            @PathVariable("buyerName")
+            buyerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for buyer organization name
+        val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundBuyerExchangeHistory = proxy.vaultQueryBy<ExchangeState>(
+                generalAllStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.buyer.name.organisation == buyerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of exchange state for $buyerName", data = foundBuyerExchangeHistory))
+    }
+
+    /**
+     * Displays last ExchangeState that exist in the node's vault for selected exchangeCode.
+     */
+    @GetMapping(value = [ "getLastExchangeByCode/{exchangeCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastExchangeByCode(
+            @PathVariable("exchangeCode")
+            exchangeCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for exchangeCode
+        var exchangeCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::exchangeCode.equal(exchangeCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundExchangeCode = proxy.vaultQueryBy<ExchangeState>(
+                exchangeCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last exchange by exchangeCode $exchangeCode .", data = foundExchangeCode))
+    }
+
+    /**
+     * Displays History ExchangeState that exist in the node's vault for selected exchangeCode.
+     */
+    @GetMapping(value = [ "getHistoryExchangeStateByCode/{exchangeCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryExchangeStateByCode(
+            @PathVariable("exchangeCode")
+            exchangeCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for exchangeCode
+        var exchangeCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::exchangeCode.equal(exchangeCode)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundExchangeCodeHistory = proxy.vaultQueryBy<ExchangeState>(
+                exchangeCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of exchange state for $exchangeCode", data = foundExchangeCodeHistory))
+    }
+
+    /**
+     * Displays last ExchangeState that exist in the node's vault for selected parentBatchID.
+     */
+    @GetMapping(value = [ "getLastExchangeByParent/{parentBatchID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastExchangeByParent(
+            @PathVariable("parentBatchID")
+            parentBatchID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for parentBatchID
+        var exchangeParentCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::parentBatchID.equal(parentBatchID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundExchangeParent = proxy.vaultQueryBy<ExchangeState>(
+                exchangeParentCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last exchange by parentBatchID $parentBatchID .", data = foundExchangeParent))
+    }
+
+    /**
+     * Displays History ExchangeState that exist in the node's vault for selected parentBatchID.
+     */
+    @GetMapping(value = [ "getHistoryExchangeStateByParent/{parentBatchID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryExchangeStateByParent(
+            @PathVariable("parentBatchID")
+            parentBatchID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for parentBatchID
+        var exchangeParentCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::parentBatchID.equal(parentBatchID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundExchangeParentHistory = proxy.vaultQueryBy<ExchangeState>(
+                exchangeParentCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of exchange state for $parentBatchID", data = foundExchangeParentHistory))
+    }
+
+    /**
+     * Displays History ExchangeState that exist in the node's vault for selected seller (organization name) and month.
+     */
+    @GetMapping(value = [ "getHistoryExchangeStateByMonthSeller/{month}/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryExchangeStateByMonthSeller(
+            @PathVariable("month")
+            month : String,
+            @PathVariable("sellerName")
+            sellerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for seller organization name and month
+        var monthCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::month.equal(month)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundMonthSellerExchangeHistory = proxy.vaultQueryBy<ExchangeState>(
+                monthCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.seller.name.organisation == sellerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of exchange state for $sellerName in $month." , data = foundMonthSellerExchangeHistory))
+    }
+
+    /**
+     * Displays History ExchangeState that exist in the node's vault for selected buyer (organization name) and month.
+     */
+    @GetMapping(value = [ "getHistoryExchangeStateByMonthBuyer/{month}/{buyerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryExchangeStateByMonthBuyer(
+            @PathVariable("month")
+            month : String,
+            @PathVariable("buyerName")
+            buyerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for buyer organization name and month
+        var monthCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::month.equal(month)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundMonthBuyerExchangeHistory = proxy.vaultQueryBy<ExchangeState>(
+                monthCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.buyer.name.organisation == buyerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of exchange state for $buyerName in $month.", data = foundMonthBuyerExchangeHistory))
+    }
+
+    /**
+     * Initiates a flow to agree an Exchange between nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-exchange" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueExchange(
+            @RequestBody
+            issueExchangePojo : ExchangePojo): ResponseEntity<ResponsePojo> {
+
+        val seller = issueExchangePojo.seller
+        val buyer = issueExchangePojo.buyer
+        val exchangeCode = issueExchangePojo.exchangeCode
+        val month = issueExchangePojo.month
+        val parentBatchID = issueExchangePojo.parentBatchID
+
+
+
+        if(seller.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "seller (organization name) cannot be empty", data = null))
+        }
+
+        if(buyer.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "buyer (organization name) cannot be empty", data = null))
+        }
+
+        if(exchangeCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "exchangeCode cannot be empty", data = null))
+        }
+
+        if(month.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "month cannot be empty", data = null))
+        }
+
+        if(parentBatchID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "parentBatchID cannot be empty", data = null))
+        }
+
+        return try {
+            val exchange = proxy.startTrackedFlow(::IssuerExchange, issueExchangePojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${exchange.linearId.id} committed to ledger.\n", data = exchange))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update Exchange
+     *
+     */
+    @PostMapping(value = [ "update-exchange" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateExchange(
+            @RequestBody
+            updateExchangePojo: ExchangeUpdatePojo): ResponseEntity<ResponsePojo> {
+
+        val exchangeCode = updateExchangePojo.exchangeCode
+        val exchangeStatus = updateExchangePojo.exchangeStatus
+
+        if(exchangeCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "exchangeCode cannot be empty", data = null))
+        }
+
+        if(exchangeStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "exchangeStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updateExchange = proxy.startTrackedFlow(::UpdaterExchange, updateExchangePojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Exchange with id: $exchangeCode update correctly. New BatchState with id: ${updateExchange.linearId.id} created.. ledger updated.", data = updateExchange))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))

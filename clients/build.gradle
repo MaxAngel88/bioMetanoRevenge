@@ -69,14 +69,20 @@ task runShipperServer(type: JavaExec, dependsOn: jar) {
     args '--server.port=50006', '--config.rpc.host=localhost', '--config.rpc.port=10009', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runDistributoreServer(type: JavaExec, dependsOn: jar) {
+task runIntermediarioServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50007', '--config.rpc.host=localhost', '--config.rpc.port=10013', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runGSEServer(type: JavaExec, dependsOn: jar) {
+task runDistributoreServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50015', '--config.rpc.host=localhost', '--config.rpc.port=10017', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runGSEServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.bioMetanoRevenge.server.ServerKt'
+    args '--server.port=50016', '--config.rpc.host=localhost', '--config.rpc.port=10021', '--config.rpc.username=user1', '--config.rpc.password=test'
 }

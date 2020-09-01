@@ -1,9 +1,9 @@
 package com.bioMetanoRevenge.flow
 
 import co.paralleluniverse.fibers.Suspendable
-import com.bioMetanoRevenge.contract.BatchContract
-import com.bioMetanoRevenge.schema.BatchSchemaV1
-import com.bioMetanoRevenge.state.BatchState
+import com.bioMetanoRevenge.contract.ExchangeContract
+import com.bioMetanoRevenge.schema.ExchangeSchemaV1
+import com.bioMetanoRevenge.state.ExchangeState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
@@ -17,27 +17,27 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
-import pojo.BatchPojo
-import pojo.BatchUpdatePojo
+import pojo.ExchangePojo
+import pojo.ExchangeUpdatePojo
 import java.time.Instant
 import java.util.*
 
-object BatchFlow {
+object ExchangeFlow {
 
     /**
      *
-     * Issue Batch Flow ------------------------------------------------------------------------------------
+     * Issue Exchange Flow ------------------------------------------------------------------------------------
      *
      * */
     @InitiatingFlow
     @StartableByRPC
-    class IssuerBatch(val batchProperty: BatchPojo) : FlowLogic<BatchState>() {
+    class IssuerExchange(val exchangeProperty: ExchangePojo) : FlowLogic<ExchangeState>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : Step("Generating transaction based on new Batch.")
+            object GENERATING_TRANSACTION : Step("Generating transaction based on new Exchange.")
             object VERIFYING_TRANSACTION : Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : Step("Signing transaction with our private key.")
             object GATHERING_SIGS : Step("Gathering the other Party signature.") {
@@ -63,7 +63,7 @@ object BatchFlow {
          * The flow logic is encapsulated within the call() method.
          */
         @Suspendable
-        override fun call(): BatchState {
+        override fun call(): ExchangeState {
 
             // Obtain a reference from a notary we wish to use.
             /**
@@ -84,49 +84,53 @@ object BatchFlow {
             var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "GSE") {
-                throw FlowException("Node $myLegalIdentity cannot start the issue-batch flow. This flow can only be started from the GSE node")
+                throw FlowException("Node $myLegalIdentity cannot start the issue-exchange flow. This flow can only be started from the GSE node")
             }
 
-            // set Party value for Produttore
-            var produttoreX500Name = CordaX500Name(organisation = batchProperty.produttore, locality = "Milan", country = "IT")
-            var produttoreParty = serviceHub.networkMapCache.getPeerByLegalName(produttoreX500Name)!!
+            // set Party value for Seller
+            var sellerX500Name = CordaX500Name(organisation = exchangeProperty.seller, locality = "Milan", country = "IT")
+            var sellerParty = serviceHub.networkMapCache.getPeerByLegalName(sellerX500Name)!!
 
-            // set Party value for Shipper
-            var shipperX500Name = CordaX500Name(organisation = batchProperty.shipper, locality = "Milan", country = "IT")
-            var shipperParty = serviceHub.networkMapCache.getPeerByLegalName(shipperX500Name)!!
+            // set Party value for Buyer
+            var buyerX500Name = CordaX500Name(organisation = exchangeProperty.buyer, locality = "Milan", country = "IT")
+            var buyerParty = serviceHub.networkMapCache.getPeerByLegalName(buyerX500Name)!!
 
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
 
             // Generate an unsigned transaction.
-            val batchState = BatchState(
+            val exchangeState = ExchangeState(
                     myLegalIdentity,
-                    produttoreParty,
-                    shipperParty,
-                    batchProperty.transactionType,
-                    batchProperty.batchID,
-                    batchProperty.month,
-                    batchProperty.remiCode,
-                    batchProperty.plantAddress,
-                    batchProperty.plantCode,
-                    batchProperty.quantity,
-                    batchProperty.energy,
-                    batchProperty.price,
-                    batchProperty.averageProductionCapacity,
-                    batchProperty.maxProductionCapacity,
-                    batchProperty.annualEstimate,
-                    batchProperty.startingPosition,
-                    batchProperty.arrivalPosition,
-                    batchProperty.docRef,
-                    batchProperty.docDate,
-                    batchProperty.batchStatus,
+                    sellerParty,
+                    buyerParty,
+                    exchangeProperty.exchangeType,
+                    exchangeProperty.PIVASeller,
+                    exchangeProperty.PIVABuyer,
+                    exchangeProperty.parentBatchID,
+                    exchangeProperty.exchangeCode,
+                    exchangeProperty.month,
+                    exchangeProperty.remiCode,
+                    exchangeProperty.plantAddress,
+                    exchangeProperty.plantCode,
+                    exchangeProperty.hauler,
+                    exchangeProperty.PIVAHauler,
+                    exchangeProperty.trackCode,
+                    exchangeProperty.pickupDate,
+                    exchangeProperty.deliveryDate,
+                    exchangeProperty.quantity,
+                    exchangeProperty.price,
+                    exchangeProperty.startingPosition,
+                    exchangeProperty.arrivalPosition,
+                    exchangeProperty.docRef,
+                    exchangeProperty.docDate,
+                    exchangeProperty.exchangeStatus,
                     Instant.now(),
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID()))
 
-            val txCommand = Command(BatchContract.Commands.Issue(), batchState.participants.map { it.owningKey })
+            val txCommand = Command(ExchangeContract.Commands.Issue(), exchangeState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(batchState, BatchContract.ID)
+                    .addOutputState(exchangeState, ExchangeContract.ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -143,30 +147,31 @@ object BatchFlow {
             progressTracker.currentStep = GATHERING_SIGS
 
             // Send the state to the other nodes, and receive it back with their signature.
-            val produttoreSession = initiateFlow(produttoreParty)
-            val shipperSession = initiateFlow(shipperParty)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(produttoreSession, shipperSession), GATHERING_SIGS.childProgressTracker()))
+            val sellerSession = initiateFlow(sellerParty)
+            val buyerSession = initiateFlow(buyerParty)
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(sellerSession, buyerSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(sellerSession, buyerSession), FINALISING_TRANSACTION.childProgressTracker()))
 
-            return batchState
+            return exchangeState
         }
     }
 
-    @InitiatedBy(IssuerBatch::class)
-    class ReceiverBatch(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+    @InitiatedBy(IssuerExchange::class)
+    class ReceiverExchange(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
             val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val output = stx.tx.outputs.single().data
-                    "This must be an batch transaction." using (output is BatchState)
-                    val batchState = output as BatchState
-                    /* "other rule batch" using (batch is new rule) */
-                    "batchID cannot be empty" using (batchState.batchID.isNotEmpty())
+                    "This must be an exchange transaction." using (output is ExchangeState)
+                    val exchangeState = output as ExchangeState
+                    /* "other rule exchange" using (exchange is new rule) */
+                    "parentBatchID cannot be empty" using (exchangeState.parentBatchID.isNotEmpty())
+                    "exchangeCode cannot be empty" using (exchangeState.exchangeCode.isNotEmpty())
                 }
             }
             val txId = subFlow(signTransactionFlow).id
@@ -177,18 +182,18 @@ object BatchFlow {
 
     /***
      *
-     * Update Batch Flow -----------------------------------------------------------------------------------
+     * Update Exchange Flow -----------------------------------------------------------------------------------
      *
      * */
     @InitiatingFlow
     @StartableByRPC
-    class UpdaterBatch(val batchUpdateProperty: BatchUpdatePojo) : FlowLogic<BatchState>() {
+    class UpdaterExchange(val exchangeUpdateProperty: ExchangeUpdatePojo) : FlowLogic<ExchangeState>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update Batch.")
+            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update Exchange.")
             object VERIFYIGN_TRANSACTION : ProgressTracker.Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : ProgressTracker.Step("Signing transaction with our private key.")
             object GATHERING_SIGS : ProgressTracker.Step("Gathering the other Party signature.") {
@@ -214,7 +219,7 @@ object BatchFlow {
          * The flow logic is encapsulated within the call() method.
          */
         @Suspendable
-        override fun call(): BatchState {
+        override fun call(): ExchangeState {
 
             // Obtain a reference from a notary we wish to use.
             /**
@@ -235,57 +240,61 @@ object BatchFlow {
             var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "GSE") {
-                throw FlowException("Node $myLegalIdentity cannot start the update-batch flow. This flow can only be started from the GSE node")
+                throw FlowException("Node $myLegalIdentity cannot start the update-exchange flow. This flow can only be started from the GSE node")
             }
 
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
 
-            // setting the criteria for retrive UNCONSUMED state AND filter it for batchID
-            var batchIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::batchID.equal(batchUpdateProperty.batchID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+            // setting the criteria for retrive UNCONSUMED state AND filter it for exchangeCode
+            var exchangeCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::exchangeCode.equal(exchangeUpdateProperty.exchangeCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
 
-            val oldBatchStateList = serviceHub.vaultService.queryBy<BatchState>(
-                    batchIDCriteria,
+            val oldExchangeStateList = serviceHub.vaultService.queryBy<ExchangeState>(
+                    exchangeCodeCriteria,
                     PageSpecification(1, MAX_PAGE_SIZE),
                     Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
             ).states
 
-            if (oldBatchStateList.size > 1 || oldBatchStateList.isEmpty()) throw FlowException("No batch state with batchID: ${batchUpdateProperty.batchID} found.")
+            if (oldExchangeStateList.size > 1 || oldExchangeStateList.isEmpty()) throw FlowException("No batch state with exchangeCode: ${exchangeUpdateProperty.exchangeCode} found.")
 
-            val oldBatchStateRef = oldBatchStateList[0]
-            val oldBatchState = oldBatchStateRef.state.data
+            val oldExchangeStateRef = oldExchangeStateList[0]
+            val oldExchangeState = oldExchangeStateRef.state.data
 
             // Generate an unsigned transaction.
-            val newBatchState = BatchState(
+            val newExchangeState = ExchangeState(
                     myLegalIdentity,
-                    oldBatchState.produttore,
-                    oldBatchState.shipper,
-                    oldBatchState.transactionType,
-                    oldBatchState.batchID,
-                    oldBatchState.month,
-                    oldBatchState.remiCode,
-                    oldBatchState.plantAddress,
-                    oldBatchState.plantCode,
-                    oldBatchState.quantity,
-                    oldBatchState.energy,
-                    oldBatchState.price,
-                    oldBatchState.averageProductionCapacity,
-                    oldBatchState.maxProductionCapacity,
-                    oldBatchState.annualEstimate,
-                    oldBatchState.startingPosition,
-                    oldBatchState.arrivalPosition,
-                    oldBatchState.docRef,
-                    oldBatchState.docDate,
-                    batchUpdateProperty.batchStatus,
-                    oldBatchState.batchDate,
+                    oldExchangeState.seller,
+                    oldExchangeState.buyer,
+                    oldExchangeState.exchangeType,
+                    oldExchangeState.PIVASeller,
+                    oldExchangeState.PIVABuyer,
+                    oldExchangeState.parentBatchID,
+                    oldExchangeState.exchangeCode,
+                    oldExchangeState.month,
+                    oldExchangeState.remiCode,
+                    oldExchangeState.plantAddress,
+                    oldExchangeState.plantCode,
+                    oldExchangeState.hauler,
+                    oldExchangeState.PIVAHauler,
+                    oldExchangeState.trackCode,
+                    oldExchangeState.pickupDate,
+                    oldExchangeState.deliveryDate,
+                    oldExchangeState.quantity,
+                    oldExchangeState.price,
+                    oldExchangeState.startingPosition,
+                    oldExchangeState.arrivalPosition,
+                    oldExchangeState.docRef,
+                    oldExchangeState.docDate,
+                    exchangeUpdateProperty.exchangeStatus,
+                    oldExchangeState.exchangeDate,
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID())
             )
 
-            val txCommand = Command(BatchContract.Commands.Update(), newBatchState.participants.map { it.owningKey })
+            val txCommand = Command(ExchangeContract.Commands.Update(), newExchangeState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addInputState(oldBatchStateRef)
-                    .addOutputState(newBatchState, BatchContract.ID)
+                    .addInputState(oldExchangeStateRef)
+                    .addOutputState(newExchangeState, ExchangeContract.ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -302,28 +311,29 @@ object BatchFlow {
             progressTracker.currentStep = GATHERING_SIGS
 
             // Send the state to the other nodes, and receive it back with their signature.
-            val produttoreSession = initiateFlow(oldBatchState.produttore)
-            val shipperSession = initiateFlow(oldBatchState.shipper)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(produttoreSession, shipperSession), GATHERING_SIGS.childProgressTracker()))
+            val sellerSession = initiateFlow(oldExchangeState.seller)
+            val buyerSession = initiateFlow(oldExchangeState.buyer)
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(sellerSession, buyerSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
-            return newBatchState
+            subFlow(FinalityFlow(fullySignedTx, setOf(sellerSession, buyerSession), FINALISING_TRANSACTION.childProgressTracker()))
+            return newExchangeState
         }
 
-        @InitiatedBy(UpdaterBatch::class)
-        class UpdateAcceptorBatch(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+        @InitiatedBy(UpdaterExchange::class)
+        class UpdateAcceptorExchange(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
             @Suspendable
             override fun call(): SignedTransaction {
                 val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                         val output = stx.tx.outputs.single().data
-                        "This must be an batch transaction." using (output is BatchState)
-                        val batchState = output as BatchState
-                        /* "other rule batch" using (output is new rule) */
-                        "batchID cannot be empty" using (batchState.batchID.isNotEmpty())
+                        "This must be an exchange transaction." using (output is ExchangeState)
+                        val exchangeState = output as ExchangeState
+                        /* "other rule exchange" using (output is new rule) */
+                        "parentBatchID cannot be empty" using (exchangeState.parentBatchID.isNotEmpty())
+                        "exchangeCode cannot be empty" using (exchangeState.exchangeCode.isNotEmpty())
                     }
                 }
                 val txId = subFlow(signTransactionFlow).id
