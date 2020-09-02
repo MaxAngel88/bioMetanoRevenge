@@ -6,6 +6,8 @@ import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterEnroll
 import com.bioMetanoRevenge.flow.ExchangeFlow.IssuerExchange
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchange
+import com.bioMetanoRevenge.flow.PSVFlow.IssuerPSVState
+import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVState
 import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgramming
 import com.bioMetanoRevenge.flow.RawMaterialFlow.IssuerRawMaterial
@@ -794,7 +796,7 @@ class MainController(rpc: NodeRPCConnection) {
         // setting the criteria for retrive UNCONSUMED state AND filter it for exchangeStatus
         var exchangeStatusCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::exchangeStatus.equal(exchangeStatus)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
 
-        val foundExchangeStatus = proxy.vaultQueryBy<BatchState>(
+        val foundExchangeStatus = proxy.vaultQueryBy<ExchangeState>(
                 exchangeStatusCriteria,
                 PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
                 Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
@@ -1088,7 +1090,335 @@ class MainController(rpc: NodeRPCConnection) {
 
         return try {
             val updateExchange = proxy.startTrackedFlow(::UpdaterExchange, updateExchangePojo).returnValue.getOrThrow()
-            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Exchange with id: $exchangeCode update correctly. New BatchState with id: ${updateExchange.linearId.id} created.. ledger updated.", data = updateExchange))
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Exchange with id: $exchangeCode update correctly. New ExchangeState with id: ${updateExchange.linearId.id} created.. ledger updated.", data = updateExchange))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * PSVSTATE API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all PSVStates that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastPSVState" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastPSVState() : ResponseEntity<ResponsePojo> {
+        var foundLastPSVStates = proxy.vaultQueryBy<PSVState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "PSVState list", data = foundLastPSVStates))
+    }
+
+    /**
+     * Displays last PSVStates that exist in the node's vault for selected transactionStatus.
+     */
+    @GetMapping(value = [ "getLastPSVStateByStatus/{transactionStatus}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastPSVStateByStatus(
+            @PathVariable("transactionStatus")
+            transactionStatus : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for transactionStatus
+        var transactionStatusCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::transactionStatus.equal(transactionStatus)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundPSVStatus = proxy.vaultQueryBy<PSVState>(
+                transactionStatusCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.hostname == hostname }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last PSVState by transactionStatus $transactionStatus .", data = foundPSVStatus))
+    }
+
+    /**
+     * Displays last PSVState that exist in the node's vault for selected seller (organization name).
+     */
+    @GetMapping(value = [ "getLastPSVStateBySeller/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastPSVStateBySeller(
+            @PathVariable("sellerName")
+            sellerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for seller organization name
+        val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundSellerPSVState = proxy.vaultQueryBy<PSVState>(
+                generalUnconsumedStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.seller.name.organisation == sellerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last PSVState by seller $sellerName .", data = foundSellerPSVState))
+    }
+
+    /**
+     * Displays History PSVState that exist in the node's vault for selected seller (organization name).
+     */
+    @GetMapping(value = [ "getHistoryPSVStateBySeller/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryPSVStateBySeller(
+            @PathVariable("sellerName")
+            sellerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for seller organization name
+        val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundSellerPSVHistory = proxy.vaultQueryBy<PSVState>(
+                generalAllStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.seller.name.organisation == sellerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of psv state for $sellerName", data = foundSellerPSVHistory))
+    }
+
+    /**
+     * Displays last PSVState that exist in the node's vault for selected buyer (organization name).
+     */
+    @GetMapping(value = [ "getLastPSVStateByBuyer/{buyerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastPSVStateByBuyer(
+            @PathVariable("buyerName")
+            buyerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for buyer organization name
+        val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundBuyerPSVState = proxy.vaultQueryBy<PSVState>(
+                generalUnconsumedStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.buyer.name.organisation == buyerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last PSVState by buyer $buyerName .", data = foundBuyerPSVState))
+    }
+
+    /**
+     * Displays History PSVState that exist in the node's vault for selected buyer (organization name).
+     */
+    @GetMapping(value = [ "getHistoryPSVStateByBuyer/{buyerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryPSVStateByBuyer(
+            @PathVariable("buyerName")
+            buyerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for buyer organization name
+        val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundBuyerPSVHistory = proxy.vaultQueryBy<PSVState>(
+                generalAllStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.buyer.name.organisation == buyerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of psv state for $buyerName", data = foundBuyerPSVHistory))
+    }
+
+    /**
+     * Displays last PSVState that exist in the node's vault for selected transactionCode.
+     */
+    @GetMapping(value = [ "getLastPSVStateByCode/{transactionCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastPSVStateByCode(
+            @PathVariable("transactionCode")
+            transactionCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for transactionCode
+        var transactionCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::transactionCode.equal(transactionCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundPSVStateCode = proxy.vaultQueryBy<PSVState>(
+                transactionCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last psvState by transactionCode $transactionCode .", data = foundPSVStateCode))
+    }
+
+    /**
+     * Displays History PSVState that exist in the node's vault for selected transactionCode.
+     */
+    @GetMapping(value = [ "getHistoryPSVStateByCode/{transactionCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryPSVStateByCode(
+            @PathVariable("transactionCode")
+            transactionCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for transactionCode
+        var transactionCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::transactionCode.equal(transactionCode)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundPSVStateCodeHistory = proxy.vaultQueryBy<PSVState>(
+                transactionCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of psv state for $transactionCode", data = foundPSVStateCodeHistory))
+    }
+
+    /**
+     * Displays last PSVState that exist in the node's vault for selected parentBatchID.
+     */
+    @GetMapping(value = [ "getLastPSVStateByParent/{parentBatchID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastPSVStateByParent(
+            @PathVariable("parentBatchID")
+            parentBatchID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for parentBatchID
+        var psvParentCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::parentBatchID.equal(parentBatchID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundPSVStateParent = proxy.vaultQueryBy<PSVState>(
+                psvParentCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last psvState by parentBatchID $parentBatchID .", data = foundPSVStateParent))
+    }
+
+    /**
+     * Displays History PSVState that exist in the node's vault for selected parentBatchID.
+     */
+    @GetMapping(value = [ "getHistoryPSVStateByParent/{parentBatchID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryPSVStateByParent(
+            @PathVariable("parentBatchID")
+            parentBatchID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for parentBatchID
+        var psvParentCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::parentBatchID.equal(parentBatchID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundPSVStateParentHistory = proxy.vaultQueryBy<PSVState>(
+                psvParentCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of psv state for $parentBatchID", data = foundPSVStateParentHistory))
+    }
+
+    /**
+     * Displays History PSVState that exist in the node's vault for selected seller (organization name) and month.
+     */
+    @GetMapping(value = [ "getHistoryPSVStateByMonthSeller/{month}/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryPSVStateByMonthSeller(
+            @PathVariable("month")
+            month : String,
+            @PathVariable("sellerName")
+            sellerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for seller organization name and month
+        var monthCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::month.equal(month)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundMonthSellerPSVHistory = proxy.vaultQueryBy<PSVState>(
+                monthCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.seller.name.organisation == sellerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of psv state for $sellerName in $month." , data = foundMonthSellerPSVHistory))
+    }
+
+    /**
+     * Displays History PSVState that exist in the node's vault for selected buyer (organization name) and month.
+     */
+    @GetMapping(value = [ "getHistoryPSVStateByMonthBuyer/{month}/{buyerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryPSVStateByMonthBuyer(
+            @PathVariable("month")
+            month : String,
+            @PathVariable("buyerName")
+            buyerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for buyer organization name and month
+        var monthCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::month.equal(month)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundMonthBuyerPSVHistory = proxy.vaultQueryBy<PSVState>(
+                monthCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.buyer.name.organisation == buyerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of psv state for $buyerName in $month.", data = foundMonthBuyerPSVHistory))
+    }
+
+    /**
+     * Initiates a flow to agree an PSVState between nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-psv" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issuePSVState(
+            @RequestBody
+            issuePSVPojo : PSVPojo): ResponseEntity<ResponsePojo> {
+
+        val seller = issuePSVPojo.seller
+        val buyer = issuePSVPojo.buyer
+        val transactionCode = issuePSVPojo.transactionCode
+        val month = issuePSVPojo.month
+        val parentBatchID = issuePSVPojo.parentBatchID
+
+
+
+        if(seller.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "seller (organization name) cannot be empty", data = null))
+        }
+
+        if(buyer.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "buyer (organization name) cannot be empty", data = null))
+        }
+
+        if(transactionCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "transactionCode cannot be empty", data = null))
+        }
+
+        if(month.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "month cannot be empty", data = null))
+        }
+
+        if(parentBatchID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "parentBatchID cannot be empty", data = null))
+        }
+
+        return try {
+            val psvState = proxy.startTrackedFlow(::IssuerPSVState, issuePSVPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${psvState.linearId.id} committed to ledger.\n", data = psvState))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update PSVState
+     *
+     */
+    @PostMapping(value = [ "update-psv" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updatePSVState(
+            @RequestBody
+            updatePSVPojo: PSVUpdatePojo): ResponseEntity<ResponsePojo> {
+
+        val transactionCode = updatePSVPojo.transactionCode
+        val transactionStatus = updatePSVPojo.transactionStatus
+
+        if(transactionCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "transactionCode cannot be empty", data = null))
+        }
+
+        if(transactionStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "transactionStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updatePSVState = proxy.startTrackedFlow(::UpdaterPSVState, updatePSVPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "PSV with id: $transactionCode update correctly. New PSVState with id: ${updatePSVState.linearId.id} created.. ledger updated.", data = updatePSVState))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))

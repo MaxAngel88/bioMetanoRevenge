@@ -310,6 +310,7 @@ object BatchFlow {
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
             subFlow(FinalityFlow(fullySignedTx, setOf(produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
+
             return newBatchState
         }
 
@@ -329,7 +330,6 @@ object BatchFlow {
                 val txId = subFlow(signTransactionFlow).id
 
                 return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
-
             }
         }
     }

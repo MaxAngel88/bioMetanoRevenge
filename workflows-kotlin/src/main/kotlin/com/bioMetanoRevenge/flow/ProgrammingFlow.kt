@@ -265,6 +265,7 @@ object ProgrammingFlow {
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
             subFlow(FinalityFlow(fullySignedTx, setOf(GSESession), FINALISING_TRANSACTION.childProgressTracker()))
+
             return newProgrammingState
         }
 
@@ -284,7 +285,6 @@ object ProgrammingFlow {
                 val txId = subFlow(signTransactionFlow).id
 
                 return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
-
             }
         }
     }

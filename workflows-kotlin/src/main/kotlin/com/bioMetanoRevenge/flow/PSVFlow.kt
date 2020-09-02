@@ -1,9 +1,9 @@
 package com.bioMetanoRevenge.flow
 
 import co.paralleluniverse.fibers.Suspendable
-import com.bioMetanoRevenge.contract.EnrollContract
-import com.bioMetanoRevenge.schema.EnrollSchemaV1
-import com.bioMetanoRevenge.state.EnrollState
+import com.bioMetanoRevenge.contract.PSVContract
+import com.bioMetanoRevenge.schema.PSVSchemaV1
+import com.bioMetanoRevenge.state.PSVState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
@@ -17,27 +17,27 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
-import pojo.EnrollPojo
-import pojo.EnrollUpdatePojo
+import pojo.PSVPojo
+import pojo.PSVUpdatePojo
 import java.time.Instant
 import java.util.*
 
-object EnrollFlow {
+object PSVFlow {
 
     /**
      *
-     * Issue Enroll Flow ------------------------------------------------------------------------------------
+     * Issue PSVState Flow ------------------------------------------------------------------------------------
      *
      * */
     @InitiatingFlow
     @StartableByRPC
-    class IssuerEnroll(val enrollProperty: EnrollPojo) : FlowLogic<EnrollState>() {
+    class IssuerPSVState(val psvStateProperty: PSVPojo) : FlowLogic<PSVState>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : Step("Generating transaction based on new Enroll.")
+            object GENERATING_TRANSACTION : Step("Generating transaction based on new PSVState.")
             object VERIFYING_TRANSACTION : Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : Step("Signing transaction with our private key.")
             object GATHERING_SIGS : Step("Gathering the other Party signature.") {
@@ -63,7 +63,7 @@ object EnrollFlow {
          * The flow logic is encapsulated within the call() method.
          */
         @Suspendable
-        override fun call(): EnrollState {
+        override fun call(): PSVState {
 
             // Obtain a reference from a notary we wish to use.
             /**
@@ -75,41 +75,60 @@ object EnrollFlow {
             val notary = serviceHub.networkMapCache.notaryIdentities.single() // METHOD 1
             // val notary = serviceHub.networkMapCache.getNotary(CordaX500Name.parse("O=Notary,L=London,C=GB")) // METHOD 2
 
-            // Stage 1.
-            progressTracker.currentStep = GENERATING_TRANSACTION
+            /**
+             *
+             * This flow can only be started from the Snam node
+             *
+             */
+            val myLegalIdentity : Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
 
-            val owner : Party = serviceHub.myInfo.legalIdentities.first()
+            if (myLegalIdentityNameOrg != "Snam") {
+                throw FlowException("Node $myLegalIdentity cannot start the issue-psvState flow. This flow can only be started from the Snam node")
+            }
 
+            // fixed Party value for GSE
             var GSEX500Name = CordaX500Name(organisation = "GSE", locality = "Milan", country = "IT")
             var GSEParty = serviceHub.networkMapCache.getPeerByLegalName(GSEX500Name)!!
 
+            // set Party value for Seller
+            var sellerX500Name = CordaX500Name(organisation = psvStateProperty.seller, locality = "Milan", country = "IT")
+            var sellerParty = serviceHub.networkMapCache.getPeerByLegalName(sellerX500Name)!!
+
+            // set Party value for Buyer
+            var buyerX500Name = CordaX500Name(organisation = psvStateProperty.buyer, locality = "Milan", country = "IT")
+            var buyerParty = serviceHub.networkMapCache.getPeerByLegalName(buyerX500Name)!!
+
+            // Stage 1.
+            progressTracker.currentStep = GENERATING_TRANSACTION
+
             // Generate an unsigned transaction.
-            val enrollState = EnrollState(
+            val psvState = PSVState(
                     GSEParty,
-                    owner,
-                    enrollProperty.enrollType,
-                    enrollProperty.businessName,
-                    enrollProperty.PIVA,
-                    enrollProperty.birthPlace,
-                    enrollProperty.idPlant,
-                    enrollProperty.plantAddress,
-                    enrollProperty.username,
-                    enrollProperty.role,
-                    enrollProperty.partner,
-                    enrollProperty.docRefAutodichiarazione,
-                    enrollProperty.docRefAttestazioniTecniche,
-                    enrollProperty.docDeadLine,
-                    enrollProperty.enrollStatus,
+                    myLegalIdentity,
+                    sellerParty,
+                    buyerParty,
+                    psvStateProperty.transactionType,
+                    psvStateProperty.PIVASeller,
+                    psvStateProperty.PIVABuyer,
+                    psvStateProperty.parentBatchID,
+                    psvStateProperty.transactionCode,
+                    psvStateProperty.month,
+                    psvStateProperty.remiCode,
+                    psvStateProperty.plantAddress,
+                    psvStateProperty.plantCode,
+                    psvStateProperty.quantity,
+                    psvStateProperty.price,
+                    psvStateProperty.docRef,
+                    psvStateProperty.docDate,
+                    psvStateProperty.transactionStatus,
                     Instant.now(),
-                    0.0,
-                    0.0,
-                    enrollProperty.uuid,
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID()))
 
-            val txCommand = Command(EnrollContract.Commands.Issue(), enrollState.participants.map { it.owningKey })
+            val txCommand = Command(PSVContract.Commands.Issue(), psvState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(enrollState, EnrollContract.ID)
+                    .addOutputState(psvState, PSVContract.ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -125,30 +144,33 @@ object EnrollFlow {
             // Stage 4.
             progressTracker.currentStep = GATHERING_SIGS
 
-            // Send the state to the other node, and receive it back with their signature.
-            val GSESession = initiateFlow(GSEParty)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(GSESession), GATHERING_SIGS.childProgressTracker()))
+            // Send the state to the other nodes, and receive it back with their signature.
+            val gseSession = initiateFlow(GSEParty)
+            val sellerSession = initiateFlow(sellerParty)
+            val buyerSession = initiateFlow(buyerParty)
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(gseSession, sellerSession, buyerSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(GSESession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(gseSession, sellerSession, buyerSession), FINALISING_TRANSACTION.childProgressTracker()))
 
-            return enrollState
+            return psvState
         }
     }
 
-    @InitiatedBy(IssuerEnroll::class)
-    class ReceiverEnroll(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+    @InitiatedBy(IssuerPSVState::class)
+    class ReceiverPSVState(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
             val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val output = stx.tx.outputs.single().data
-                    "This must be an enroll transaction." using (output is EnrollState)
-                    val enroll = output as EnrollState
-                    /* "other rule enroll" using (enroll is new rule) */
-                    "uuid cannot be empty" using (enroll.uuid.isNotEmpty())
+                    "This must be an psvState transaction." using (output is PSVState)
+                    val psvState = output as PSVState
+                    /* "other rule psvState" using (psvState is new rule) */
+                    "parentBatchID cannot be empty" using (psvState.parentBatchID.isNotEmpty())
+                    "transactionCode cannot be empty" using (psvState.transactionCode.isNotEmpty())
                 }
             }
             val txId = subFlow(signTransactionFlow).id
@@ -159,18 +181,18 @@ object EnrollFlow {
 
     /***
      *
-     * Update Enroll Flow -----------------------------------------------------------------------------------
+     * Update PSVState Flow -----------------------------------------------------------------------------------
      *
      * */
     @InitiatingFlow
     @StartableByRPC
-    class UpdaterEnroll(val enrollUpdateProperty: EnrollUpdatePojo) : FlowLogic<EnrollState>() {
+    class UpdaterPSVState(val psvStateUpdateProperty: PSVUpdatePojo) : FlowLogic<PSVState>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update Enroll.")
+            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update PSVState.")
             object VERIFYIGN_TRANSACTION : ProgressTracker.Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : ProgressTracker.Step("Signing transaction with our private key.")
             object GATHERING_SIGS : ProgressTracker.Step("Gathering the other Party signature.") {
@@ -196,7 +218,7 @@ object EnrollFlow {
          * The flow logic is encapsulated within the call() method.
          */
         @Suspendable
-        override fun call(): EnrollState {
+        override fun call(): PSVState {
 
             // Obtain a reference from a notary we wish to use.
             /**
@@ -208,57 +230,64 @@ object EnrollFlow {
             val notary = serviceHub.networkMapCache.notaryIdentities.single() // METHOD 1
             // val notary = serviceHub.networkMapCache.getNotary(CordaX500Name.parse("O=Notary,L=London,C=GB")) // METHOD 2
 
-            val owner : Party = serviceHub.myInfo.legalIdentities.first()
+            /**
+             *
+             * This flow can only be started from the Snam node
+             *
+             */
+            val myLegalIdentity : Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
 
-            var GSEX500Name = CordaX500Name(organisation = "GSE", locality = "Milan", country = "IT")
-            var GSEParty = serviceHub.networkMapCache.getPeerByLegalName(GSEX500Name)!!
+            if (myLegalIdentityNameOrg != "Snam") {
+                throw FlowException("Node $myLegalIdentity cannot start the update-psvState flow. This flow can only be started from the Snam node")
+            }
 
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
 
-            // setting the criteria for retrive UNCONSUMED state AND filter it for uuid
-            var uuidCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {EnrollSchemaV1.PersistentEnroll::uuid.equal(enrollUpdateProperty.uuid)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
+            // setting the criteria for retrive UNCONSUMED state AND filter it for transactionCode
+            var transactionCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::transactionCode.equal(psvStateUpdateProperty.transactionCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
 
-            val oldEnrollStateList = serviceHub.vaultService.queryBy<EnrollState>(
-                    uuidCriteria,
+            val oldPSVStateStateList = serviceHub.vaultService.queryBy<PSVState>(
+                    transactionCodeCriteria,
                     PageSpecification(1, MAX_PAGE_SIZE),
                     Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
             ).states
 
-            if (oldEnrollStateList.size > 1 || oldEnrollStateList.isEmpty()) throw FlowException("No enroll state with uuid: ${enrollUpdateProperty.uuid} found.")
+            if (oldPSVStateStateList.size > 1 || oldPSVStateStateList.isEmpty()) throw FlowException("No psvState state with transactionCode: ${psvStateUpdateProperty.transactionCode} found.")
 
-            val oldEnrollStateRef = oldEnrollStateList[0]
-            val oldEnrollState = oldEnrollStateRef.state.data
+            val oldPSVStateStateRef = oldPSVStateStateList[0]
+            val oldPSVState = oldPSVStateStateRef.state.data
 
             // Generate an unsigned transaction.
-            val newEnrollState = EnrollState(
-                    GSEParty,
-                    owner,
-                    oldEnrollState.enrollType,
-                    oldEnrollState.businessName,
-                    oldEnrollState.PIVA,
-                    oldEnrollState.birthPlace,
-                    oldEnrollState.idPlant,
-                    oldEnrollState.plantAddress,
-                    oldEnrollState.username,
-                    oldEnrollState.role,
-                    oldEnrollState.partner,
-                    oldEnrollState.docRefAutodichiarazione,
-                    oldEnrollState.docRefAttestazioniTecniche,
-                    oldEnrollState.docDeadLine,
-                    enrollUpdateProperty.enrollStatus,
-                    oldEnrollState.enrollDate,
-                    enrollUpdateProperty.bioGasAmount,
-                    enrollUpdateProperty.gasAmount,
-                    oldEnrollState.uuid,
+            val newPSVState = PSVState(
+                    oldPSVState.GSE,
+                    myLegalIdentity,
+                    oldPSVState.seller,
+                    oldPSVState.buyer,
+                    oldPSVState.transactionType,
+                    oldPSVState.PIVASeller,
+                    oldPSVState.PIVABuyer,
+                    oldPSVState.parentBatchID,
+                    oldPSVState.transactionCode,
+                    oldPSVState.month,
+                    oldPSVState.remiCode,
+                    oldPSVState.plantAddress,
+                    oldPSVState.plantCode,
+                    oldPSVState.quantity,
+                    oldPSVState.price,
+                    oldPSVState.docRef,
+                    oldPSVState.docDate,
+                    psvStateUpdateProperty.transactionStatus,
+                    oldPSVState.transactionDate,
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID())
             )
 
-            val txCommand = Command(EnrollContract.Commands.Update(), newEnrollState.participants.map { it.owningKey })
+            val txCommand = Command(PSVContract.Commands.Update(), newPSVState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addInputState(oldEnrollStateRef)
-                    .addOutputState(newEnrollState, EnrollContract.ID)
+                    .addInputState(oldPSVStateStateRef)
+                    .addOutputState(newPSVState, PSVContract.ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -274,30 +303,32 @@ object EnrollFlow {
             // Stage 4.
             progressTracker.currentStep = GATHERING_SIGS
 
-            val GSESession = initiateFlow(GSEParty)
-
-            // Send the state to the counterparty, and receive it back with their signature.
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(GSESession), GATHERING_SIGS.childProgressTracker()))
+            // Send the state to the other nodes, and receive it back with their signature.
+            val gseSession = initiateFlow(oldPSVState.GSE)
+            val sellerSession = initiateFlow(oldPSVState.seller)
+            val buyerSession = initiateFlow(oldPSVState.buyer)
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(gseSession, sellerSession, buyerSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(GSESession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(gseSession, sellerSession, buyerSession), FINALISING_TRANSACTION.childProgressTracker()))
 
-            return newEnrollState
+            return newPSVState
         }
 
-        @InitiatedBy(UpdaterEnroll::class)
-        class UpdateAcceptorEnroll(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+        @InitiatedBy(UpdaterPSVState::class)
+        class UpdateAcceptorPSVState(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
             @Suspendable
             override fun call(): SignedTransaction {
                 val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                         val output = stx.tx.outputs.single().data
-                        "This must be an enroll transaction." using (output is EnrollState)
-                        val enroll = output as EnrollState
-                        /* "other rule enroll" using (output is new rule) */
-                        "uuid cannot be empty on update" using (enroll.uuid.isNotEmpty())
+                        "This must be an psvState transaction." using (output is PSVState)
+                        val psvState = output as PSVState
+                        /* "other rule psvState" using (output is new rule) */
+                        "parentBatchID cannot be empty" using (psvState.parentBatchID.isNotEmpty())
+                        "transactionCode cannot be empty" using (psvState.transactionCode.isNotEmpty())
                     }
                 }
                 val txId = subFlow(signTransactionFlow).id

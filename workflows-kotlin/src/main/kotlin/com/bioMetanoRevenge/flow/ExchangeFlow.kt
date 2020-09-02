@@ -255,7 +255,7 @@ object ExchangeFlow {
                     Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
             ).states
 
-            if (oldExchangeStateList.size > 1 || oldExchangeStateList.isEmpty()) throw FlowException("No batch state with exchangeCode: ${exchangeUpdateProperty.exchangeCode} found.")
+            if (oldExchangeStateList.size > 1 || oldExchangeStateList.isEmpty()) throw FlowException("No exchange state with exchangeCode: ${exchangeUpdateProperty.exchangeCode} found.")
 
             val oldExchangeStateRef = oldExchangeStateList[0]
             val oldExchangeState = oldExchangeStateRef.state.data
@@ -319,6 +319,7 @@ object ExchangeFlow {
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
             subFlow(FinalityFlow(fullySignedTx, setOf(sellerSession, buyerSession), FINALISING_TRANSACTION.childProgressTracker()))
+
             return newExchangeState
         }
 
@@ -339,7 +340,6 @@ object ExchangeFlow {
                 val txId = subFlow(signTransactionFlow).id
 
                 return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
-
             }
         }
     }
