@@ -184,6 +184,66 @@
 			"name": "Programming",
 			"item": [
 				{
+					"name": "issue-programming",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"sendDate\": \"30031988\",\r\n    \"monthYear\": \"031988\",\r\n    \"programmingType\": \"PRI\",\r\n    \"versionFile\": \"001\",\r\n    \"bioAgreementCode\": \"1234\",\r\n    \"remiCode\": \"remi1234\",\r\n    \"docRef\": \"docRef01\",\r\n    \"docName\": \"docName01\"\r\n} ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-programming",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-programming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-programming",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"versionFile\": \"002\",\r\n    \"bioAgreementCode\": \"1234\",\r\n    \"docRef\": \"docRef02\",\r\n    \"docName\": \"docName02\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-programming",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-programming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getLastProgramming",
 					"request": {
 						"method": "GET",
@@ -291,66 +351,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "issue-programming",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"sendDate\": \"30031988\",\r\n    \"monthYear\": \"031988\",\r\n    \"programmingType\": \"PRI\",\r\n    \"versionFile\": \"001\",\r\n    \"bioAgreementCode\": \"1234\",\r\n    \"remiCode\": \"remi1234\",\r\n    \"docRef\": \"docRef01\",\r\n    \"docName\": \"docName01\"\r\n} ",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-programming",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "50005",
-							"path": [
-								"api",
-								"bioMetanoRevenge",
-								"issue-programming"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update-programming",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"versionFile\": \"002\",\r\n    \"bioAgreementCode\": \"1234\",\r\n    \"docRef\": \"docRef02\",\r\n    \"docName\": \"docName02\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-programming",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "50005",
-							"path": [
-								"api",
-								"bioMetanoRevenge",
-								"update-programming"
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -358,6 +358,36 @@
 		{
 			"name": "RawMaterial",
 			"item": [
+				{
+					"name": "issue-rawMaterial",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rawMaterialChar\": \"A\",\r\n    \"rawMaterialType\": \"BioFossile\",\r\n    \"CERCode\": \"abcde\",\r\n    \"quantity\": 10.5,\r\n    \"originCountry\": \"IT\",\r\n    \"secondaryHarvest\": false,\r\n    \"degradedLand\": true,\r\n    \"sustainabilityCode\": \"xxx123\"\r\n} ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-rawMaterial",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-rawMaterial"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "getLastRawMaterial",
 					"request": {
@@ -396,36 +426,6 @@
 								"bioMetanoRevenge",
 								"getLastRawMaterialByCERCode",
 								"1234"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "issue-rawMaterial",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"rawMaterialChar\": \"A\",\r\n    \"rawMaterialType\": \"BioFossile\",\r\n    \"CERCode\": \"abcde\",\r\n    \"quantity\": 10.5,\r\n    \"originCountry\": \"IT\",\r\n    \"secondaryHarvest\": false,\r\n    \"degradedLand\": true,\r\n    \"sustainabilityCode\": \"xxx123\"\r\n} ",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-rawMaterial",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "50005",
-							"path": [
-								"api",
-								"bioMetanoRevenge",
-								"issue-rawMaterial"
 							]
 						}
 					},
@@ -1375,6 +1375,181 @@
 								"getHistoryPSVStateByMonthBuyer",
 								"Agosto",
 								"Shipper_B"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "WalletReward",
+			"item": [
+				{
+					"name": "issue-wallet-reward",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"walletID\": \"WalletProd1234\",\r\n    \"rewardPoint\": 250,\r\n    \"reason\": \"Creazione + Premio di Benvenuto\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-wallet-reward",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-wallet-reward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-wallet-reward",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"walletID\": \"WalletProd1234\",\r\n    \"rewardPoint\": 100,\r\n    \"reason\": \"Ritiro TV Samsung 50 Pollici\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-wallet-reward",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-wallet-reward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastWalletReward",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastWalletReward",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastWalletReward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastWalletRewardStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastWalletRewardStateByOwner/Produttore",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastWalletRewardStateByOwner",
+								"Produttore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryWalletRewardStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryWalletRewardStateByOwner/Produttore",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryWalletRewardStateByOwner",
+								"Produttore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastWalletRewardByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastWalletRewardByID/WalletProd1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastWalletRewardByID",
+								"WalletProd1234"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryWalletRewardByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryWalletRewardByID/WalletProd1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryWalletRewardByID",
+								"WalletProd1234"
 							]
 						}
 					},
