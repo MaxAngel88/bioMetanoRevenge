@@ -11,6 +11,8 @@ import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVState
 import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgramming
 import com.bioMetanoRevenge.flow.RawMaterialFlow.IssuerRawMaterial
+import com.bioMetanoRevenge.flow.WalletRewardFlow.IssuerWalletReward
+import com.bioMetanoRevenge.flow.WalletRewardFlow.UpdaterWalletReward
 import com.bioMetanoRevenge.schema.*
 import com.bioMetanoRevenge.state.*
 import net.corda.core.identity.CordaX500Name
@@ -1419,6 +1421,180 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updatePSVState = proxy.startTrackedFlow(::UpdaterPSVState, updatePSVPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "PSV with id: $transactionCode update correctly. New PSVState with id: ${updatePSVState.linearId.id} created.. ledger updated.", data = updatePSVState))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * WALLETREWARD API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all WalletRewardState that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastWalletReward" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastWalletReward() : ResponseEntity<ResponsePojo> {
+        var foundLastWalletRewardStates = proxy.vaultQueryBy<WalletRewardState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "WalletReward list", data = foundLastWalletRewardStates))
+    }
+
+    /**
+     * Displays last WalletRewardState that exist in the node's vault for selected owner.
+     */
+    @GetMapping(value = [ "getLastWalletRewardStateByOwner/{ownerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastWalletRewardStateByOwner(
+            @PathVariable("ownerName")
+            ownerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for owner organization name
+        val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(WalletRewardState::class.java))
+
+        val foundOwnerWalletRewardState = proxy.vaultQueryBy<WalletRewardState>(
+                generalUnconsumedStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.owner.name.organisation == ownerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last WalletRewardState by owner $ownerName .", data = foundOwnerWalletRewardState))
+    }
+
+    /**
+     * Displays History WalletRewardState that exist in the node's vault for selected owner (organization name).
+     */
+    @GetMapping(value = [ "getHistoryWalletRewardStateByOwner/{ownerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryWalletRewardStateByOwner(
+            @PathVariable("ownerName")
+            ownerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for owner organization name
+        val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(WalletRewardState::class.java))
+
+        val foundOwnerWalletRewardHistory = proxy.vaultQueryBy<WalletRewardState>(
+                generalAllStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.owner.name.organisation == ownerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of walletReward state for $ownerName", data = foundOwnerWalletRewardHistory))
+    }
+
+    /**
+     * Displays last WalletRewardState that exist in the node's vault for selected walletID.
+     */
+    @GetMapping(value = [ "getLastWalletRewardByID/{walletID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastWalletRewardByID(
+            @PathVariable("walletID")
+            walletID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for walletID
+        var walletIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {WalletRewardSchemaV1.PersistentWalletReward::walletID.equal(walletID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(WalletRewardState::class.java))
+
+        val foundLastWalletID = proxy.vaultQueryBy<WalletRewardState>(
+                walletIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last WalletRewardState by walletID $walletID .", data = foundLastWalletID))
+    }
+
+    /**
+     * Displays History WalletRewardState that exist in the node's vault for selected walletID.
+     */
+    @GetMapping(value = [ "getHistoryWalletRewardByID/{walletID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryWalletRewardByID(
+            @PathVariable("walletID")
+            walletID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for walletID
+        var walletIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {WalletRewardSchemaV1.PersistentWalletReward::walletID.equal(walletID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(WalletRewardState::class.java))
+
+        val foundWalletIDHistory = proxy.vaultQueryBy<WalletRewardState>(
+                walletIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of walletReward state for $walletID", data = foundWalletIDHistory))
+    }
+
+    /**
+     * Initiates a flow to agree an WalletReward between two nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-wallet-reward" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueWalletReward(
+            @RequestBody
+            issueWalletReward : WalletRewardPojo): ResponseEntity<ResponsePojo> {
+
+        val walletID = issueWalletReward.walletID
+        val rewardPoint = issueWalletReward.rewardPoint
+        val reason = issueWalletReward.reason
+
+        if(walletID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "walletID cannot be empty", data = null))
+        }
+
+        if(rewardPoint <= 0) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "rewardPoint must be greater than zero", data = null))
+        }
+
+        if(reason.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "reason cannot be empty", data = null))
+        }
+
+        return try {
+            val walletReward = proxy.startTrackedFlow(::IssuerWalletReward, issueWalletReward).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${walletReward.linearId.id} committed to ledger.\n", data = walletReward))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update WalletReward
+     *
+     */
+    @PostMapping(value = [ "update-wallet-reward" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateWalletReward(
+            @RequestBody
+            updateWalletRewardPojo: WalletRewardUpdatePojo): ResponseEntity<ResponsePojo> {
+
+        val walletID = updateWalletRewardPojo.walletID
+        val rewardPoint = updateWalletRewardPojo.rewardPoint
+        val reason = updateWalletRewardPojo.reason
+
+        if(walletID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "walletID cannot be empty", data = null))
+        }
+
+        if(rewardPoint < 0.0) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "rewardPoint must be a >= 0.0 number", data = null))
+        }
+
+        if(reason.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "reason cannot be empty", data = null))
+        }
+
+        return try {
+            val updateWalletReward = proxy.startTrackedFlow(::UpdaterWalletReward, updateWalletRewardPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "WalletReward with id: $walletID update correctly. New WalletRewardState with id: ${updateWalletReward.linearId.id} created.. ledger updated.", data = updateWalletReward))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
