@@ -38,6 +38,7 @@ class BatchContract : Contract {
 
             // Batch-specific constraints.
             "GSE and produttore cannot be the same entity." using (batch.GSE != batch.produttore)
+            "GSE and Snam cannot be the same entity." using (batch.GSE != batch.Snam)
             "GSE and shipper cannot be the same entity." using (batch.GSE != batch.shipper)
             "produttore and shipper cannot be the same entity." using (batch.produttore != batch.shipper)
             "transacionType cannot be empty." using (batch.transactionType.isNotEmpty())
@@ -71,6 +72,7 @@ class BatchContract : Contract {
 
             // Generic constraints around the new Batch transaction
             "GSE from old and new Batch cannot change." using (oldBatchState.GSE == newBatchState.GSE)
+            "Snam from old and new Batch cannot change." using (oldBatchState.Snam == newBatchState.Snam)
             "produttore from old and new Batch cannot change." using (oldBatchState.produttore == newBatchState.produttore)
             "shipper from old and new Batch cannot change." using (oldBatchState.shipper == newBatchState.shipper)
             "batchStatus cannot be empty." using (newBatchState.batchStatus.isNotEmpty())

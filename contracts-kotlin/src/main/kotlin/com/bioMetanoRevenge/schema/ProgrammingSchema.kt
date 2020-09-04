@@ -55,6 +55,9 @@ object ProgrammingSchemaV1 : MappedSchema(
             @Column(name = "docName")
             var docName: String,
 
+            @Column(name = "programmingStatus")
+            var programmingStatus: String,
+
             @Column(name = "programmingDate")
             var programmingDate: Instant,
 
@@ -63,6 +66,6 @@ object ProgrammingSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", produttore = "", sendDate = "", monthYear = "", programmingType = "", versionFile = "", bioAgreementCode = "", remiCode = "", docRef = "", docName = "", programmingDate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(GSE = "", produttore = "", sendDate = "", monthYear = "", programmingType = "", versionFile = "", bioAgreementCode = "", remiCode = "", docRef = "", docName = "", programmingStatus = "", programmingDate = Instant.now(), linearId = UUID.randomUUID())
     }
 }

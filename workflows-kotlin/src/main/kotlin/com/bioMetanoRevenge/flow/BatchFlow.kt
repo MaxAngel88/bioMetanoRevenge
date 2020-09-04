@@ -80,12 +80,16 @@ object BatchFlow {
              * This flow can only be started from the GSE node
              *
              */
-            val myLegalIdentity : Party = serviceHub.myInfo.legalIdentities.first()
-            var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "GSE") {
                 throw FlowException("Node $myLegalIdentity cannot start the issue-batch flow. This flow can only be started from the GSE node")
             }
+
+            // set Snam Party value
+            var snamX500Name = CordaX500Name(organisation = "Snam", locality = "Milan", country = "IT")
+            var snamParty = serviceHub.networkMapCache.getPeerByLegalName(snamX500Name)!!
 
             // set Party value for Produttore
             var produttoreX500Name = CordaX500Name(organisation = batchProperty.produttore, locality = "Milan", country = "IT")
@@ -101,6 +105,7 @@ object BatchFlow {
             // Generate an unsigned transaction.
             val batchState = BatchState(
                     myLegalIdentity,
+                    snamParty,
                     produttoreParty,
                     shipperParty,
                     batchProperty.transactionType,
@@ -143,14 +148,15 @@ object BatchFlow {
             progressTracker.currentStep = GATHERING_SIGS
 
             // Send the state to the other nodes, and receive it back with their signature.
+            val snamSession = initiateFlow(snamParty)
             val produttoreSession = initiateFlow(produttoreParty)
             val shipperSession = initiateFlow(shipperParty)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(produttoreSession, shipperSession), GATHERING_SIGS.childProgressTracker()))
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(snamSession, produttoreSession, shipperSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(snamSession, produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
 
             return batchState
         }
@@ -231,8 +237,8 @@ object BatchFlow {
              * This flow can only be started from the GSE node
              *
              */
-            val myLegalIdentity : Party = serviceHub.myInfo.legalIdentities.first()
-            var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "GSE") {
                 throw FlowException("Node $myLegalIdentity cannot start the update-batch flow. This flow can only be started from the GSE node")
@@ -242,7 +248,7 @@ object BatchFlow {
             progressTracker.currentStep = GENERATING_TRANSACTION
 
             // setting the criteria for retrive UNCONSUMED state AND filter it for batchID
-            var batchIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::batchID.equal(batchUpdateProperty.batchID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+            var batchIDCriteria: QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder { BatchSchemaV1.PersistentBatch::batchID.equal(batchUpdateProperty.batchID) }, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
 
             val oldBatchStateList = serviceHub.vaultService.queryBy<BatchState>(
                     batchIDCriteria,
@@ -258,6 +264,7 @@ object BatchFlow {
             // Generate an unsigned transaction.
             val newBatchState = BatchState(
                     myLegalIdentity,
+                    oldBatchState.Snam,
                     oldBatchState.produttore,
                     oldBatchState.shipper,
                     oldBatchState.transactionType,
@@ -302,35 +309,36 @@ object BatchFlow {
             progressTracker.currentStep = GATHERING_SIGS
 
             // Send the state to the other nodes, and receive it back with their signature.
+            val snamSession = initiateFlow(oldBatchState.Snam)
             val produttoreSession = initiateFlow(oldBatchState.produttore)
             val shipperSession = initiateFlow(oldBatchState.shipper)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(produttoreSession, shipperSession), GATHERING_SIGS.childProgressTracker()))
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(snamSession, produttoreSession, shipperSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(snamSession, produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
 
             return newBatchState
         }
+    }
 
-        @InitiatedBy(UpdaterBatch::class)
-        class UpdateAcceptorBatch(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
-            @Suspendable
-            override fun call(): SignedTransaction {
-                val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
-                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                        val output = stx.tx.outputs.single().data
-                        "This must be an batch transaction." using (output is BatchState)
-                        val batchState = output as BatchState
-                        /* "other rule batch" using (output is new rule) */
-                        "batchID cannot be empty" using (batchState.batchID.isNotEmpty())
-                    }
+    @InitiatedBy(UpdaterBatch::class)
+    class UpdateAcceptorBatch(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+        @Suspendable
+        override fun call(): SignedTransaction {
+            val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
+                override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                    val output = stx.tx.outputs.single().data
+                    "This must be an batch transaction." using (output is BatchState)
+                    val batchState = output as BatchState
+                    /* "other rule batch" using (output is new rule) */
+                    "batchID cannot be empty" using (batchState.batchID.isNotEmpty())
                 }
-                val txId = subFlow(signTransactionFlow).id
-
-                return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
             }
+            val txId = subFlow(signTransactionFlow).id
+
+            return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
         }
     }
 }

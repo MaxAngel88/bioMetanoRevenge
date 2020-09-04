@@ -39,6 +39,10 @@ class EnrollContract : Contract {
             // Enroll-specific constraints.
             "GSE and owner cannot be the same entity." using (enroll.GSE != enroll.owner)
             "enrollType cannot be empty." using (enroll.enrollType.isNotEmpty())
+            "subjectFirstName cannot be empty." using (enroll.subjectFirstName.isNotEmpty())
+            "subjectLastName cannot be empty." using (enroll.subjectLastName.isNotEmpty())
+            "qualificationCode cannot be empty." using (enroll.qualificationCode.isNotEmpty())
+            "remiCode cannot be empty." using (enroll.remiCode.isNotEmpty())
             "username cannot be empty." using (enroll.username.isNotEmpty())
             "role cannot be empty." using (enroll.role.isNotEmpty())
             "docRefAutodichiarazione cannot be empty." using (enroll.docRefAutodichiarazione.isNotEmpty())

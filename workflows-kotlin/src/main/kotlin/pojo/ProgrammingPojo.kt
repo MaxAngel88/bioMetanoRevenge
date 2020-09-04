@@ -11,5 +11,6 @@ data class ProgrammingPojo(
         val bioAgreementCode: String = "",
         val remiCode: String = "",
         val docRef: String = "",
-        val docName: String = ""
+        val docName: String = "",
+        val programmingStatus: String = ""
 )

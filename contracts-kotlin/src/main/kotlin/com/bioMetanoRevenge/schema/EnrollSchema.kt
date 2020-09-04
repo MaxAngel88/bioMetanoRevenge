@@ -33,6 +33,21 @@ object EnrollSchemaV1 : MappedSchema(
             @Column(name = "enrollType")
             var enrollType: String,
 
+            @Column(name = "subjectFirstName")
+            var subjectFirstName: String,
+
+            @Column(name = "subjectLastName")
+            var subjectLastName: String,
+
+            @Column(name = "subjectAddress")
+            var subjectAddress: String,
+
+            @Column(name = "subjectBusiness")
+            var subjectBusiness: String,
+
+            @Column(name = "qualificationCode")
+            var qualificationCode: String,
+
             @Column(name = "businessName")
             var businessName: String,
 
@@ -41,6 +56,12 @@ object EnrollSchemaV1 : MappedSchema(
 
             @Column(name = "birthPlace")
             var birthPlace: String,
+
+            @Column(name = "remiCode")
+            var remiCode: String,
+
+            @Column(name = "remiAddress")
+            var remiAddress: String,
 
             @Column(name = "idPlant")
             var idPlant: String,
@@ -89,6 +110,6 @@ object EnrollSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", owner = "", enrollType = "", businessName = "", PIVA = "", birthPlace = "", idPlant = "", plantAddress = "", username = "", role = "", partner = "", docRefAutodichiarazione = "", docRefAttestazioniTecniche = "", docDeadLine = "", enrollStatus = "", enrollDate = Instant.now(), bioGasAmount = 0.0, gasAmount = 0.0, uuid = "", lastUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(GSE = "", owner = "", enrollType = "", subjectFirstName = "", subjectLastName = "", subjectAddress = "", subjectBusiness = "", qualificationCode = "", businessName = "", PIVA = "", birthPlace = "", remiCode = "", remiAddress = "", idPlant = "", plantAddress = "", username = "", role = "", partner = "", docRefAutodichiarazione = "", docRefAttestazioniTecniche = "", docDeadLine = "", enrollStatus = "", enrollDate = Instant.now(), bioGasAmount = 0.0, gasAmount = 0.0, uuid = "", lastUpdate = Instant.now(), linearId = UUID.randomUUID())
     }
 }

@@ -78,7 +78,7 @@ object EnrollFlow {
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
 
-            val owner : Party = serviceHub.myInfo.legalIdentities.first()
+            val owner: Party = serviceHub.myInfo.legalIdentities.first()
 
             var GSEX500Name = CordaX500Name(organisation = "GSE", locality = "Milan", country = "IT")
             var GSEParty = serviceHub.networkMapCache.getPeerByLegalName(GSEX500Name)!!
@@ -88,9 +88,16 @@ object EnrollFlow {
                     GSEParty,
                     owner,
                     enrollProperty.enrollType,
+                    enrollProperty.subjectFirstName,
+                    enrollProperty.subjectLastName,
+                    enrollProperty.subjectAddress,
+                    enrollProperty.subjectBusiness,
+                    enrollProperty.qualificationCode,
                     enrollProperty.businessName,
                     enrollProperty.PIVA,
                     enrollProperty.birthPlace,
+                    enrollProperty.remiCode,
+                    enrollProperty.remiAddress,
                     enrollProperty.idPlant,
                     enrollProperty.plantAddress,
                     enrollProperty.username,
@@ -149,6 +156,7 @@ object EnrollFlow {
                     val enroll = output as EnrollState
                     /* "other rule enroll" using (enroll is new rule) */
                     "uuid cannot be empty" using (enroll.uuid.isNotEmpty())
+                    "qualificationCode cannot be empty" using (enroll.qualificationCode.isNotEmpty())
                 }
             }
             val txId = subFlow(signTransactionFlow).id
@@ -208,7 +216,7 @@ object EnrollFlow {
             val notary = serviceHub.networkMapCache.notaryIdentities.single() // METHOD 1
             // val notary = serviceHub.networkMapCache.getNotary(CordaX500Name.parse("O=Notary,L=London,C=GB")) // METHOD 2
 
-            val owner : Party = serviceHub.myInfo.legalIdentities.first()
+            val owner: Party = serviceHub.myInfo.legalIdentities.first()
 
             var GSEX500Name = CordaX500Name(organisation = "GSE", locality = "Milan", country = "IT")
             var GSEParty = serviceHub.networkMapCache.getPeerByLegalName(GSEX500Name)!!
@@ -217,7 +225,7 @@ object EnrollFlow {
             progressTracker.currentStep = GENERATING_TRANSACTION
 
             // setting the criteria for retrive UNCONSUMED state AND filter it for uuid
-            var uuidCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {EnrollSchemaV1.PersistentEnroll::uuid.equal(enrollUpdateProperty.uuid)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
+            var uuidCriteria: QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder { EnrollSchemaV1.PersistentEnroll::uuid.equal(enrollUpdateProperty.uuid) }, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
 
             val oldEnrollStateList = serviceHub.vaultService.queryBy<EnrollState>(
                     uuidCriteria,
@@ -235,9 +243,16 @@ object EnrollFlow {
                     GSEParty,
                     owner,
                     oldEnrollState.enrollType,
+                    oldEnrollState.subjectFirstName,
+                    oldEnrollState.subjectLastName,
+                    oldEnrollState.subjectAddress,
+                    oldEnrollState.subjectBusiness,
+                    oldEnrollState.qualificationCode,
                     oldEnrollState.businessName,
                     oldEnrollState.PIVA,
                     oldEnrollState.birthPlace,
+                    oldEnrollState.remiCode,
+                    oldEnrollState.remiAddress,
                     oldEnrollState.idPlant,
                     oldEnrollState.plantAddress,
                     oldEnrollState.username,
@@ -286,24 +301,25 @@ object EnrollFlow {
 
             return newEnrollState
         }
+    }
 
-        @InitiatedBy(UpdaterEnroll::class)
-        class UpdateAcceptorEnroll(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
-            @Suspendable
-            override fun call(): SignedTransaction {
-                val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
-                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                        val output = stx.tx.outputs.single().data
-                        "This must be an enroll transaction." using (output is EnrollState)
-                        val enroll = output as EnrollState
-                        /* "other rule enroll" using (output is new rule) */
-                        "uuid cannot be empty on update" using (enroll.uuid.isNotEmpty())
-                    }
+    @InitiatedBy(UpdaterEnroll::class)
+    class UpdateAcceptorEnroll(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+        @Suspendable
+        override fun call(): SignedTransaction {
+            val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
+                override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                    val output = stx.tx.outputs.single().data
+                    "This must be an enroll transaction." using (output is EnrollState)
+                    val enroll = output as EnrollState
+                    /* "other rule enroll" using (output is new rule) */
+                    "uuid cannot be empty on update" using (enroll.uuid.isNotEmpty())
+                    "qualificationCode cannot be empty on update" using (enroll.qualificationCode.isNotEmpty())
                 }
-                val txId = subFlow(signTransactionFlow).id
-
-                return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
             }
+            val txId = subFlow(signTransactionFlow).id
+
+            return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
         }
     }
 }

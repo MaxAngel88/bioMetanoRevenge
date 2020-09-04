@@ -27,6 +27,9 @@ object BatchSchemaV1 : MappedSchema(
             @Column(name = "GSE")
             var GSE: String,
 
+            @Column(name = "Snam")
+            var Snam: String,
+
             @Column(name = "produttore")
             var produttore: String,
 
@@ -95,6 +98,6 @@ object BatchSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", produttore = "", shipper = "", transactionType = "", batchID = "", month = "", remiCode = "", plantAddress = "", plantCode = "", quantity = 0.0, energy = 0.0, price = 0.0, averageProductionCapacity = 0.0, maxProductionCapacity = 0.0, annualEstimate = 0.0, startingPosition = "", arrivalPosition = "", docRef = "", docDate = "", batchStatus = "", batchDate = Instant.now(), lastBatchUpdate = Instant.now() , linearId = UUID.randomUUID())
+        constructor(): this(GSE = "", Snam = "", produttore = "", shipper = "", transactionType = "", batchID = "", month = "", remiCode = "", plantAddress = "", plantCode = "", quantity = 0.0, energy = 0.0, price = 0.0, averageProductionCapacity = 0.0, maxProductionCapacity = 0.0, annualEstimate = 0.0, startingPosition = "", arrivalPosition = "", docRef = "", docDate = "", batchStatus = "", batchDate = Instant.now(), lastBatchUpdate = Instant.now() , linearId = UUID.randomUUID())
     }
 }

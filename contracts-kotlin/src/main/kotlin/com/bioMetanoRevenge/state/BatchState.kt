@@ -15,6 +15,7 @@ import java.time.Instant
 
 @BelongsToContract(BatchContract::class)
 data class BatchState(val GSE: Party,
+                      val Snam: Party,
                       val produttore: Party,
                       val shipper: Party,
                       val transactionType: String,
@@ -40,12 +41,13 @@ data class BatchState(val GSE: Party,
         LinearState, QueryableState {
 
     /** The public keys of the involved parties. */
-    override val participants: List<AbstractParty> get() = listOf(GSE, produttore, shipper)
+    override val participants: List<AbstractParty> get() = listOf(GSE, Snam, produttore, shipper)
 
     override fun generateMappedObject(schema: MappedSchema): PersistentState {
         return when (schema) {
             is BatchSchemaV1 -> BatchSchemaV1.PersistentBatch(
                     this.GSE.name.toString(),
+                    this.Snam.name.toString(),
                     this.produttore.name.toString(),
                     this.shipper.name.toString(),
                     this.transactionType,

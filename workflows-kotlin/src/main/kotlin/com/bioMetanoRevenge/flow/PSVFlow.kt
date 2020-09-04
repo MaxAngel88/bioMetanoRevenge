@@ -80,8 +80,8 @@ object PSVFlow {
              * This flow can only be started from the Snam node
              *
              */
-            val myLegalIdentity : Party = serviceHub.myInfo.legalIdentities.first()
-            var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "Snam") {
                 throw FlowException("Node $myLegalIdentity cannot start the issue-psvState flow. This flow can only be started from the Snam node")
@@ -235,8 +235,8 @@ object PSVFlow {
              * This flow can only be started from the Snam node
              *
              */
-            val myLegalIdentity : Party = serviceHub.myInfo.legalIdentities.first()
-            var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "Snam") {
                 throw FlowException("Node $myLegalIdentity cannot start the update-psvState flow. This flow can only be started from the Snam node")
@@ -246,7 +246,7 @@ object PSVFlow {
             progressTracker.currentStep = GENERATING_TRANSACTION
 
             // setting the criteria for retrive UNCONSUMED state AND filter it for transactionCode
-            var transactionCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::transactionCode.equal(psvStateUpdateProperty.transactionCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
+            var transactionCodeCriteria: QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder { PSVSchemaV1.PersistentPSV::transactionCode.equal(psvStateUpdateProperty.transactionCode) }, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
 
             val oldPSVStateStateList = serviceHub.vaultService.queryBy<PSVState>(
                     transactionCodeCriteria,
@@ -316,25 +316,25 @@ object PSVFlow {
 
             return newPSVState
         }
+    }
 
-        @InitiatedBy(UpdaterPSVState::class)
-        class UpdateAcceptorPSVState(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
-            @Suspendable
-            override fun call(): SignedTransaction {
-                val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
-                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                        val output = stx.tx.outputs.single().data
-                        "This must be an psvState transaction." using (output is PSVState)
-                        val psvState = output as PSVState
-                        /* "other rule psvState" using (output is new rule) */
-                        "parentBatchID cannot be empty" using (psvState.parentBatchID.isNotEmpty())
-                        "transactionCode cannot be empty" using (psvState.transactionCode.isNotEmpty())
-                    }
+    @InitiatedBy(UpdaterPSVState::class)
+    class UpdateAcceptorPSVState(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+        @Suspendable
+        override fun call(): SignedTransaction {
+            val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
+                override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                    val output = stx.tx.outputs.single().data
+                    "This must be an psvState transaction." using (output is PSVState)
+                    val psvState = output as PSVState
+                    /* "other rule psvState" using (output is new rule) */
+                    "parentBatchID cannot be empty" using (psvState.parentBatchID.isNotEmpty())
+                    "transactionCode cannot be empty" using (psvState.transactionCode.isNotEmpty())
                 }
-                val txId = subFlow(signTransactionFlow).id
-
-                return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
             }
+            val txId = subFlow(signTransactionFlow).id
+
+            return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
         }
     }
 }

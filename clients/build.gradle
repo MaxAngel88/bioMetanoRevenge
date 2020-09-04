@@ -57,44 +57,50 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
 }
 
 
-task runProduttoreServer(type: JavaExec, dependsOn: jar) {
+task runProduttoreAServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50005', '--config.rpc.host=localhost', '--config.rpc.port=10005', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runShipperAServer(type: JavaExec, dependsOn: jar) {
+task runProduttoreBServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50006', '--config.rpc.host=localhost', '--config.rpc.port=10009', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runShipperBServer(type: JavaExec, dependsOn: jar) {
+task runShipperAServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50007', '--config.rpc.host=localhost', '--config.rpc.port=10013', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runIntermediarioServer(type: JavaExec, dependsOn: jar) {
+task runShipperBServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50015', '--config.rpc.host=localhost', '--config.rpc.port=10017', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runDistributoreServer(type: JavaExec, dependsOn: jar) {
+task runIntermediarioServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50016', '--config.rpc.host=localhost', '--config.rpc.port=10021', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runGSEServer(type: JavaExec, dependsOn: jar) {
+task runDistributoreServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50017', '--config.rpc.host=localhost', '--config.rpc.port=10025', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runSnamServer(type: JavaExec, dependsOn: jar) {
+task runGSEServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50018', '--config.rpc.host=localhost', '--config.rpc.port=10029', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runSnamServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.bioMetanoRevenge.server.ServerKt'
+    args '--server.port=50019', '--config.rpc.host=localhost', '--config.rpc.port=10033', '--config.rpc.username=user1', '--config.rpc.password=test'
 }

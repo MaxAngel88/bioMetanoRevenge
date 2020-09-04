@@ -5,9 +5,16 @@ import net.corda.core.serialization.CordaSerializable
 @CordaSerializable
 data class EnrollPojo(
         val enrollType: String = "",
+        val subjectFirstName: String = "",
+        val subjectLastName: String = "",
+        val subjectAddress: String = "",
+        val subjectBusiness: String = "",
+        val qualificationCode: String = "",
         val businessName: String = "",
         val PIVA: String = "",
         val birthPlace: String = "",
+        val remiCode: String = "",
+        val remiAddress: String = "",
         val idPlant: String = "",
         val plantAddress: String = "",
         val username: String = "",

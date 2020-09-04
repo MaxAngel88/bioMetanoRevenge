@@ -24,6 +24,7 @@ data class ProgrammingState(val GSE: Party,
                             val remiCode: String,
                             val docRef: String,
                             val docName: String,
+                            val programmingStatus: String,
                             val programmingDate: Instant,
                             override val linearId: UniqueIdentifier = UniqueIdentifier()):
         LinearState, QueryableState {
@@ -44,6 +45,7 @@ data class ProgrammingState(val GSE: Party,
                     this.remiCode,
                     this.docRef,
                     this.docName,
+                    this.programmingStatus,
                     this.programmingDate,
                     this.linearId.id
             )

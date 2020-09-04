@@ -21,7 +21,8 @@ class ProgrammingContract : Contract {
             val setOfSigners = command.signers.toSet()
             when(command.value){
                 is Commands.Issue -> verifyIssue(tx, setOfSigners)
-                is Commands.Update -> verifyUpdate(tx, setOfSigners)
+                is Commands.UpdateDoc -> verifyUpdateDoc(tx, setOfSigners)
+                is Commands.UpdateStatus -> verifyUpdateStatus(tx, setOfSigners)
                 else -> throw IllegalArgumentException("Unrecognised command.")
             }
         }
@@ -44,11 +45,13 @@ class ProgrammingContract : Contract {
             "remiCode cannot be empty." using (programming.remiCode.isNotEmpty())
             "docRef cannot be empty." using (programming.docRef.isNotEmpty())
             "docName cannot be empty." using (programming.docName.isNotEmpty())
+            "programmingStatus cannot be empty." using (programming.programmingStatus.isNotEmpty())
+            "programmingStatus must be equal to Draft or Inviato" using (programming.programmingStatus.equals("Draft", ignoreCase = true) || programming.programmingStatus.equals("Inviato", ignoreCase = true))
         }
     }
 
-    private fun verifyUpdate(tx: LedgerTransaction, signers: Set<PublicKey>){
-        tx.commands.requireSingleCommand<Commands.Update>()
+    private fun verifyUpdateDoc(tx: LedgerTransaction, signers: Set<PublicKey>){
+        tx.commands.requireSingleCommand<Commands.UpdateDoc>()
         requireThat {
             // Generic constraints around the old Programming transaction.
             "there must be only one programming input." using (tx.inputs.size == 1)
@@ -66,15 +69,39 @@ class ProgrammingContract : Contract {
             "versionFile must be update." using (oldProgrammingState.versionFile != newProgrammingState.versionFile)
             "docRef must be update." using (oldProgrammingState.docRef != newProgrammingState.docRef)
             "docName must be update." using (oldProgrammingState.docName != newProgrammingState.docName)
+            "programmingStatus cannot be empty." using (newProgrammingState.programmingStatus.isNotEmpty())
+            "programmingStatus must be equal to Draft or Inviato" using (newProgrammingState.programmingStatus.equals("Draft", ignoreCase = true) || newProgrammingState.programmingStatus.equals("Inviato", ignoreCase = true))
+        }
+    }
+
+    private fun verifyUpdateStatus(tx: LedgerTransaction, signers: Set<PublicKey>){
+        tx.commands.requireSingleCommand<Commands.UpdateStatus>()
+        requireThat {
+            // Generic constraints around the old Programming transaction.
+            "there must be only one programming input." using (tx.inputs.size == 1)
+            val oldProgrammingState = tx.inputsOfType<ProgrammingState>().single()
+
+            // Generic constraints around the generic update transaction.
+            "Only one transaction state should be created." using (tx.outputs.size == 1)
+            val newProgrammingState = tx.outputsOfType<ProgrammingState>().single()
+            "All of the participants must be signers." using (signers.containsAll(newProgrammingState.participants.map { it.owningKey }))
+
+            // Generic constraints around the new Programming transaction
+            "GSE from old and new Programming cannot change." using (oldProgrammingState.GSE == newProgrammingState.GSE)
+            "owner from old and new Programming cannot change." using (oldProgrammingState.produttore == newProgrammingState.produttore)
+            "bioAgreementCode from old and new Programming cannot change." using (oldProgrammingState.bioAgreementCode == newProgrammingState.bioAgreementCode)
+            "programmingStatus cannot be empty." using (newProgrammingState.programmingStatus.isNotEmpty())
+            "programmingStatus must be equal to Draft or Inviato" using (newProgrammingState.programmingStatus.equals("Draft", ignoreCase = true) || newProgrammingState.programmingStatus.equals("Inviato", ignoreCase = true))
         }
     }
 
 
     /**
-     * This contract only implements two commands: Issue, Update.
+     * This contract only implements three commands: Issue, UpdateDoc, UpdateStatus.
      */
     interface Commands : CommandData {
         class Issue : Commands, TypeOnlyCommandData()
-        class Update: Commands, TypeOnlyCommandData()
+        class UpdateDoc: Commands, TypeOnlyCommandData()
+        class UpdateStatus: Commands, TypeOnlyCommandData()
     }
 }

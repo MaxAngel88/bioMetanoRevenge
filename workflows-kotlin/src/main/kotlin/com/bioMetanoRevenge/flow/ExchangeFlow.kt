@@ -80,8 +80,8 @@ object ExchangeFlow {
              * This flow can only be started from the GSE node
              *
              */
-            val myLegalIdentity : Party = serviceHub.myInfo.legalIdentities.first()
-            var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "GSE") {
                 throw FlowException("Node $myLegalIdentity cannot start the issue-exchange flow. This flow can only be started from the GSE node")
@@ -236,8 +236,8 @@ object ExchangeFlow {
              * This flow can only be started from the GSE node
              *
              */
-            val myLegalIdentity : Party = serviceHub.myInfo.legalIdentities.first()
-            var myLegalIdentityNameOrg : String = myLegalIdentity.name.organisation
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "GSE") {
                 throw FlowException("Node $myLegalIdentity cannot start the update-exchange flow. This flow can only be started from the GSE node")
@@ -247,7 +247,7 @@ object ExchangeFlow {
             progressTracker.currentStep = GENERATING_TRANSACTION
 
             // setting the criteria for retrive UNCONSUMED state AND filter it for exchangeCode
-            var exchangeCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::exchangeCode.equal(exchangeUpdateProperty.exchangeCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+            var exchangeCodeCriteria: QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder { ExchangeSchemaV1.PersistentExchange::exchangeCode.equal(exchangeUpdateProperty.exchangeCode) }, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
 
             val oldExchangeStateList = serviceHub.vaultService.queryBy<ExchangeState>(
                     exchangeCodeCriteria,
@@ -322,25 +322,25 @@ object ExchangeFlow {
 
             return newExchangeState
         }
+    }
 
-        @InitiatedBy(UpdaterExchange::class)
-        class UpdateAcceptorExchange(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
-            @Suspendable
-            override fun call(): SignedTransaction {
-                val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
-                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                        val output = stx.tx.outputs.single().data
-                        "This must be an exchange transaction." using (output is ExchangeState)
-                        val exchangeState = output as ExchangeState
-                        /* "other rule exchange" using (output is new rule) */
-                        "parentBatchID cannot be empty" using (exchangeState.parentBatchID.isNotEmpty())
-                        "exchangeCode cannot be empty" using (exchangeState.exchangeCode.isNotEmpty())
-                    }
+    @InitiatedBy(UpdaterExchange::class)
+    class UpdateAcceptorExchange(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+        @Suspendable
+        override fun call(): SignedTransaction {
+            val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
+                override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                    val output = stx.tx.outputs.single().data
+                    "This must be an exchange transaction." using (output is ExchangeState)
+                    val exchangeState = output as ExchangeState
+                    /* "other rule exchange" using (output is new rule) */
+                    "parentBatchID cannot be empty" using (exchangeState.parentBatchID.isNotEmpty())
+                    "exchangeCode cannot be empty" using (exchangeState.exchangeCode.isNotEmpty())
                 }
-                val txId = subFlow(signTransactionFlow).id
-
-                return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
             }
+            val txId = subFlow(signTransactionFlow).id
+
+            return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
         }
     }
 }

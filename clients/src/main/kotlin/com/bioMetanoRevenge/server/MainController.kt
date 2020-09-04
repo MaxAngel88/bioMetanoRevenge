@@ -9,7 +9,8 @@ import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchange
 import com.bioMetanoRevenge.flow.PSVFlow.IssuerPSVState
 import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVState
 import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
-import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgramming
+import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgrammingDoc
+import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgrammingStatus
 import com.bioMetanoRevenge.flow.RawMaterialFlow.IssuerRawMaterial
 import com.bioMetanoRevenge.flow.WalletRewardFlow.IssuerWalletReward
 import com.bioMetanoRevenge.flow.WalletRewardFlow.UpdaterWalletReward
@@ -167,6 +168,48 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
+     * Displays last EnrollStates that exist in the node's vault for selected qualificationCode.
+     */
+    @GetMapping(value = [ "getLastEnrollByQualification/{qualificationCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastEnrollByQualification(
+            @PathVariable("qualificationCode")
+            qualificationCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for qualificationCode
+        var qualificationCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {EnrollSchemaV1.PersistentEnroll::qualificationCode.equal(qualificationCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(EnrollState::class.java))
+
+        val foundQualificationCodeEnroll = proxy.vaultQueryBy<EnrollState>(
+                qualificationCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last Enrolled by qualificationCode $qualificationCode .", data = foundQualificationCodeEnroll))
+    }
+
+    /**
+     * Displays History EnrollStates that exist in the node's vault for selected qualificationCode.
+     */
+    @GetMapping(value = [ "getHistoryEnrollStateByQualification/{qualificationCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryEnrollStateByQualification(
+            @PathVariable("qualificationCode")
+            qualificationCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for qualificationCode
+        var qualificationCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {EnrollSchemaV1.PersistentEnroll::qualificationCode.equal(qualificationCode)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(EnrollState::class.java))
+
+        val foundQualificationEnrollHistory = proxy.vaultQueryBy<EnrollState>(
+                qualificationCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of enroll state for $qualificationCode", data = foundQualificationEnrollHistory))
+    }
+
+    /**
      * Initiates a flow to agree an Enroll between two nodes.
      *
      * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
@@ -298,6 +341,49 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
+     * Displays last ProgrammingStates that exist in the node's vault for selected programmingStatus.
+     */
+    @GetMapping(value = [ "getLastProgrammingByStatus/{programmingStatus}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastProgrammingByStatus(
+            @PathVariable("programmingStatus")
+            programmingStatus : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for programmingStatus
+        var programmingStatusCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ProgrammingSchemaV1.PersistentProgramming::programmingStatus.equal(programmingStatus)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ProgrammingState::class.java))
+
+        val foundProgrammingStatusProgramming = proxy.vaultQueryBy<ProgrammingState>(
+                programmingStatusCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.hostname == hostname }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last Programming by programmingStatus $programmingStatus .", data = foundProgrammingStatusProgramming))
+    }
+
+    /**
+     * Displays History ProgrammingStates that exist in the node's vault for selected programmingStatus.
+     */
+    @GetMapping(value = [ "getHistoryProgrammingByStatus/{programmingStatus}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryProgrammingByStatus(
+            @PathVariable("programmingStatus")
+            programmingStatus : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for programmingStatus
+        var programmingStatusCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ProgrammingSchemaV1.PersistentProgramming::programmingStatus.equal(programmingStatus)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(ProgrammingState::class.java))
+
+
+        val foundProgrammingStatusProgrammingHistory = proxy.vaultQueryBy<ProgrammingState>(
+                programmingStatusCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.hostname == hostname }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of programming state for $programmingStatus", data = foundProgrammingStatusProgrammingHistory))
+    }
+
+    /**
      * Displays last ProgrammingState that exist in the node's vault for selected produttore (organization name).
      */
     @GetMapping(value = [ "getLastProgrammingByProducer/{producerName}" ], produces = [ APPLICATION_JSON_VALUE ])
@@ -386,18 +472,18 @@ class MainController(rpc: NodeRPCConnection) {
 
     /***
      *
-     * Update Programming
+     * Update Programming Doc
      *
      */
-    @PostMapping(value = [ "update-programming" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
-    fun updateProgramming(
+    @PostMapping(value = [ "update-programming-doc" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateProgrammingDoc(
             @RequestBody
-            updateProgrammingPojo: ProgrammingUpdatePojo): ResponseEntity<ResponsePojo> {
+            updateProgrammingDocPojo: ProgrammingUpdateDocPojo): ResponseEntity<ResponsePojo> {
 
-        val versionFile = updateProgrammingPojo.versionFile
-        val bioAgreementCode = updateProgrammingPojo.bioAgreementCode
-        val docRef = updateProgrammingPojo.docRef
-        val docName = updateProgrammingPojo.docName
+        val versionFile = updateProgrammingDocPojo.versionFile
+        val bioAgreementCode = updateProgrammingDocPojo.bioAgreementCode
+        val docRef = updateProgrammingDocPojo.docRef
+        val docName = updateProgrammingDocPojo.docName
 
         if(versionFile.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "versionFile cannot be empty", data = null))
@@ -416,8 +502,38 @@ class MainController(rpc: NodeRPCConnection) {
         }
 
         return try {
-            val updateProgramming = proxy.startTrackedFlow(::UpdaterProgramming, updateProgrammingPojo).returnValue.getOrThrow()
-            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Programming with bioAgreementCode: $bioAgreementCode update correctly." + "New ProgrammingState with id: ${updateProgramming.linearId.id} created.. ledger updated.", data = updateProgramming))
+            val updateProgrammingDoc = proxy.startTrackedFlow(::UpdaterProgrammingDoc, updateProgrammingDocPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Programming with bioAgreementCode: $bioAgreementCode update correctly." + "New ProgrammingState with id: ${updateProgrammingDoc.linearId.id} created.. ledger updated.", data = updateProgrammingDoc))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update Programming Status
+     *
+     */
+    @PostMapping(value = [ "update-programming-status" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateProgrammingStatus(
+            @RequestBody
+            updateProgrammingStatusPojo: ProgrammingUpdateStatusPojo): ResponseEntity<ResponsePojo> {
+
+        val bioAgreementCode = updateProgrammingStatusPojo.bioAgreementCode
+        val programmingStatus = updateProgrammingStatusPojo.programmingStatus
+
+        if(bioAgreementCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "bioAgreementCode cannot be empty", data = null))
+        }
+
+        if(programmingStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "programmingStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updateProgrammingStatus = proxy.startTrackedFlow(::UpdaterProgrammingStatus, updateProgrammingStatusPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Programming with bioAgreementCode: $bioAgreementCode update correctly." + "New ProgrammingState with id: ${updateProgrammingStatus.linearId.id} created.. ledger updated.", data = updateProgrammingStatus))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
