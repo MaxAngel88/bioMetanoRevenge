@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"enrollType\": \"Enrollment\",\r\n    \"subjectFirstName\": \"Angelo\",\r\n    \"subjectLastName\": \"Massimino\",\r\n    \"subjectAddress\": \"via Roma\",\r\n    \"subjectBusiness\": \"Manager\",\r\n    \"qualificationCode\": \"qcode1234\",\r\n    \"businessName\": \"test1234\",\r\n    \"PIVA\": \"01234\",\r\n    \"birthPlace\": \"Catania\",\r\n    \"remiCode\": \"remiCode1234\",\r\n    \"remiAddress\": \"Milano1234\",\r\n    \"idPlant\": \"11Biancavilla10\",\r\n    \"plantAddress\": \"Biancavilla\",\r\n    \"username\": \"maxibus\",\r\n    \"role\": \"manager\",\r\n    \"partner\": \"fabio\",\r\n    \"docRefAutodichiarazione\": \"docauto1\",\r\n    \"docRefAttestazioniTecniche\": \"docattestazione1\",\r\n    \"docDeadLine\": \"dicembre\",\r\n    \"enrollStatus\": \"pending\",\r\n    \"bioGasAmount\": 0.0,\r\n    \"gasAmount\": 0.0,\r\n    \"uuid\": \"30031988-am\"\r\n}",
+							"raw": "{\r\n    \"enrollType\": \"Enrollment Distributore\",\r\n    \"subjectFirstName\": \"N/A\",\r\n    \"subjectLastName\": \"N/A\",\r\n    \"subjectAddress\": \"N/A\",\r\n    \"subjectBusiness\": \"N/A\",\r\n    \"qualificationCode\": \"5.1.2.6.0\",\r\n    \"businessName\": \"N/A\",\r\n    \"PIVA\": \"N/A\",\r\n    \"birthPlace\": \"Milano\",\r\n    \"remiCode\": \"30711301\",\r\n    \"remiAddress\": \"via Pontida, 28, 15002 Abbiategrasso (MI)\",\r\n    \"idPlant\": \"N/A\",\r\n    \"plantAddress\": \"N/A\",\r\n    \"username\": \"m_rossi\",\r\n    \"role\": \"Produttore_A\",\r\n    \"partner\": \"Iar Siltal Spa\",\r\n    \"docRefAutodichiarazione\": \"N/A\",\r\n    \"docRefAttestazioniTecniche\": \"N/A\",\r\n    \"docDeadLineAuto\": \"N/A\",\r\n    \"docDeadLineTech\": \"N/A\",\r\n    \"enrollStatus\": \"pending\",\r\n    \"bioGasAmount\": 0.0,\r\n    \"gasAmount\": 0.0,\r\n    \"uuid\": \"36d869f2-d352-43fe-891e-ee4629b7077f\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -45,7 +45,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"uuid\": \"30031988-am\",\r\n    \"enrollStatus\": \"Pending\",\r\n    \"bioGasAmount\": 10.0,\r\n    \"gasAmount\": 12.5\r\n}",
+							"raw": "{\r\n    \"uuid\": \"36d869f2-d352-43fe-891e-ee4629b7077f\",\r\n    \"enrollStatus\": \"Approved\",\r\n    \"bioGasAmount\": 10.0,\r\n    \"gasAmount\": 12.5\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -63,6 +63,36 @@
 								"api",
 								"bioMetanoRevenge",
 								"update-enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-ocr-enroll",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uuid\": \"36d869f2-d352-43fe-891e-ee4629b7077f\",\r\n    \"subjectFirstName\": \"Mario\",\r\n    \"subjectLastName\": \"Rossi\",\r\n    \"subjectAddress\": \"Piazza Leonardo da Vinci, 42, 20131 Milano (MI)\",\r\n    \"subjectBusiness\": \"Direttore\",\r\n    \"businessName\": \"cp2012\",\r\n    \"PIVA\": \"47164060692\",\r\n    \"docRefAutodichiarazione\": \"NuovoDocumentoAuto.pdf\",\r\n    \"docRefAttestazioniTecniche\": \"NuovoDocumentoTech.pdf\",\r\n    \"docDeadLineAuto\": \"12/2020\",\r\n    \"docDeadLineTech\": \"01/2021\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-ocr-enroll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-ocr-enroll"
 							]
 						}
 					},
@@ -117,7 +147,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryEnrollStateByUsername/maxibus",
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryEnrollStateByUsername/m_rossi",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -127,7 +157,7 @@
 								"api",
 								"bioMetanoRevenge",
 								"getHistoryEnrollStateByUsername",
-								"maxibus"
+								"m_rossi"
 							]
 						}
 					},

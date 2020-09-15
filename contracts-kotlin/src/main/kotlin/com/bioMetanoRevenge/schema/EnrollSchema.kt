@@ -84,8 +84,11 @@ object EnrollSchemaV1 : MappedSchema(
             @Column(name = "docRefAttestazioniTecniche")
             var docRefAttestazioniTecniche: String,
 
-            @Column(name = "docDeadLine")
-            var docDeadLine: String,
+            @Column(name = "docDeadLineAuto")
+            var docDeadLineAuto: String,
+
+            @Column(name = "docDeadLineTech")
+            var docDeadLineTech: String,
 
             @Column(name = "enrollStatus")
             var enrollStatus: String,
@@ -110,6 +113,6 @@ object EnrollSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", owner = "", enrollType = "", subjectFirstName = "", subjectLastName = "", subjectAddress = "", subjectBusiness = "", qualificationCode = "", businessName = "", PIVA = "", birthPlace = "", remiCode = "", remiAddress = "", idPlant = "", plantAddress = "", username = "", role = "", partner = "", docRefAutodichiarazione = "", docRefAttestazioniTecniche = "", docDeadLine = "", enrollStatus = "", enrollDate = Instant.now(), bioGasAmount = 0.0, gasAmount = 0.0, uuid = "", lastUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(GSE = "", owner = "", enrollType = "", subjectFirstName = "", subjectLastName = "", subjectAddress = "", subjectBusiness = "", qualificationCode = "", businessName = "", PIVA = "", birthPlace = "", remiCode = "", remiAddress = "", idPlant = "", plantAddress = "", username = "", role = "", partner = "", docRefAutodichiarazione = "", docRefAttestazioniTecniche = "", docDeadLineAuto = "", docDeadLineTech = "", enrollStatus = "", enrollDate = Instant.now(), bioGasAmount = 0.0, gasAmount = 0.0, uuid = "", lastUpdate = Instant.now(), linearId = UUID.randomUUID())
     }
 }

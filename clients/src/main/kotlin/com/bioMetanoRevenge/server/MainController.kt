@@ -4,6 +4,7 @@ import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
 import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterEnroll
+import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterOCREnroll
 import com.bioMetanoRevenge.flow.ExchangeFlow.IssuerExchange
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchange
 import com.bioMetanoRevenge.flow.PSVFlow.IssuerPSVState
@@ -275,6 +276,72 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateEnroll = proxy.startTrackedFlow(::UpdaterEnroll, updateEnrollPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Enroll with id: $uuid update correctly. New EnrollState with id: ${updateEnroll.linearId.id} created.. ledger updated.", data = updateEnroll))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+
+    /***
+     *
+     * Update OCR Enroll
+     *
+     */
+    @PostMapping(value = [ "update-ocr-enroll" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateOCREnroll(
+            @RequestBody
+            updateOCREnrollPojo: EnrollUpdateOCRPojo): ResponseEntity<ResponsePojo> {
+
+        val uuid = updateOCREnrollPojo.uuid
+        val subjectFirstName = updateOCREnrollPojo.subjectFirstName
+        val subjectLastName = updateOCREnrollPojo.subjectLastName
+        val subjectAddress = updateOCREnrollPojo.subjectAddress
+        val subjectBusiness = updateOCREnrollPojo.subjectBusiness
+        val businessName = updateOCREnrollPojo.businessName
+        val PIVA = updateOCREnrollPojo.PIVA
+        val docRefAutodichiarazione = updateOCREnrollPojo.docRefAutodichiarazione
+        val docRefAttestazioniTecniche = updateOCREnrollPojo.docRefAttestazioniTecniche
+
+        if(uuid.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "uuid cannot be empty", data = null))
+        }
+
+        if(subjectFirstName.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "subjectFirstName cannot be empty", data = null))
+        }
+
+        if(subjectLastName.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "subjectLastName cannot be empty", data = null))
+        }
+
+        if(subjectAddress.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "subjectAddress cannot be empty", data = null))
+        }
+
+        if(subjectBusiness.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "subjectBusiness cannot be empty", data = null))
+        }
+
+        if(businessName.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "businessName cannot be empty", data = null))
+        }
+
+        if(PIVA.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "PIVA cannot be empty", data = null))
+        }
+
+        if(docRefAutodichiarazione.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "docRefAutodichiarazione cannot be empty", data = null))
+        }
+
+        if(docRefAttestazioniTecniche.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "docRefAttestazioniTecniche cannot be empty", data = null))
+        }
+
+        return try {
+            val updateOCREnroll = proxy.startTrackedFlow(::UpdaterOCREnroll, updateOCREnrollPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Enroll with id: $uuid update OCR correctly. New EnrollState with id: ${updateOCREnroll.linearId.id} created.. ledger updated.", data = updateOCREnroll))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))

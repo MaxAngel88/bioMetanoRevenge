@@ -22,6 +22,7 @@ class EnrollContract : Contract {
             when(command.value){
                 is Commands.Issue -> verifyIssue(tx, setOfSigners)
                 is Commands.Update -> verifyUpdate(tx, setOfSigners)
+                is Commands.UpdateOCR -> verifyUpdateOCR(tx, setOfSigners)
                 else -> throw IllegalArgumentException("Unrecognised command.")
             }
         }
@@ -73,12 +74,35 @@ class EnrollContract : Contract {
         }
     }
 
+    private fun verifyUpdateOCR(tx: LedgerTransaction, signers: Set<PublicKey>){
+        tx.commands.requireSingleCommand<Commands.UpdateOCR>()
+        requireThat {
+            // Generic constraints around the old Enroll transaction.
+            "there must be only one enroll input." using (tx.inputs.size == 1)
+            val oldEnrollState = tx.inputsOfType<EnrollState>().single()
+
+            // Generic constraints around the generic update transaction.
+            "Only one transaction state should be created." using (tx.outputs.size == 1)
+            val newEnrollState = tx.outputsOfType<EnrollState>().single()
+            "All of the participants must be signers." using (signers.containsAll(newEnrollState.participants.map { it.owningKey }))
+
+            // Generic constraints around the new Enroll transaction
+            "GSE from old and new Enroll cannot change." using (oldEnrollState.GSE == newEnrollState.GSE)
+            "owner from old and new Enroll cannot change." using (oldEnrollState.owner == newEnrollState.owner)
+            "enrollStatus must be \"Pending\" or \"Approved\"." using (newEnrollState.enrollStatus.equals("Pending", ignoreCase = true) || newEnrollState.enrollStatus.equals("Approved", ignoreCase = true))
+            "uuid cannot be update." using (oldEnrollState.uuid == newEnrollState.uuid)
+            "docRefAutodichiarazione cannot be empty." using (newEnrollState.docRefAutodichiarazione.isNotEmpty())
+            "docRefAttestazioniTecniche cannot be empty." using (newEnrollState.docRefAttestazioniTecniche.isNotEmpty())
+        }
+    }
+
 
     /**
-     * This contract only implements two commands: Issue, Update.
+     * This contract only implements three commands: Issue, Update, UpdateOCR.
      */
     interface Commands : CommandData {
         class Issue : Commands, TypeOnlyCommandData()
         class Update: Commands, TypeOnlyCommandData()
+        class UpdateOCR: Commands, TypeOnlyCommandData()
     }
 }
