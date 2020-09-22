@@ -229,7 +229,7 @@ object ProgrammingFlow {
                     produttore,
                     oldProgrammingState.sendDate,
                     oldProgrammingState.monthYear,
-                    oldProgrammingState.programmingType,
+                    "RET",
                     programmingUpdateDocProperty.versionFile,
                     oldProgrammingState.bioAgreementCode,
                     oldProgrammingState.remiCode,
