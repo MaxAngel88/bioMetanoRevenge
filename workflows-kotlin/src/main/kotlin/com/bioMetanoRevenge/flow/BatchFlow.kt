@@ -108,6 +108,8 @@ object BatchFlow {
                     snamParty,
                     produttoreParty,
                     shipperParty,
+                    batchProperty.idProducer,
+                    batchProperty.idShipper,
                     batchProperty.transactionType,
                     batchProperty.batchID,
                     batchProperty.month,
@@ -173,6 +175,8 @@ object BatchFlow {
                     val batchState = output as BatchState
                     /* "other rule batch" using (batch is new rule) */
                     "batchID cannot be empty" using (batchState.batchID.isNotEmpty())
+                    "idProducer cannot be empty" using (batchState.idProducer.isNotEmpty())
+                    "idShipper cannot be empty" using (batchState.idShipper.isNotEmpty())
                 }
             }
             val txId = subFlow(signTransactionFlow).id
@@ -267,6 +271,8 @@ object BatchFlow {
                     oldBatchState.Snam,
                     oldBatchState.produttore,
                     oldBatchState.shipper,
+                    oldBatchState.idProducer,
+                    oldBatchState.idShipper,
                     oldBatchState.transactionType,
                     oldBatchState.batchID,
                     oldBatchState.month,

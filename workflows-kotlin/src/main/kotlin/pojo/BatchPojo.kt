@@ -6,6 +6,8 @@ import net.corda.core.serialization.CordaSerializable
 data class BatchPojo(
         val produttore: String = "",
         val shipper: String = "",
+        val idProducer: String = "",
+        val idShipper: String = "",
         val transactionType: String = "",
         val batchID: String = "",
         val month: String = "",

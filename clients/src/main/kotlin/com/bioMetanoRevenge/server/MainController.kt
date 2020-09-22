@@ -879,6 +879,90 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
+     * Displays last BatchState that exist in the node's vault for selected idProducer.
+     */
+    @GetMapping(value = [ "getLastBatchByIdProducer/{idProducer}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchByIdProducer(
+            @PathVariable("idProducer")
+            idProducer : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for idProducer
+        var idProducerCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::idProducer.equal(idProducer)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundBatchIdProducer = proxy.vaultQueryBy<BatchState>(
+                idProducerCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last batch by idProducer $idProducer .", data = foundBatchIdProducer))
+    }
+
+    /**
+     * Displays History BatchState that exist in the node's vault for selected idProducer.
+     */
+    @GetMapping(value = [ "getHistoryBatchStateByIdProducer/{idProducer}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByIdProducer(
+            @PathVariable("idProducer")
+            idProducer : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for idProducer
+        var batchIdProducerCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::idProducer.equal(idProducer)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundBatchIdProducerHistory = proxy.vaultQueryBy<BatchState>(
+                batchIdProducerCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $idProducer", data = foundBatchIdProducerHistory))
+    }
+
+    /**
+     * Displays last BatchState that exist in the node's vault for selected idShipper.
+     */
+    @GetMapping(value = [ "getLastBatchByIdShipper/{idShipper}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchByIdShipper(
+            @PathVariable("idProducer")
+            idShipper : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for idShipper
+        var idShipperCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::idShipper.equal(idShipper)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundBatchIdShipper = proxy.vaultQueryBy<BatchState>(
+                idShipperCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last batch by idShipper $idShipper .", data = foundBatchIdShipper))
+    }
+
+    /**
+     * Displays History BatchState that exist in the node's vault for selected idShipper.
+     */
+    @GetMapping(value = [ "getHistoryBatchStateByIdShipper/{idShipper}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByIdShipper(
+            @PathVariable("idShipper")
+            idShipper : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for idShipper
+        var batchIdShipperCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::idShipper.equal(idShipper)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundBatchIdShipperHistory = proxy.vaultQueryBy<BatchState>(
+                batchIdShipperCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $idShipper", data = foundBatchIdShipperHistory))
+    }
+
+    /**
      * Initiates a flow to agree an Batch between nodes.
      *
      * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to

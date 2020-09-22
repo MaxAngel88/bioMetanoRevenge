@@ -41,6 +41,8 @@ class BatchContract : Contract {
             "GSE and Snam cannot be the same entity." using (batch.GSE != batch.Snam)
             "GSE and shipper cannot be the same entity." using (batch.GSE != batch.shipper)
             "produttore and shipper cannot be the same entity." using (batch.produttore != batch.shipper)
+            "idProducer cannot be empty." using (batch.idProducer.isNotEmpty())
+            "idShipper cannot be empty." using (batch.idShipper.isNotEmpty())
             "transacionType cannot be empty." using (batch.transactionType.isNotEmpty())
             "batchID cannot be empty." using (batch.batchID.isNotEmpty())
             "month cannot be empty." using (batch.month.isNotEmpty())
@@ -75,6 +77,8 @@ class BatchContract : Contract {
             "Snam from old and new Batch cannot change." using (oldBatchState.Snam == newBatchState.Snam)
             "produttore from old and new Batch cannot change." using (oldBatchState.produttore == newBatchState.produttore)
             "shipper from old and new Batch cannot change." using (oldBatchState.shipper == newBatchState.shipper)
+            "idProducer from old and new Batch cannot change." using (oldBatchState.idProducer == newBatchState.idProducer)
+            "idShipper from old and new Batch cannot change." using (oldBatchState.idShipper == newBatchState.idShipper)
             "batchStatus cannot be empty." using (newBatchState.batchStatus.isNotEmpty())
             "batchStatus must be \"open\", \"toVerify\" or \"closed\"." using (newBatchState.batchStatus.equals("open", ignoreCase = true) || newBatchState.batchStatus.equals("toVerify", ignoreCase = true) || newBatchState.batchStatus.equals("closed", ignoreCase = true))
         }
