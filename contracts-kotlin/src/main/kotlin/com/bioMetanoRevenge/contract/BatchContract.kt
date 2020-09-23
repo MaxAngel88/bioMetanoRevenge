@@ -56,7 +56,7 @@ class BatchContract : Contract {
             "annualEstimate must be greater than zero." using (batch.annualEstimate > 0.0)
             "docRef cannot be empty." using (batch.docRef.isNotEmpty())
             "batchStatus cannot be empty." using (batch.batchStatus.isNotEmpty())
-            "batchStatus must be \"open\", \"toVerify\" or \"closed\"." using (batch.batchStatus.equals("open", ignoreCase = true) || batch.batchStatus.equals("toVerify", ignoreCase = true) || batch.batchStatus.equals("closed", ignoreCase = true))
+            "batchStatus must be \"open\", \"selling\" or \"closed\"." using (batch.batchStatus.equals("open", ignoreCase = true) || batch.batchStatus.equals("selling", ignoreCase = true) || batch.batchStatus.equals("closed", ignoreCase = true))
         }
     }
 
@@ -80,7 +80,7 @@ class BatchContract : Contract {
             "idProducer from old and new Batch cannot change." using (oldBatchState.idProducer == newBatchState.idProducer)
             "idShipper from old and new Batch cannot change." using (oldBatchState.idShipper == newBatchState.idShipper)
             "batchStatus cannot be empty." using (newBatchState.batchStatus.isNotEmpty())
-            "batchStatus must be \"open\", \"toVerify\" or \"closed\"." using (newBatchState.batchStatus.equals("open", ignoreCase = true) || newBatchState.batchStatus.equals("toVerify", ignoreCase = true) || newBatchState.batchStatus.equals("closed", ignoreCase = true))
+            "batchStatus must be \"open\", \"selling\" or \"closed\"." using (newBatchState.batchStatus.equals("open", ignoreCase = true) || newBatchState.batchStatus.equals("selling", ignoreCase = true) || newBatchState.batchStatus.equals("closed", ignoreCase = true))
         }
     }
 
