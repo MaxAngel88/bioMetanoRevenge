@@ -49,7 +49,7 @@ class ExchangeContract : Contract {
             "price must be greater than zero." using (exchange.price > 0.0)
             "docRef cannot be empty." using (exchange.docRef.isNotEmpty())
             "exchangeStatus cannot be empty." using (exchange.exchangeStatus.isNotEmpty())
-            "exchangeStatus must be \"open\", \"toVerify\" or \"closed\"." using (exchange.exchangeStatus.equals("open", ignoreCase = true) || exchange.exchangeStatus.equals("toVerify", ignoreCase = true) || exchange.exchangeStatus.equals("closed", ignoreCase = true))
+            "exchangeStatus must be \"open\", \"selling\" or \"closed\"." using (exchange.exchangeStatus.equals("open", ignoreCase = true) || exchange.exchangeStatus.equals("selling", ignoreCase = true) || exchange.exchangeStatus.equals("closed", ignoreCase = true))
         }
     }
 
@@ -73,7 +73,7 @@ class ExchangeContract : Contract {
             "exchangeCode from old and new Exchange cannot change." using (oldExchangeState.exchangeCode == newExchangeState.exchangeCode)
             "month from old and new Exchange cannot change." using (oldExchangeState.month == newExchangeState.month)
             "exchangeStatus cannot be empty." using (newExchangeState.exchangeStatus.isNotEmpty())
-            "exchangeStatus must be \"open\", \"toVerify\" or \"closed\"." using (newExchangeState.exchangeStatus.equals("open", ignoreCase = true) || newExchangeState.exchangeStatus.equals("toVerify", ignoreCase = true) || newExchangeState.exchangeStatus.equals("closed", ignoreCase = true))
+            "exchangeStatus must be \"open\", \"selling\" or \"closed\"." using (newExchangeState.exchangeStatus.equals("open", ignoreCase = true) || newExchangeState.exchangeStatus.equals("selling", ignoreCase = true) || newExchangeState.exchangeStatus.equals("closed", ignoreCase = true))
         }
     }
 

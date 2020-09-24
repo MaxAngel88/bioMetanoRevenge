@@ -274,7 +274,7 @@ object PSVFlow {
                     oldPSVState.remiCode,
                     oldPSVState.plantAddress,
                     oldPSVState.plantCode,
-                    oldPSVState.quantity,
+                    psvStateUpdateProperty.quantity,
                     oldPSVState.price,
                     oldPSVState.docRef,
                     oldPSVState.docDate,

@@ -279,7 +279,7 @@ object BatchFlow {
                     oldBatchState.remiCode,
                     oldBatchState.plantAddress,
                     oldBatchState.plantCode,
-                    oldBatchState.quantity,
+                    batchUpdateProperty.quantity,
                     oldBatchState.energy,
                     oldBatchState.price,
                     oldBatchState.averageProductionCapacity,

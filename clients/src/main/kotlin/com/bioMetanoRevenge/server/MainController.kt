@@ -1020,6 +1020,7 @@ class MainController(rpc: NodeRPCConnection) {
 
         val batchId = updateBatchPojo.batchID
         val batchStatus = updateBatchPojo.batchStatus
+        val batchQuantity = updateBatchPojo.quantity
 
         if(batchId.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchId cannot be empty", data = null))
@@ -1027,6 +1028,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(batchStatus.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchStatus cannot be empty", data = null))
+        }
+
+        if(batchQuantity.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
         }
 
         return try {
@@ -1305,8 +1310,6 @@ class MainController(rpc: NodeRPCConnection) {
         val month = issueExchangePojo.month
         val parentBatchID = issueExchangePojo.parentBatchID
 
-
-
         if(seller.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "seller (organization name) cannot be empty", data = null))
         }
@@ -1348,6 +1351,7 @@ class MainController(rpc: NodeRPCConnection) {
 
         val exchangeCode = updateExchangePojo.exchangeCode
         val exchangeStatus = updateExchangePojo.exchangeStatus
+        val exchangeQuantity = updateExchangePojo.quantity
 
         if(exchangeCode.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "exchangeCode cannot be empty", data = null))
@@ -1355,6 +1359,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(exchangeStatus.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "exchangeStatus cannot be empty", data = null))
+        }
+
+        if(exchangeQuantity.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
         }
 
         return try {
@@ -1633,8 +1641,6 @@ class MainController(rpc: NodeRPCConnection) {
         val month = issuePSVPojo.month
         val parentBatchID = issuePSVPojo.parentBatchID
 
-
-
         if(seller.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "seller (organization name) cannot be empty", data = null))
         }
@@ -1676,6 +1682,7 @@ class MainController(rpc: NodeRPCConnection) {
 
         val transactionCode = updatePSVPojo.transactionCode
         val transactionStatus = updatePSVPojo.transactionStatus
+        val transactionQuantity = updatePSVPojo.quantity
 
         if(transactionCode.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "transactionCode cannot be empty", data = null))
@@ -1683,6 +1690,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(transactionStatus.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "transactionStatus cannot be empty", data = null))
+        }
+
+        if(transactionQuantity.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
         }
 
         return try {

@@ -279,7 +279,7 @@ object ExchangeFlow {
                     oldExchangeState.trackCode,
                     oldExchangeState.pickupDate,
                     oldExchangeState.deliveryDate,
-                    oldExchangeState.quantity,
+                    exchangeUpdateProperty.quantity,
                     oldExchangeState.price,
                     oldExchangeState.startingPosition,
                     oldExchangeState.arrivalPosition,

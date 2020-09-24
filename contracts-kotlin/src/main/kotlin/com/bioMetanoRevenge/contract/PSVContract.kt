@@ -50,7 +50,7 @@ class PSVContract : Contract {
             "price must be greater than zero." using (psvState.price > 0.0)
             "docRef cannot be empty." using (psvState.docRef.isNotEmpty())
             "transactionStatus cannot be empty." using (psvState.transactionStatus.isNotEmpty())
-            "transactionStatus must be \"open\", \"toVerify\" or \"closed\"." using (psvState.transactionStatus.equals("open", ignoreCase = true) || psvState.transactionStatus.equals("toVerify", ignoreCase = true) || psvState.transactionStatus.equals("closed", ignoreCase = true))
+            "transactionStatus must be \"open\", \"selling\" or \"closed\"." using (psvState.transactionStatus.equals("open", ignoreCase = true) || psvState.transactionStatus.equals("selling", ignoreCase = true) || psvState.transactionStatus.equals("closed", ignoreCase = true))
         }
     }
 
@@ -75,7 +75,7 @@ class PSVContract : Contract {
             "transactionCode from old and new PSVState cannot change." using (oldPSVState.transactionCode == newPSVState.transactionCode)
             "month from old and new PSVState cannot change." using (oldPSVState.month == newPSVState.month)
             "transactionStatus cannot be empty." using (newPSVState.transactionStatus.isNotEmpty())
-            "transactionStatus must be \"open\", \"toVerify\" or \"closed\"." using (newPSVState.transactionStatus.equals("open", ignoreCase = true) || newPSVState.transactionStatus.equals("toVerify", ignoreCase = true) || newPSVState.transactionStatus.equals("closed", ignoreCase = true))
+            "transactionStatus must be \"open\", \"selling\" or \"closed\"." using (newPSVState.transactionStatus.equals("open", ignoreCase = true) || newPSVState.transactionStatus.equals("selling", ignoreCase = true) || newPSVState.transactionStatus.equals("closed", ignoreCase = true))
         }
     }
 
