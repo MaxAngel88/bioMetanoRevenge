@@ -20,6 +20,7 @@ data class ExchangePojo(
         val trackCode: String = "",
         val pickupDate: String = "",
         val deliveryDate: String = "",
+        val initialQuantity: Double = 0.0,
         val quantity: Double = 0.0,
         val price: Double = 0.0,
         val startingPosition: String = "",

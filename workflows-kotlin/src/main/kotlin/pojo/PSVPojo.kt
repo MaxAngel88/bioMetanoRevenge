@@ -15,8 +15,11 @@ data class PSVPojo(
         val remiCode: String = "",
         val plantAddress: String = "",
         val plantCode: String = "",
+        val initialQuantity: Double = 0.0,
         val quantity: Double = 0.0,
         val price: Double = 0.0,
+        val pcs: Double = 0.0,
+        val pci: Double = 0.0,
         val docRef: String = "",
         val docDate: String = "",
         val transactionStatus: String = ""

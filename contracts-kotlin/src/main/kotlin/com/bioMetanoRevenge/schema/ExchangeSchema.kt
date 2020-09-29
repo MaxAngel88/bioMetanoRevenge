@@ -75,6 +75,9 @@ object ExchangeSchemaV1 : MappedSchema(
             @Column(name = "deliveryDate")
             var deliveryDate: String,
 
+            @Column(name = "initialQuantity")
+            var initialQuantity: Double,
+
             @Column(name = "quantity")
             var quantity: Double,
 
@@ -107,6 +110,6 @@ object ExchangeSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", seller = "", buyer = "", exchangeType = "", PIVASeller = "", PIVABuyer = "", parentBatchID = "", exchangeCode = "", month = "", remiCode = "", plantAddress = "", plantCode = "", hauler = "", PIVAHauler = "", trackCode = "", pickupDate = "", deliveryDate = "", quantity = 0.0, price = 0.0, startingPosition = "", arrivalPosition = "", docRef = "", docDate = "", exchangeStatus = "", exchangeDate = Instant.now(), lastExchangeUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(GSE = "", seller = "", buyer = "", exchangeType = "", PIVASeller = "", PIVABuyer = "", parentBatchID = "", exchangeCode = "", month = "", remiCode = "", plantAddress = "", plantCode = "", hauler = "", PIVAHauler = "", trackCode = "", pickupDate = "", deliveryDate = "", initialQuantity = 0.0, quantity = 0.0, price = 0.0, startingPosition = "", arrivalPosition = "", docRef = "", docDate = "", exchangeStatus = "", exchangeDate = Instant.now(), lastExchangeUpdate = Instant.now(), linearId = UUID.randomUUID())
     }
 }

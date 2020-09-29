@@ -60,6 +60,9 @@ object BatchSchemaV1 : MappedSchema(
             @Column(name = "plantCode")
             var plantCode: String,
 
+            @Column(name = "initialQuantity")
+            var initialQuantity: Double,
+
             @Column(name = "quantity")
             var quantity: Double,
 
@@ -77,6 +80,12 @@ object BatchSchemaV1 : MappedSchema(
 
             @Column(name = "annualEstimate")
             var annualEstimate: Double,
+
+            @Column(name = "pcs")
+            var pcs: Double,
+
+            @Column(name = "pci")
+            var pci: Double,
 
             @Column(name = "startingPosition")
             var startingPosition: String,
@@ -104,6 +113,6 @@ object BatchSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", Snam = "", produttore = "", shipper = "", idProducer = "", idShipper = "", transactionType = "", batchID = "", month = "", remiCode = "", plantAddress = "", plantCode = "", quantity = 0.0, energy = 0.0, price = 0.0, averageProductionCapacity = 0.0, maxProductionCapacity = 0.0, annualEstimate = 0.0, startingPosition = "", arrivalPosition = "", docRef = "", docDate = "", batchStatus = "", batchDate = Instant.now(), lastBatchUpdate = Instant.now() , linearId = UUID.randomUUID())
+        constructor(): this(GSE = "", Snam = "", produttore = "", shipper = "", idProducer = "", idShipper = "", transactionType = "", batchID = "", month = "", remiCode = "", plantAddress = "", plantCode = "", initialQuantity = 0.0, quantity = 0.0, energy = 0.0, price = 0.0, averageProductionCapacity = 0.0, maxProductionCapacity = 0.0, annualEstimate = 0.0, pcs = 0.0, pci = 0.0, startingPosition = "", arrivalPosition = "", docRef = "", docDate = "", batchStatus = "", batchDate = Instant.now(), lastBatchUpdate = Instant.now() , linearId = UUID.randomUUID())
     }
 }

@@ -63,11 +63,20 @@ object PSVSchemaV1 : MappedSchema(
             @Column(name = "plantCode")
             var plantCode: String,
 
+            @Column(name = "initialQuantity")
+            var initialQuantity: Double,
+
             @Column(name = "quantity")
             var quantity: Double,
 
             @Column(name = "price")
             var price: Double,
+
+            @Column(name = "pcs")
+            var pcs: Double,
+
+            @Column(name = "pci")
+            var pci: Double,
 
             @Column(name = "docRef")
             var docRef: String,
@@ -89,6 +98,6 @@ object PSVSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", Snam = "", seller = "", buyer = "", transactionType = "", PIVASeller = "", PIVABuyer = "", parentBatchID = "", transactionCode = "", month = "", remiCode = "", plantAddress = "", plantCode = "", quantity = 0.0, price = 0.0, docRef = "", docDate = "", transactionStatus = "", exchangeDate = Instant.now(), lastExchangeUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(GSE = "", Snam = "", seller = "", buyer = "", transactionType = "", PIVASeller = "", PIVABuyer = "", parentBatchID = "", transactionCode = "", month = "", remiCode = "", plantAddress = "", plantCode = "", initialQuantity = 0.0, quantity = 0.0, price = 0.0, pcs = 0.0, pci = 0.0, docRef = "", docDate = "", transactionStatus = "", exchangeDate = Instant.now(), lastExchangeUpdate = Instant.now(), linearId = UUID.randomUUID())
     }
 }

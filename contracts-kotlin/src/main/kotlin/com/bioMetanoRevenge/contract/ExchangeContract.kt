@@ -45,6 +45,7 @@ class ExchangeContract : Contract {
             "exchangeCode cannot be empty." using (exchange.exchangeCode.isNotEmpty())
             "month cannot be empty." using (exchange.month.isNotEmpty())
             "remiCode cannot be empty." using (exchange.remiCode.isNotEmpty())
+            "initialQuantity must be greater than zero." using (exchange.initialQuantity > 0.0)
             "quantity must be greater than zero." using (exchange.quantity > 0.0)
             "price must be greater than zero." using (exchange.price > 0.0)
             "docRef cannot be empty." using (exchange.docRef.isNotEmpty())
