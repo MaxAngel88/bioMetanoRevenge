@@ -7,5 +7,5 @@ data class ExchangeUpdatePojo(
         val exchangeCode: String = "",
         val exchangeStatus: String = "",
         val quantity: Double = 0.0,
-        val price: Double = 0.0
+        val sellingPrice: Double = 0.0
 )

@@ -622,7 +622,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"batchID\": \"batch12345\",\r\n    \"batchStatus\": \"closed\",\r\n    \"quantity\": 10.0\r\n}",
+							"raw": "{\r\n    \"batchID\": \"batch12345\",\r\n    \"batchStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 50.0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -967,7 +967,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"seller\": \"Produttore_A\",\r\n    \"buyer\": \"Shipper_A\",\r\n    \"exchangeType\": \"vendita\",\r\n    \"PIVASeller\": \"PIVASeller1234\",\r\n    \"PIVABuyer\": \"PIVABuyer1234\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"exchangeCode\": \"e12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"xxxx1\",\r\n    \"plantAddress\": \"Verona\",\r\n    \"plantCode\": \"Verona01\",\r\n    \"hauler\": \"N/A\",\r\n    \"PIVAHauler\": \"N/A\",\r\n    \"trackCode\": \"N/A\",\r\n    \"pickupDate\": \"12/08/2020\",\r\n    \"deliveryDate\": \"18/08/2020\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 12.0,\r\n    \"price\": 14.5,\r\n    \"startingPosition\": \"Verona\",\r\n    \"arrivalPosition\": \"Milano\",\r\n    \"docRef\": \"docRefABCD\",\r\n    \"docDate\": \"22062020\",\r\n    \"exchangeStatus\": \"open\"\r\n}",
+							"raw": "{\r\n    \"seller\": \"Produttore_A\",\r\n    \"buyer\": \"Shipper_A\",\r\n    \"exchangeType\": \"vendita\",\r\n    \"PIVASeller\": \"PIVASeller1234\",\r\n    \"PIVABuyer\": \"PIVABuyer1234\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"exchangeCode\": \"e12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"xxxx1\",\r\n    \"plantAddress\": \"Verona\",\r\n    \"plantCode\": \"Verona01\",\r\n    \"hauler\": \"N/A\",\r\n    \"PIVAHauler\": \"N/A\",\r\n    \"trackCode\": \"N/A\",\r\n    \"pickupDate\": \"12/08/2020\",\r\n    \"deliveryDate\": \"18/08/2020\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 12.0,\r\n    \"price\": 14.5,\r\n    \"pcs\": 0.98,\r\n    \"pci\": 0.85,\r\n    \"startingPosition\": \"Verona\",\r\n    \"arrivalPosition\": \"Milano\",\r\n    \"docRef\": \"docRefABCD\",\r\n    \"docDate\": \"22062020\",\r\n    \"exchangeStatus\": \"open\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -997,7 +997,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"exchangeCode\": \"e12345\",\r\n    \"exchangeStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"price\": 200.0\r\n}",
+							"raw": "{\r\n    \"exchangeCode\": \"e12345\",\r\n    \"exchangeStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 200.0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1328,7 +1328,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"transactionCode\": \"t12345\",\r\n    \"transactionStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"price\": 200.0\r\n}",
+							"raw": "{\r\n    \"transactionCode\": \"t12345\",\r\n    \"transactionStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 200.0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

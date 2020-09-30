@@ -84,6 +84,15 @@ object ExchangeSchemaV1 : MappedSchema(
             @Column(name = "price")
             var price: Double,
 
+            @Column(name = "sellingPrice")
+            var sellingPrice: Double,
+
+            @Column(name = "pcs")
+            var pcs: Double,
+
+            @Column(name = "pci")
+            var pci: Double,
+
             @Column(name = "startingPosition")
             var startingPosition: String,
 
@@ -110,6 +119,38 @@ object ExchangeSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", seller = "", buyer = "", exchangeType = "", PIVASeller = "", PIVABuyer = "", parentBatchID = "", exchangeCode = "", month = "", remiCode = "", plantAddress = "", plantCode = "", hauler = "", PIVAHauler = "", trackCode = "", pickupDate = "", deliveryDate = "", initialQuantity = 0.0, quantity = 0.0, price = 0.0, startingPosition = "", arrivalPosition = "", docRef = "", docDate = "", exchangeStatus = "", exchangeDate = Instant.now(), lastExchangeUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(
+                GSE = "",
+                seller = "",
+                buyer = "",
+                exchangeType = "",
+                PIVASeller = "",
+                PIVABuyer = "",
+                parentBatchID = "",
+                exchangeCode = "",
+                month = "",
+                remiCode = "",
+                plantAddress = "",
+                plantCode = "",
+                hauler = "",
+                PIVAHauler = "",
+                trackCode = "",
+                pickupDate = "",
+                deliveryDate = "",
+                initialQuantity = 0.0,
+                quantity = 0.0,
+                price = 0.0,
+                sellingPrice = 0.0,
+                pcs = 0.0,
+                pci = 0.0,
+                startingPosition = "",
+                arrivalPosition = "",
+                docRef = "",
+                docDate = "",
+                exchangeStatus = "",
+                exchangeDate = Instant.now(),
+                lastExchangeUpdate = Instant.now(),
+                linearId = UUID.randomUUID()
+        )
     }
 }

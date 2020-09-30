@@ -23,6 +23,8 @@ data class ExchangePojo(
         val initialQuantity: Double = 0.0,
         val quantity: Double = 0.0,
         val price: Double = 0.0,
+        val pcs: Double = 0.0,
+        val pci: Double = 0.0,
         val startingPosition: String = "",
         val arrivalPosition: String = "",
         val docRef: String = "",

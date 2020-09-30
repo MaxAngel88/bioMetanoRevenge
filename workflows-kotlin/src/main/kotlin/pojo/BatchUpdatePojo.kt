@@ -6,5 +6,6 @@ import net.corda.core.serialization.CordaSerializable
 data class BatchUpdatePojo(
         val batchID: String = "",
         val batchStatus: String = "",
-        val quantity: Double = 0.0
+        val quantity: Double = 0.0,
+        val sellingPrice: Double = 0.0
 )

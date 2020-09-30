@@ -1031,6 +1031,7 @@ class MainController(rpc: NodeRPCConnection) {
         val batchId = updateBatchPojo.batchID
         val batchStatus = updateBatchPojo.batchStatus
         val batchQuantity = updateBatchPojo.quantity
+        val batchSellingPrice = updateBatchPojo.sellingPrice
 
         if(batchId.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchId cannot be empty", data = null))
@@ -1042,6 +1043,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(batchQuantity.isNaN()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
+        }
+
+        if(batchSellingPrice.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "sellingPrice must be a number", data = null))
         }
 
         return try {
@@ -1321,6 +1326,8 @@ class MainController(rpc: NodeRPCConnection) {
         val parentBatchID = issueExchangePojo.parentBatchID
         val initialQuantity = issueExchangePojo.initialQuantity
         val quantity = issueExchangePojo.quantity
+        val pcs = issueExchangePojo.pcs
+        val pci = issueExchangePojo.pci
 
         if(seller.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "seller (organization name) cannot be empty", data = null))
@@ -1350,6 +1357,14 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
         }
 
+        if(pcs.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "pcs must be a number", data = null))
+        }
+
+        if(pci.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "pci must be a number", data = null))
+        }
+
         return try {
             val exchange = proxy.startTrackedFlow(::IssuerExchange, issueExchangePojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${exchange.linearId.id} committed to ledger.\n", data = exchange))
@@ -1372,7 +1387,7 @@ class MainController(rpc: NodeRPCConnection) {
         val exchangeCode = updateExchangePojo.exchangeCode
         val exchangeStatus = updateExchangePojo.exchangeStatus
         val exchangeQuantity = updateExchangePojo.quantity
-        val exchangePrice = updateExchangePojo.price
+        val exchangeSellingPrice = updateExchangePojo.sellingPrice
 
         if(exchangeCode.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "exchangeCode cannot be empty", data = null))
@@ -1386,8 +1401,8 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
         }
 
-        if(exchangePrice.isNaN()) {
-            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "price must be a number", data = null))
+        if(exchangeSellingPrice.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "sellingPrice must be a number", data = null))
         }
 
         return try {
@@ -1718,7 +1733,7 @@ class MainController(rpc: NodeRPCConnection) {
         val transactionCode = updatePSVPojo.transactionCode
         val transactionStatus = updatePSVPojo.transactionStatus
         val transactionQuantity = updatePSVPojo.quantity
-        val transactionPrice = updatePSVPojo.price
+        val transactionSellingPrice = updatePSVPojo.sellingPrice
 
         if(transactionCode.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "transactionCode cannot be empty", data = null))
@@ -1732,8 +1747,8 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
         }
 
-        if(transactionPrice.isNaN()) {
-            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "price must be a number", data = null))
+        if(transactionSellingPrice.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "sellingPrice must be a number", data = null))
         }
 
         return try {
