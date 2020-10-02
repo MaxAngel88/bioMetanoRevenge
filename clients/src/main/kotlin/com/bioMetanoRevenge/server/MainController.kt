@@ -300,6 +300,9 @@ class MainController(rpc: NodeRPCConnection) {
         val subjectBusiness = updateOCREnrollPojo.subjectBusiness
         val businessName = updateOCREnrollPojo.businessName
         val PIVA = updateOCREnrollPojo.PIVA
+        val idPlant = updateOCREnrollPojo.idPlant
+        val plantAddress = updateOCREnrollPojo.plantAddress
+        val remiCode = updateOCREnrollPojo.remiCode
         val docRefAutodichiarazione = updateOCREnrollPojo.docRefAutodichiarazione
         val docRefAttestazioniTecniche = updateOCREnrollPojo.docRefAttestazioniTecniche
 
@@ -338,6 +341,19 @@ class MainController(rpc: NodeRPCConnection) {
         if(docRefAttestazioniTecniche.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "docRefAttestazioniTecniche cannot be empty", data = null))
         }
+
+        if(idPlant.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "idPlant cannot be empty", data = null))
+        }
+
+        if(plantAddress.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "plantAddress cannot be empty", data = null))
+        }
+
+        if(remiCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "remiCode cannot be empty", data = null))
+        }
+
 
         return try {
             val updateOCREnroll = proxy.startTrackedFlow(::UpdaterOCREnroll, updateOCREnrollPojo).returnValue.getOrThrow()
