@@ -57,50 +57,80 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
 }
 
 
-task runProduttoreAServer(type: JavaExec, dependsOn: jar) {
+task runGSEServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50005', '--config.rpc.host=localhost', '--config.rpc.port=10005', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runProduttoreBServer(type: JavaExec, dependsOn: jar) {
+task runSnamServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50006', '--config.rpc.host=localhost', '--config.rpc.port=10009', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runShipperAServer(type: JavaExec, dependsOn: jar) {
+task runKalabriaServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=50007', '--config.rpc.host=localhost', '--config.rpc.port=10013', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runShipperBServer(type: JavaExec, dependsOn: jar) {
+task runMondelloServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
-    args '--server.port=50015', '--config.rpc.host=localhost', '--config.rpc.port=10017', '--config.rpc.username=user1', '--config.rpc.password=test'
+    args '--server.port=50008', '--config.rpc.host=localhost', '--config.rpc.port=10017', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runIntermediarioServer(type: JavaExec, dependsOn: jar) {
+task runEniServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
-    args '--server.port=50016', '--config.rpc.host=localhost', '--config.rpc.port=10021', '--config.rpc.username=user1', '--config.rpc.password=test'
+    args '--server.port=50009', '--config.rpc.host=localhost', '--config.rpc.port=10021', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runDistributoreServer(type: JavaExec, dependsOn: jar) {
+task runEdisonServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
-    args '--server.port=50017', '--config.rpc.host=localhost', '--config.rpc.port=10025', '--config.rpc.username=user1', '--config.rpc.password=test'
+    args '--server.port=50010', '--config.rpc.host=localhost', '--config.rpc.port=10025', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runGSEServer(type: JavaExec, dependsOn: jar) {
+task runNBAServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
-    args '--server.port=50018', '--config.rpc.host=localhost', '--config.rpc.port=10029', '--config.rpc.username=user1', '--config.rpc.password=test'
+    args '--server.port=50011', '--config.rpc.host=localhost', '--config.rpc.port=10029', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runSnamServer(type: JavaExec, dependsOn: jar) {
+task runACSPOServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
-    args '--server.port=50019', '--config.rpc.host=localhost', '--config.rpc.port=10033', '--config.rpc.username=user1', '--config.rpc.password=test'
+    args '--server.port=50012', '--config.rpc.host=localhost', '--config.rpc.port=10033', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runInterDistributionServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.bioMetanoRevenge.server.ServerKt'
+    args '--server.port=50013', '--config.rpc.host=localhost', '--config.rpc.port=10037', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runIntermediariRiunitiServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.bioMetanoRevenge.server.ServerKt'
+    args '--server.port=50014', '--config.rpc.host=localhost', '--config.rpc.port=10041', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runButeraServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.bioMetanoRevenge.server.ServerKt'
+    args '--server.port=50015', '--config.rpc.host=localhost', '--config.rpc.port=10045', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runLaRipaServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.bioMetanoRevenge.server.ServerKt'
+    args '--server.port=50016', '--config.rpc.host=localhost', '--config.rpc.port=10049', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runColosseumServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.bioMetanoRevenge.server.ServerKt'
+    args '--server.port=50017', '--config.rpc.host=localhost', '--config.rpc.port=10053', '--config.rpc.username=user1', '--config.rpc.password=test'
 }

@@ -86,7 +86,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         cordapps.clear()
     }
     node {
-        name "O=Produttore_A,L=Milan,C=IT"
+        name "O=GSE,L=Milan,C=IT"
         p2pAddress "localhost:10004"
         rpcSettings {
             address("0.0.0.0:10005")
@@ -95,7 +95,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
     }
     node {
-        name "O=Produttore_B,L=Milan,C=IT"
+        name "O=Snam,L=Milan,C=IT"
         p2pAddress "localhost:10008"
         rpcSettings {
             address("0.0.0.0:10009")
@@ -104,7 +104,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
     }
     node {
-        name "O=Shipper_A,L=Milan,C=IT"
+        name "O=KalabriaMaceri,L=Milan,C=IT"
         p2pAddress "localhost:10012"
         rpcSettings {
             address("0.0.0.0:10013")
@@ -113,7 +113,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
     }
     node {
-        name "O=Shipper_B,L=Milan,C=IT"
+        name "O=MondelloSpA,L=Milan,C=IT"
         p2pAddress "localhost:10016"
         rpcSettings {
             address("0.0.0.0:10017")
@@ -122,7 +122,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
     }
     node {
-        name "O=Intermediario,L=Milan,C=IT"
+        name "O=Eni,L=Milan,C=IT"
         p2pAddress "localhost:10020"
         rpcSettings {
             address("0.0.0.0:10021")
@@ -131,7 +131,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
     }
     node {
-        name "O=Distributore,L=Milan,C=IT"
+        name "O=Edison,L=Milan,C=IT"
         p2pAddress "localhost:10024"
         rpcSettings {
             address("0.0.0.0:10025")
@@ -140,7 +140,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
     }
     node {
-        name "O=GSE,L=Milan,C=IT"
+        name "O=NBAInternationalCorporation,L=Milan,C=IT"
         p2pAddress "localhost:10028"
         rpcSettings {
             address("0.0.0.0:10029")
@@ -149,11 +149,56 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
     }
     node {
-        name "O=Snam,L=Milan,C=IT"
+        name "O=ACSPO,L=Milan,C=IT"
         p2pAddress "localhost:10032"
         rpcSettings {
             address("0.0.0.0:10033")
             adminAddress("0.0.0.0:10034")
+        }
+        rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
+    }
+    node {
+        name "O=InterDistributorSrl,L=Milan,C=IT"
+        p2pAddress "localhost:10036"
+        rpcSettings {
+            address("0.0.0.0:10037")
+            adminAddress("0.0.0.0:10038")
+        }
+        rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
+    }
+    node {
+        name "O=IntermediariRiunitiSpA,L=Milan,C=IT"
+        p2pAddress "localhost:10040"
+        rpcSettings {
+            address("0.0.0.0:10041")
+            adminAddress("0.0.0.0:10042")
+        }
+        rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
+    }
+    node {
+        name "O=ButeraEnergy,L=Milan,C=IT"
+        p2pAddress "localhost:10044"
+        rpcSettings {
+            address("0.0.0.0:10045")
+            adminAddress("0.0.0.0:10046")
+        }
+        rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
+    }
+    node {
+        name "O=LaRipaBioGas,L=Milan,C=IT"
+        p2pAddress "localhost:10048"
+        rpcSettings {
+            address("0.0.0.0:10049")
+            adminAddress("0.0.0.0:10050")
+        }
+        rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
+    }
+    node {
+        name "O=ColosseumFuel,L=Milan,C=IT"
+        p2pAddress "localhost:10052"
+        rpcSettings {
+            address("0.0.0.0:10053")
+            adminAddress("0.0.0.0:10054")
         }
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
     }
