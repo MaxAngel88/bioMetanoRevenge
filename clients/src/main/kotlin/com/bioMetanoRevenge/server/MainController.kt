@@ -1,5 +1,7 @@
 package com.bioMetanoRevenge.server
 
+import com.bioMetanoRevenge.flow.AgreementFlow.IssuerAgreement
+import com.bioMetanoRevenge.flow.AgreementFlow.UpdaterAgreement
 import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
 import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
@@ -353,7 +355,6 @@ class MainController(rpc: NodeRPCConnection) {
         if(remiCode.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "remiCode cannot be empty", data = null))
         }
-
 
         return try {
             val updateOCREnroll = proxy.startTrackedFlow(::UpdaterOCREnroll, updateOCREnrollPojo).returnValue.getOrThrow()
@@ -1944,6 +1945,284 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateWalletReward = proxy.startTrackedFlow(::UpdaterWalletReward, updateWalletRewardPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "WalletReward with id: $walletID update correctly. New WalletRewardState with id: ${updateWalletReward.linearId.id} created.. ledger updated.", data = updateWalletReward))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * AGREEMENT API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all AgreementState that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastAgreement" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastAgreement() : ResponseEntity<ResponsePojo> {
+        var foundLastAgreementStates = proxy.vaultQueryBy<AgreementState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "AgreementState list", data = foundLastAgreementStates))
+    }
+
+    /**
+     * Displays last AgreementState that exist in the node's vault for selected owner.
+     */
+    @GetMapping(value = [ "getLastAgreementStateByOwner/{owner}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastAgreementStateByOwner(
+            @PathVariable("owner")
+            owner : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for owner
+        var ownerCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementSchemaV1.PersistentAgreement::owner.equal(owner)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(AgreementState::class.java))
+
+        val foundOwnerLastAgreement = proxy.vaultQueryBy<AgreementState>(
+                ownerCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last AgreementState by owner $owner .", data = foundOwnerLastAgreement))
+    }
+
+    /**
+     * Displays History AgreementState that exist in the node's vault for selected owner.
+     */
+    @GetMapping(value = [ "getHistoryAgreementStateByOwner/{owner}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryAgreementStateByOwner(
+            @PathVariable("owner")
+            owner : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for owner
+        var ownerCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementSchemaV1.PersistentAgreement::owner.equal(owner)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(AgreementState::class.java))
+
+        val foundOwnerAgreementHistory = proxy.vaultQueryBy<AgreementState>(
+                ownerCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of agreement state for $owner", data = foundOwnerAgreementHistory))
+    }
+
+    /**
+     * Displays last AgreementState that exist in the node's vault for selected counterpart.
+     */
+    @GetMapping(value = [ "getLastAgreementStateByCounterpart/{counterpart}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastAgreementStateByCounterpart(
+            @PathVariable("counterpart")
+            counterpart : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for counterpart
+        var counterpartCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementSchemaV1.PersistentAgreement::counterpart.equal(counterpart)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(AgreementState::class.java))
+
+        val foundCounterpartLastAgreement = proxy.vaultQueryBy<AgreementState>(
+                counterpartCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last AgreementState by counterpart $counterpart .", data = foundCounterpartLastAgreement))
+    }
+
+    /**
+     * Displays History AgreementState that exist in the node's vault for selected counterpart.
+     */
+    @GetMapping(value = [ "getHistoryAgreementStateByCounterpart/{counterpart}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryAgreementStateByCounterpart(
+            @PathVariable("counterpart")
+            counterpart : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for counterpart
+        var counterpartCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementSchemaV1.PersistentAgreement::counterpart.equal(counterpart)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(AgreementState::class.java))
+
+        val foundCounterpartAgreementHistory = proxy.vaultQueryBy<AgreementState>(
+                counterpartCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of agreement state for $counterpart", data = foundCounterpartAgreementHistory))
+    }
+
+    /**
+     * Displays last AgreementState that exist in the node's vault for selected agreementID.
+     */
+    @GetMapping(value = [ "getLastAgreementStateByID/{agreementID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastAgreementStateByID(
+            @PathVariable("agreementID")
+            agreementID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for counterpart
+        var agreementIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementSchemaV1.PersistentAgreement::agreementID.equal(agreementID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(AgreementState::class.java))
+
+        val foundIDLastAgreement = proxy.vaultQueryBy<AgreementState>(
+                agreementIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last AgreementState by agreementID $agreementID .", data = foundIDLastAgreement))
+    }
+
+    /**
+     * Displays History AgreementState that exist in the node's vault for selected agreementID.
+     */
+    @GetMapping(value = [ "getHistoryAgreementStateByID/{agreementID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryAgreementStateByID(
+            @PathVariable("agreementID")
+            agreementID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for counterpart
+        var agreementIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementSchemaV1.PersistentAgreement::agreementID.equal(agreementID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(AgreementState::class.java))
+
+        val foundIDAgreementHistory = proxy.vaultQueryBy<AgreementState>(
+                agreementIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of agreement state for $agreementID", data = foundIDAgreementHistory))
+    }
+
+    /**
+     * Initiates a flow to agree an AgreementState between two nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-agreement" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueAgreement(
+            @RequestBody
+            issueAgreement : AgreementPojo): ResponseEntity<ResponsePojo> {
+
+        val counterpartParty = issueAgreement.counterpartParty
+        val agreementID = issueAgreement.agreementID
+        val agreementCode = issueAgreement.agreementCode
+        val agreementType = issueAgreement.agreementType
+        val agreementSubType = issueAgreement.agreementSubType
+        val owner = issueAgreement.owner
+        val counterpart = issueAgreement.counterpart
+        val energy = issueAgreement.energy
+        val dcq = issueAgreement.dcq
+        val price = issueAgreement.price
+        val validFrom = issueAgreement.validFrom
+        val validTo = issueAgreement.validTo
+
+        if(counterpartParty.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "counterpartParty cannot be empty", data = null))
+        }
+
+        if(agreementID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementID cannot be empty", data = null))
+        }
+
+        if(agreementCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementCode cannot be empty", data = null))
+        }
+
+        if(agreementType.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementType cannot be empty", data = null))
+        }
+
+        if(agreementSubType.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementSubType cannot be empty", data = null))
+        }
+
+        if(owner.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "owner cannot be empty", data = null))
+        }
+
+        if(counterpart.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "counterpart cannot be empty", data = null))
+        }
+
+        if(energy.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "energy must be a number", data = null))
+        }
+
+        if(dcq.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "dcq must be a number", data = null))
+        }
+
+        if(price.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "price must be a number", data = null))
+        }
+
+        if(validFrom.toString().isBlank()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be empty", data = null))
+        }
+
+        if(validTo.toString().isBlank()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validTo cannot be empty", data = null))
+        }
+
+        return try {
+            val agreement = proxy.startTrackedFlow(::IssuerAgreement, issueAgreement).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${agreement.linearId.id} committed to ledger.\n", data = agreement))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update Agreement
+     *
+     */
+    @PostMapping(value = [ "update-agreement" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateAgreement(
+            @RequestBody
+            updateAgreementPojo: AgreementUpdatePojo): ResponseEntity<ResponsePojo> {
+
+        val agreementID = updateAgreementPojo.agreementID
+        val agreementEnergy = updateAgreementPojo.energy
+        val agreementDcq = updateAgreementPojo.dcq
+        val agreementPrice = updateAgreementPojo.price
+        val agreementValidFrom = updateAgreementPojo.validFrom
+        val agreementValidTo = updateAgreementPojo.validTo
+
+        if(agreementID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementID cannot be empty", data = null))
+        }
+
+        if(agreementEnergy.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementEnergy must be a number", data = null))
+        }
+
+        if(agreementDcq.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "dcq must be a number", data = null))
+        }
+
+        if(agreementPrice.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "price must be a number", data = null))
+        }
+
+        if(agreementValidFrom.toString().isBlank()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be empty", data = null))
+        }
+
+        if(agreementValidTo.toString().isBlank()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validTo cannot be empty", data = null))
+        }
+
+        return try {
+            val updateAgreement = proxy.startTrackedFlow(::UpdaterAgreement, updateAgreementPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Agreement with id: $agreementID update correctly. New AgreementState with id: ${updateAgreement.linearId.id} created.. ledger updated.", data = updateAgreement))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))

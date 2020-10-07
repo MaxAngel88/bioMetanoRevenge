@@ -1,0 +1,2060 @@
+{
+	"info": {
+		"_postman_id": "e84304b4-0901-41de-b006-4c4323f26fea",
+		"name": "bioMetanoRevengeBranch3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Enroll",
+			"item": [
+				{
+					"name": "issue-enroll",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"enrollType\": \"Enrollment Distributore\",\r\n    \"subjectFirstName\": \"N/A\",\r\n    \"subjectLastName\": \"N/A\",\r\n    \"subjectAddress\": \"N/A\",\r\n    \"subjectBusiness\": \"N/A\",\r\n    \"qualificationCode\": \"5.1.2.6.0\",\r\n    \"businessName\": \"N/A\",\r\n    \"PIVA\": \"N/A\",\r\n    \"birthPlace\": \"Milano\",\r\n    \"remiCode\": \"30711301\",\r\n    \"remiAddress\": \"via Pontida, 28, 15002 Abbiategrasso (MI)\",\r\n    \"idPlant\": \"N/A\",\r\n    \"plantAddress\": \"N/A\",\r\n    \"username\": \"m_rossi\",\r\n    \"role\": \"Produttore_A\",\r\n    \"partner\": \"Iar Siltal Spa\",\r\n    \"docRefAutodichiarazione\": \"N/A\",\r\n    \"docRefAttestazioniTecniche\": \"N/A\",\r\n    \"docDeadLineAuto\": \"N/A\",\r\n    \"docDeadLineTech\": \"N/A\",\r\n    \"enrollStatus\": \"pending\",\r\n    \"bioGasAmount\": 0.0,\r\n    \"gasAmount\": 0.0,\r\n    \"uuid\": \"36d869f2-d352-43fe-891e-ee4629b7077f\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-enroll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-enroll",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uuid\": \"36d869f2-d352-43fe-891e-ee4629b7077f\",\r\n    \"enrollStatus\": \"Approved\",\r\n    \"bioGasAmount\": 10.0,\r\n    \"gasAmount\": 12.5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-enroll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-ocr-enroll",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uuid\": \"36d869f2-d352-43fe-891e-ee4629b7077f\",\r\n    \"subjectFirstName\": \"Mario\",\r\n    \"subjectLastName\": \"Rossi\",\r\n    \"subjectAddress\": \"Piazza Leonardo da Vinci, 42, 20131 Milano (MI)\",\r\n    \"subjectBusiness\": \"Direttore\",\r\n    \"businessName\": \"cp2012\",\r\n    \"PIVA\": \"47164060692\",\r\n    \"idPlant\": \"plant_1234\",\r\n    \"plantAddress\": \"Piazza Leonardo da Vinci, 42, 20131 Milano (MI)\",\r\n    \"remiCode\": \"remi_1234\",\r\n    \"docRefAutodichiarazione\": \"NuovoDocumentoAuto.pdf\",\r\n    \"docRefAttestazioniTecniche\": \"NuovoDocumentoTech.pdf\",\r\n    \"docDeadLineAuto\": \"12/2020\",\r\n    \"docDeadLineTech\": \"01/2021\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-ocr-enroll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-ocr-enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreementStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastEnrollments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastEnrollments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastEnrollByUsername",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastEnrollByUsername/maxibus",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastEnrollByUsername",
+								"maxibus"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryEnrollStateByUsername",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryEnrollStateByUsername/m_rossi",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryEnrollStateByUsername",
+								"m_rossi"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastEnrollByUuid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastEnrollByUuid/30031988-am",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastEnrollByUuid",
+								"30031988-am"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryEnrollStateByUuid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryEnrollStateByUuid/30031988-am",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryEnrollStateByUuid",
+								"30031988-am"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastEnrollByQualification",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastEnrollByQualification/qcode1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastEnrollByQualification",
+								"qcode1234"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryEnrollStateByQualification",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryEnrollStateByQualification/qcode1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryEnrollStateByQualification",
+								"qcode1234"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Programming",
+			"item": [
+				{
+					"name": "issue-programming",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"sendDate\": \"30031988\",\r\n    \"monthYear\": \"031988\",\r\n    \"programmingType\": \"PRI\",\r\n    \"versionFile\": \"001\",\r\n    \"bioAgreementCode\": \"1234\",\r\n    \"remiCode\": \"remi1234\",\r\n    \"docRef\": \"docRef01\",\r\n    \"docName\": \"docName01\",\r\n    \"programmingStatus\": \"Draft\"\r\n} ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-programming",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-programming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-programming-doc",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"versionFile\": \"002\",\r\n    \"bioAgreementCode\": \"1234\",\r\n    \"docRef\": \"docRef02\",\r\n    \"docName\": \"docName02\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-programming-doc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-programming-doc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-programming-status",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"bioAgreementCode\": \"1234\",\r\n    \"programmingStatus\": \"Inviato\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-programming-status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-programming-status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastProgramming",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastProgramming",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastProgramming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastProgrammingByBioAgreementCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastProgrammingByBioAgreementCode/1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastProgrammingByBioAgreementCode",
+								"1234"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryProgrammingByBioAgreementCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryProgrammingByBioAgreementCode/1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryProgrammingByBioAgreementCode",
+								"1234"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastProgrammingByProducer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastProgrammingByProducer/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastProgrammingByProducer",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryProgrammingByProducer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryProgrammingByProducer/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryProgrammingByProducer",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastProgrammingByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastProgrammingByStatus/Inviato",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastProgrammingByStatus",
+								"Inviato"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryProgrammingByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryProgrammingByStatus/Inviato",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryProgrammingByStatus",
+								"Inviato"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "RawMaterial",
+			"item": [
+				{
+					"name": "issue-rawMaterial",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rawMaterialChar\": \"A\",\r\n    \"rawMaterialType\": \"BioFossile\",\r\n    \"CERCode\": \"abcde\",\r\n    \"quantity\": 10.5,\r\n    \"originCountry\": \"IT\",\r\n    \"secondaryHarvest\": false,\r\n    \"degradedLand\": true,\r\n    \"sustainabilityCode\": \"xxx123\"\r\n} ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-rawMaterial",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-rawMaterial"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastRawMaterial",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastRawMaterial",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastRawMaterial"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastRawMaterialByCERCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastRawMaterialByCERCode/abcde",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastRawMaterialByCERCode",
+								"abcde"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Batch",
+			"item": [
+				{
+					"name": "issue-batch",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"produttore\": \"Produttore_A\",\r\n    \"shipper\": \"Shipper_A\",\r\n    \"idProducer\": \"idProducer_A\",\r\n    \"idShipper\": \"idShipper_A\",\r\n    \"transactionType\": \"test\",\r\n    \"batchID\": \"batch12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"remi12345\",\r\n    \"plantAddress\": \"via Roma\",\r\n    \"plantCode\": \"plant12345\",\r\n    \"initialQuantity\": 200.0,\r\n    \"quantity\": 200.0,\r\n    \"energy\": 30.0,\r\n    \"price\": 25.0,\r\n    \"averageProductionCapacity\": 50.0,\r\n    \"maxProductionCapacity\": 60.0,\r\n    \"annualEstimate\": 100.0,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"startingPosition\": \"Biancavilla\",\r\n    \"arrivalPosition\": \"Roma\",\r\n    \"docRef\": \"docRef12345\",\r\n    \"docDate\": \"310820\",\r\n    \"batchStatus\": \"open\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/issue-batch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-batch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-batch",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"batchID\": \"batch12345\",\r\n    \"batchStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 50.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50015/api/bioMetanoRevenge/update-batch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50015",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-batch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastBatch",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastBatchByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchByStatus/closed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatchByStatus",
+								"closed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastBatchStateByProducer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchStateByProducer/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatchStateByProducer",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryBatchStateByProducer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByProducer/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryBatchStateByProducer",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastBatchStateByShipper",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchStateByShipper/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatchStateByShipper",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryBatchStateByShipper",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByShipper/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryBatchStateByShipper",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastBatchByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchByID/batch12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatchByID",
+								"batch12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryBatchStateByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByID/batch12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryBatchStateByID",
+								"batch12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastBatchByIdProducer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchByIdProducer/idProducer_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatchByIdProducer",
+								"idProducer_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryBatchStateByIdProducer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByIdProducer/idProducer_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryBatchStateByIdProducer",
+								"idProducer_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastBatchByIdShipper",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchByIdShipper/idShipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatchByIdShipper",
+								"idShipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryBatchStateByIdShipper",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByIdShipper/idShipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryBatchStateByIdShipper",
+								"idShipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryBatchStateByMonthProducer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByMonthProducer/Agosto/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryBatchStateByMonthProducer",
+								"Agosto",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryBatchStateByMonthShipper",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByMonthShipper/Agosto/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryBatchStateByMonthShipper",
+								"Agosto",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Exchange",
+			"item": [
+				{
+					"name": "issue-exchange",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"seller\": \"Produttore_A\",\r\n    \"buyer\": \"Shipper_A\",\r\n    \"exchangeType\": \"vendita\",\r\n    \"PIVASeller\": \"PIVASeller1234\",\r\n    \"PIVABuyer\": \"PIVABuyer1234\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"exchangeCode\": \"e12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"xxxx1\",\r\n    \"plantAddress\": \"Verona\",\r\n    \"plantCode\": \"Verona01\",\r\n    \"hauler\": \"N/A\",\r\n    \"PIVAHauler\": \"N/A\",\r\n    \"trackCode\": \"N/A\",\r\n    \"pickupDate\": \"12/08/2020\",\r\n    \"deliveryDate\": \"18/08/2020\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 12.0,\r\n    \"price\": 14.5,\r\n    \"pcs\": 0.98,\r\n    \"pci\": 0.85,\r\n    \"startingPosition\": \"Verona\",\r\n    \"arrivalPosition\": \"Milano\",\r\n    \"docRef\": \"docRefABCD\",\r\n    \"docDate\": \"22062020\",\r\n    \"exchangeStatus\": \"open\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/issue-exchange",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-exchange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-exchange",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"exchangeCode\": \"e12345\",\r\n    \"exchangeStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 200.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/update-exchange",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-exchange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastExchange",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastExchange",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastExchange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastExchangeByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastExchangeByStatus/closed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastExchangeByStatus",
+								"closed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastExchangeStateBySeller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastExchangeStateBySeller/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastExchangeStateBySeller",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryExchangeStateBySeller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryExchangeStateBySeller/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryExchangeStateBySeller",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastExchangeStateByBuyer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastExchangeStateByBuyer/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastExchangeStateByBuyer",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryExchangeStateByBuyer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryExchangeStateByBuyer/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryExchangeStateByBuyer",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastExchangeByCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastExchangeByCode/e12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastExchangeByCode",
+								"e12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryExchangeStateByCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryExchangeStateByCode/e12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryExchangeStateByCode",
+								"e12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastExchangeByParent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastExchangeByParent/p12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastExchangeByParent",
+								"p12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryExchangeStateByParent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryExchangeStateByParent/p12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryExchangeStateByParent",
+								"p12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryExchangeStateByMonthSeller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryExchangeStateByMonthSeller/Agosto/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryExchangeStateByMonthSeller",
+								"Agosto",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryExchangeStateByMonthBuyer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryExchangeStateByMonthBuyer/Agosto/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryExchangeStateByMonthBuyer",
+								"Agosto",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "PSVState",
+			"item": [
+				{
+					"name": "issue-psv",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"seller\": \"Shipper_A\",\r\n    \"buyer\": \"Shipper_B\",\r\n    \"transactionType\": \"scambio PSV\",\r\n    \"PIVASeller\": \"PIVA1234\",\r\n    \"PIVABuyer\": \"PIVA5678\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"transactionCode\": \"t12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"r12345\",\r\n    \"plantAddress\": \"Catania\",\r\n    \"plantCode\": \"Catania01\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 110.0,\r\n    \"price\": 12.6,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"docRef\": \"documentABC\",\r\n    \"docDate\": \"22082020\",\r\n    \"transactionStatus\": \"open\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/issue-psv",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-psv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-psv",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"transactionCode\": \"t12345\",\r\n    \"transactionStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 200.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/update-psv",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-psv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastPSVState",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getLastPSVState",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastPSVState"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastPSVStateByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getLastPSVStateByStatus/closed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastPSVStateByStatus",
+								"closed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastPSVStateBySeller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getLastPSVStateBySeller/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastPSVStateBySeller",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryPSVStateBySeller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getHistoryPSVStateBySeller/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryPSVStateBySeller",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastPSVStateByBuyer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getLastPSVStateByBuyer/Shipper_B",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastPSVStateByBuyer",
+								"Shipper_B"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryPSVStateByBuyer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getHistoryPSVStateByBuyer/Shipper_B",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryPSVStateByBuyer",
+								"Shipper_B"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastPSVStateByCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getLastPSVStateByCode/t12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastPSVStateByCode",
+								"t12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryPSVStateByCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getHistoryPSVStateByCode/t12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryPSVStateByCode",
+								"t12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastPSVStateByParent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getLastPSVStateByParent/p12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastPSVStateByParent",
+								"p12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryPSVStateByParent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getHistoryPSVStateByParent/p12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryPSVStateByParent",
+								"p12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryPSVStateByMonthSeller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getHistoryPSVStateByMonthSeller/Agosto/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryPSVStateByMonthSeller",
+								"Agosto",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryPSVStateByMonthBuyer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getHistoryPSVStateByMonthBuyer/Agosto/Shipper_B",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryPSVStateByMonthBuyer",
+								"Agosto",
+								"Shipper_B"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "WalletReward",
+			"item": [
+				{
+					"name": "issue-wallet-reward",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"walletID\": \"WalletProd1234\",\r\n    \"rewardPoint\": 250,\r\n    \"reason\": \"Creazione + Premio di Benvenuto\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-wallet-reward",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-wallet-reward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-wallet-reward",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"walletID\": \"WalletProd1234\",\r\n    \"rewardPoint\": 100,\r\n    \"reason\": \"Ritiro TV Samsung 50 Pollici\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-wallet-reward",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-wallet-reward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastWalletReward",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastWalletReward",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastWalletReward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastWalletRewardStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastWalletRewardStateByOwner/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastWalletRewardStateByOwner",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryWalletRewardStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryWalletRewardStateByOwner/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryWalletRewardStateByOwner",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastWalletRewardByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastWalletRewardByID/WalletProd1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastWalletRewardByID",
+								"WalletProd1234"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryWalletRewardByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryWalletRewardByID/WalletProd1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryWalletRewardByID",
+								"WalletProd1234"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Agreement",
+			"item": [
+				{
+					"name": "issue-agreement",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"counterpartParty\": \"Edison\",\r\n    \"agreementID\": \"agreement0001\",\r\n    \"agreementCode\": \"agreementCode0001\",\r\n    \"agreementDescription\": \"Description of Agreement\",\r\n    \"agreementType\": \"Vendita\",\r\n    \"agrementSubType\": \"PSV\",\r\n    \"owner\": \"Kalabria Maceri\",\r\n    \"counterpart\": \"Edison\",\r\n    \"tso\": \"SRG - Snam Rete Gas SpA\",\r\n    \"portfolio\": \"Gas Supply\",\r\n    \"sourceSystem\": \"Endur\",\r\n    \"programmingMethod\": \"Flat\",\r\n    \"agreementNote\": \"Agreement Note\",\r\n    \"energy\": 150.0,\r\n    \"dcq\": 120.0,\r\n    \"price\": 1.5,\r\n    \"validFrom\": \"2020-10-07T12:39:42.777Z\",\r\n    \"validTo\": \"2020-11-07T12:39:42.777Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{KALABRIAPORT}}/api/bioMetanoRevenge/issue-agreement",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{KALABRIAPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-agreement"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-agreement",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"agreementID\": \"agreement0001\",\r\n    \"energy\": 150.0,\r\n    \"dcq\": 120.0,\r\n    \"price\": 1.4,\r\n    \"validFrom\": \"2020-10-07T12:39:42.777Z\",\r\n    \"validTo\": \"2020-11-07T12:39:42.777Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{KALABRIAPORT}}/api/bioMetanoRevenge/update-agreement",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{KALABRIAPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-agreement"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreement",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastAgreement",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastAgreement"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreementStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastAgreementStateByOwner/Kalabria",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastAgreementStateByOwner",
+								"Kalabria"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryAgreementStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryAgreementStateByOwner/Kalabria",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryAgreementStateByOwner",
+								"Kalabria"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreementStateByCounterpart",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastAgreementStateByCounterpart/Edison",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastAgreementStateByCounterpart",
+								"Edison"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryAgreementStateByCounterpart",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryAgreementStateByCounterpart/Edison",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryAgreementStateByCounterpart",
+								"Edison"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreementStateByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastAgreementStateByID/agreement0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastAgreementStateByID",
+								"agreement0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryAgreementStateByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryAgreementStateByID/agreement0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryAgreementStateByID",
+								"agreement0001"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "me",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:50005/api/bioMetanoRevenge/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "50005",
+					"path": [
+						"api",
+						"bioMetanoRevenge",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "peers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:50005/api/bioMetanoRevenge/peers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "50005",
+					"path": [
+						"api",
+						"bioMetanoRevenge",
+						"peers"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
