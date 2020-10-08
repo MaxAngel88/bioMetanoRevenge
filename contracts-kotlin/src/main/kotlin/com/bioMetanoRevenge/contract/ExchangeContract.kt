@@ -73,6 +73,7 @@ class ExchangeContract : Contract {
             "parentBatchID from old and new Exchange cannot change." using (oldExchangeState.parentBatchID == newExchangeState.parentBatchID)
             "exchangeCode from old and new Exchange cannot change." using (oldExchangeState.exchangeCode == newExchangeState.exchangeCode)
             "month from old and new Exchange cannot change." using (oldExchangeState.month == newExchangeState.month)
+            "quantity must be greater or equal than zero." using (newExchangeState.quantity >= 0.0)
             "exchangeStatus cannot be empty." using (newExchangeState.exchangeStatus.isNotEmpty())
             "exchangeStatus must be \"open\", \"selling\" or \"closed\"." using (newExchangeState.exchangeStatus.equals("open", ignoreCase = true) || newExchangeState.exchangeStatus.equals("selling", ignoreCase = true) || newExchangeState.exchangeStatus.equals("closed", ignoreCase = true))
         }

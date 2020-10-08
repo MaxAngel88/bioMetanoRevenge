@@ -82,6 +82,7 @@ class BatchContract : Contract {
             "shipper from old and new Batch cannot change." using (oldBatchState.shipper == newBatchState.shipper)
             "idProducer from old and new Batch cannot change." using (oldBatchState.idProducer == newBatchState.idProducer)
             "idShipper from old and new Batch cannot change." using (oldBatchState.idShipper == newBatchState.idShipper)
+            "quantity must be greater or equal than zero." using (newBatchState.quantity >= 0.0)
             "batchStatus cannot be empty." using (newBatchState.batchStatus.isNotEmpty())
             "batchStatus must be \"open\", \"selling\" or \"closed\"." using (newBatchState.batchStatus.equals("open", ignoreCase = true) || newBatchState.batchStatus.equals("selling", ignoreCase = true) || newBatchState.batchStatus.equals("closed", ignoreCase = true))
         }

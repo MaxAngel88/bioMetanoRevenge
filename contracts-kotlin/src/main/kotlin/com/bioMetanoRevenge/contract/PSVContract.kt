@@ -77,6 +77,7 @@ class PSVContract : Contract {
             "parentBatchID from old and new PSVState cannot change." using (oldPSVState.parentBatchID == newPSVState.parentBatchID)
             "transactionCode from old and new PSVState cannot change." using (oldPSVState.transactionCode == newPSVState.transactionCode)
             "month from old and new PSVState cannot change." using (oldPSVState.month == newPSVState.month)
+            "quantity must be greater or equal than zero." using (newPSVState.quantity >= 0.0)
             "transactionStatus cannot be empty." using (newPSVState.transactionStatus.isNotEmpty())
             "transactionStatus must be \"open\", \"selling\" or \"closed\"." using (newPSVState.transactionStatus.equals("open", ignoreCase = true) || newPSVState.transactionStatus.equals("selling", ignoreCase = true) || newPSVState.transactionStatus.equals("closed", ignoreCase = true))
         }

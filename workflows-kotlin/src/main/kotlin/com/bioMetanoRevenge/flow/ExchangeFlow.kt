@@ -284,7 +284,7 @@ object ExchangeFlow {
                     oldExchangeState.pickupDate,
                     oldExchangeState.deliveryDate,
                     oldExchangeState.initialQuantity,
-                    exchangeUpdateProperty.quantity,
+                    oldExchangeState.quantity - exchangeUpdateProperty.sellingQuantity,
                     oldExchangeState.price,
                     exchangeUpdateProperty.sellingPrice,
                     oldExchangeState.pcs,
@@ -344,6 +344,7 @@ object ExchangeFlow {
                     /* "other rule exchange" using (output is new rule) */
                     "parentBatchID cannot be empty" using (exchangeState.parentBatchID.isNotEmpty())
                     "exchangeCode cannot be empty" using (exchangeState.exchangeCode.isNotEmpty())
+                    "quantity must be greater or equal than zero" using (exchangeState.quantity >= 0.0)
                 }
             }
             val txId = subFlow(signTransactionFlow).id

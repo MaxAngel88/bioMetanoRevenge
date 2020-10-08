@@ -6,6 +6,6 @@ import net.corda.core.serialization.CordaSerializable
 data class PSVUpdatePojo(
         val transactionCode: String = "",
         val transactionStatus: String = "",
-        val quantity: Double = 0.0,
+        val sellingQuantity: Double = 0.0,
         val sellingPrice: Double = 0.0
 )

@@ -284,7 +284,7 @@ object BatchFlow {
                     oldBatchState.plantAddress,
                     oldBatchState.plantCode,
                     oldBatchState.initialQuantity,
-                    batchUpdateProperty.quantity,
+                    oldBatchState.quantity - batchUpdateProperty.sellingQuantity,
                     oldBatchState.energy,
                     oldBatchState.price,
                     batchUpdateProperty.sellingPrice,
@@ -348,6 +348,7 @@ object BatchFlow {
                     val batchState = output as BatchState
                     /* "other rule batch" using (output is new rule) */
                     "batchID cannot be empty" using (batchState.batchID.isNotEmpty())
+                    "quantity must be greater or equal than zero" using (batchState.quantity >= 0.0)
                 }
             }
             val txId = subFlow(signTransactionFlow).id

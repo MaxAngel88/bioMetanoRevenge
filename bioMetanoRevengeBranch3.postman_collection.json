@@ -622,7 +622,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"batchID\": \"batch12345\",\r\n    \"batchStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 50.0\r\n}",
+							"raw": "{\r\n    \"batchID\": \"batch12345\",\r\n    \"batchStatus\": \"closed\",\r\n    \"sellingQuantity\": 10.0,\r\n    \"sellingPrice\": 50.0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -997,7 +997,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"exchangeCode\": \"e12345\",\r\n    \"exchangeStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 200.0\r\n}",
+							"raw": "{\r\n    \"exchangeCode\": \"e12345\",\r\n    \"exchangeStatus\": \"closed\",\r\n    \"sellingQuantity\": 10.0,\r\n    \"sellingPrice\": 200.0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1328,7 +1328,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"transactionCode\": \"t12345\",\r\n    \"transactionStatus\": \"closed\",\r\n    \"quantity\": 10.0,\r\n    \"sellingPrice\": 200.0\r\n}",
+							"raw": "{\r\n    \"transactionCode\": \"t12345\",\r\n    \"transactionStatus\": \"closed\",\r\n    \"sellingQuantity\": 10.0,\r\n    \"sellingPrice\": 200.0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

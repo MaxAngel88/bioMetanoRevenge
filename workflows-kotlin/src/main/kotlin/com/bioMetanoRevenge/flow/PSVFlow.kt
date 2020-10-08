@@ -279,7 +279,7 @@ object PSVFlow {
                     oldPSVState.plantAddress,
                     oldPSVState.plantCode,
                     oldPSVState.initialQuantity,
-                    psvStateUpdateProperty.quantity,
+                    oldPSVState.quantity - psvStateUpdateProperty.sellingQuantity,
                     oldPSVState.price,
                     psvStateUpdateProperty.sellingPrice,
                     oldPSVState.pcs,
@@ -338,6 +338,7 @@ object PSVFlow {
                     /* "other rule psvState" using (output is new rule) */
                     "parentBatchID cannot be empty" using (psvState.parentBatchID.isNotEmpty())
                     "transactionCode cannot be empty" using (psvState.transactionCode.isNotEmpty())
+                    "quantity must be greater or equal than zero" using (psvState.quantity >= 0.0)
                 }
             }
             val txId = subFlow(signTransactionFlow).id
