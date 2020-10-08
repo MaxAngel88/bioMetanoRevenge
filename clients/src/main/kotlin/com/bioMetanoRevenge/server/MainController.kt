@@ -2,6 +2,7 @@ package com.bioMetanoRevenge.server
 
 import com.bioMetanoRevenge.flow.AgreementFlow.IssuerAgreement
 import com.bioMetanoRevenge.flow.AgreementFlow.UpdaterAgreement
+import com.bioMetanoRevenge.flow.AgreementFlow.UpdaterAgreementStatus
 import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
 import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
@@ -2116,11 +2117,16 @@ class MainController(rpc: NodeRPCConnection) {
         val agreementSubType = issueAgreement.agreementSubType
         val owner = issueAgreement.owner
         val counterpart = issueAgreement.counterpart
+        val remiCode = issueAgreement.remiCode
+        val averageDailyCapacity = issueAgreement.averageDailyCapacity
+        val maxDailyCapacity = issueAgreement.maxDailyCapacity
+        val energyEstimation = issueAgreement.energyEstimation
         val energy = issueAgreement.energy
         val dcq = issueAgreement.dcq
         val price = issueAgreement.price
         val validFrom = issueAgreement.validFrom
         val validTo = issueAgreement.validTo
+        val agreementStatus = issueAgreement.agreementStatus
 
         if(counterpartParty.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "counterpartParty cannot be empty", data = null))
@@ -2150,6 +2156,22 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "counterpart cannot be empty", data = null))
         }
 
+        if(remiCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "remiCode cannot be empty", data = null))
+        }
+
+        if(averageDailyCapacity.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "averageDailyCapacity must be a number", data = null))
+        }
+
+        if(maxDailyCapacity.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "maxDailyCapacity must be a number", data = null))
+        }
+
+        if(energyEstimation.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "energyEstimation must be a number", data = null))
+        }
+
         if(energy.isNaN()){
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "energy must be a number", data = null))
         }
@@ -2168,6 +2190,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(validTo.toString().isBlank()){
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validTo cannot be empty", data = null))
+        }
+
+        if(agreementStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementStatus cannot be empty", data = null))
         }
 
         return try {
@@ -2222,6 +2248,37 @@ class MainController(rpc: NodeRPCConnection) {
 
         return try {
             val updateAgreement = proxy.startTrackedFlow(::UpdaterAgreement, updateAgreementPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Agreement with id: $agreementID update correctly. New AgreementState with id: ${updateAgreement.linearId.id} created.. ledger updated.", data = updateAgreement))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update Agreement Status
+     *
+     */
+    @PostMapping(value = [ "update-agreement-status" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateAgreementStatus(
+            @RequestBody
+            updateAgreementStatusPojo: AgreementUpdateStatusPojo): ResponseEntity<ResponsePojo> {
+
+        val agreementID = updateAgreementStatusPojo.agreementID
+        val agreementStatus = updateAgreementStatusPojo.agreementStatus
+
+        if(agreementID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementID cannot be empty", data = null))
+        }
+
+        if(agreementStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementStatus cannot be empty", data = null))
+        }
+
+
+        return try {
+            val updateAgreement = proxy.startTrackedFlow(::UpdaterAgreementStatus, updateAgreementStatusPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Agreement with id: $agreementID update correctly. New AgreementState with id: ${updateAgreement.linearId.id} created.. ledger updated.", data = updateAgreement))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)

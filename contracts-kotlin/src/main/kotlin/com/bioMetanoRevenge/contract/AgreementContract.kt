@@ -22,6 +22,7 @@ class AgreementContract : Contract {
             when(command.value){
                 is Commands.Issue -> verifyIssue(tx, setOfSigners)
                 is Commands.Update -> verifyUpdate(tx, setOfSigners)
+                is Commands.UpdateStatus -> verifyUpdateStatus(tx, setOfSigners)
                 else -> throw IllegalArgumentException("Unrecognised command.")
             }
         }
@@ -47,12 +48,17 @@ class AgreementContract : Contract {
             "owner cannot be empty." using (agreement.owner.isNotEmpty())
             "counterpart cannot be empty." using (agreement.counterpart.isNotEmpty())
             "owner and counterpart cannot be the same entity." using (agreement.owner != agreement.counterpart)
+            "remiCode cannot be empty." using (agreement.remiCode.isNotEmpty())
+            "averageDailyCapacity must be greater than zero." using (agreement.averageDailyCapacity > 0.0)
+            "maxDailyCapacity must be greater than zero." using (agreement.maxDailyCapacity > 0.0)
+            "energyEstimation must be greater than zero." using (agreement.energyEstimation > 0.0)
             "energy must be greater than zero." using (agreement.energy > 0.0)
             "dcq must be greater than zero." using (agreement.dcq > 0.0)
             "price must be greater than zero." using (agreement.price > 0.0)
             "validFrom cannot be empty." using (agreement.validFrom.toString().isBlank())
             "validTo cannot be empty." using (agreement.validTo.toString().isBlank())
             "validFrom must be before validTo." using (agreement.validFrom.isBefore(agreement.validTo))
+            "agreementStatus cannot be empty." using (agreement.agreementStatus.isNotEmpty())
         }
     }
 
@@ -82,15 +88,39 @@ class AgreementContract : Contract {
             "validFrom cannot be empty." using (newAgreementState.validFrom.toString().isBlank())
             "validTo cannot be empty." using (newAgreementState.validTo.toString().isBlank())
             "validFrom must be before validTo." using (newAgreementState.validFrom.isBefore(newAgreementState.validTo))
+            "agreementStatus cannot be empty." using (newAgreementState.agreementStatus.isNotEmpty())
+        }
+    }
+
+    private fun verifyUpdateStatus(tx: LedgerTransaction, signers: Set<PublicKey>){
+        tx.commands.requireSingleCommand<Commands.UpdateStatus>()
+        requireThat {
+            // Generic constraints around the old Agreement transaction.
+            "there must be only one agreement input." using (tx.inputs.size == 1)
+            val oldAgreementState = tx.inputsOfType<AgreementState>().single()
+
+            // Generic constraints around the generic update transaction.
+            "Only one transaction state should be created." using (tx.outputs.size == 1)
+            val newAgreementState = tx.outputsOfType<AgreementState>().single()
+            "All of the participants must be signers." using (signers.containsAll(newAgreementState.participants.map { it.owningKey }))
+
+            // Generic constraints around the new Agreement transaction
+            "GSE from old and new Agreement cannot change." using (oldAgreementState.GSE == newAgreementState.GSE)
+            "ownerParty from old and new Agreement cannot change." using (oldAgreementState.ownerParty == newAgreementState.ownerParty)
+            "counterpartParty from old and new Agreement cannot change." using (oldAgreementState.counterpartParty == newAgreementState.counterpartParty)
+            "owner from old and new Agreement cannot change." using (oldAgreementState.owner == newAgreementState.owner)
+            "counterpart from old and new Agreement cannot change." using (oldAgreementState.counterpart == newAgreementState.counterpart)
+            "agreementStatus cannot be empty." using (newAgreementState.agreementStatus.isNotEmpty())
         }
     }
 
 
     /**
-     * This contract only implements two commands: Issue, Update.
+     * This contract only implements three commands: Issue, Update, UpdateStatus.
      */
     interface Commands : CommandData {
         class Issue : Commands, TypeOnlyCommandData()
         class Update: Commands, TypeOnlyCommandData()
+        class UpdateStatus: Commands, TypeOnlyCommandData()
     }
 }

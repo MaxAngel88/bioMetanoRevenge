@@ -1804,7 +1804,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"counterpartParty\": \"Edison\",\r\n    \"agreementID\": \"agreement0001\",\r\n    \"agreementCode\": \"agreementCode0001\",\r\n    \"agreementDescription\": \"Description of Agreement\",\r\n    \"agreementType\": \"Vendita\",\r\n    \"agrementSubType\": \"PSV\",\r\n    \"owner\": \"Kalabria Maceri\",\r\n    \"counterpart\": \"Edison\",\r\n    \"tso\": \"SRG - Snam Rete Gas SpA\",\r\n    \"portfolio\": \"Gas Supply\",\r\n    \"sourceSystem\": \"Endur\",\r\n    \"programmingMethod\": \"Flat\",\r\n    \"agreementNote\": \"Agreement Note\",\r\n    \"energy\": 150.0,\r\n    \"dcq\": 120.0,\r\n    \"price\": 1.5,\r\n    \"validFrom\": \"2020-10-07T12:39:42.777Z\",\r\n    \"validTo\": \"2020-11-07T12:39:42.777Z\"\r\n}",
+							"raw": "{\r\n    \"counterpartParty\": \"Edison\",\r\n    \"agreementID\": \"agreement0001\",\r\n    \"agreementCode\": \"agreementCode0001\",\r\n    \"agreementDescription\": \"Description of Agreement\",\r\n    \"agreementType\": \"Vendita\",\r\n    \"agrementSubType\": \"PSV\",\r\n    \"plantID\": \"plant0001\",\r\n    \"plantAddress\": \"via Roma 15, Biancavilla, CT\",\r\n    \"plantBusinessName\": \"Kalabria Maceri\",\r\n    \"owner\": \"Kalabria Maceri\",\r\n    \"counterpart\": \"Edison\",\r\n    \"remiCode\": \"remiCode00001\",\r\n    \"averageDailyCapacity\": 10.1,\r\n    \"maxDailyCapacity\": 12.0,\r\n    \"energyEstimation\": 13.1, \r\n    \"tso\": \"SRG - Snam Rete Gas SpA\",\r\n    \"portfolio\": \"Gas Supply\",\r\n    \"sourceSystem\": \"Endur\",\r\n    \"programmingMethod\": \"Flat\",\r\n    \"agreementNote\": \"Agreement Note\",\r\n    \"invoicingCode\": \"invoicing0001\",\r\n    \"energy\": 150.0,\r\n    \"dcq\": 120.0,\r\n    \"price\": 1.5,\r\n    \"validFrom\": \"2020-10-07T12:39:42.777Z\",\r\n    \"validTo\": \"2020-11-07T12:39:42.777Z\",\r\n    \"agreementStatus\": \"active\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1852,6 +1852,36 @@
 								"api",
 								"bioMetanoRevenge",
 								"update-agreement"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-agreement-status",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"agreementID\": \"agreement0001\",\r\n    \"agreementStatus\": \"deactive\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{KALABRIAPORT}}/api/bioMetanoRevenge/update-agreement-status",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{KALABRIAPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-agreement-status"
 							]
 						}
 					},

@@ -48,11 +48,32 @@ object AgreementSchemaV1 : MappedSchema(
             @Column(name = "agreementSubType")
             var agreementSubType: String,
 
+            @Column(name = "plantID")
+            var plantID: String,
+
+            @Column(name = "plantAddress")
+            var plantAddress: String,
+
+            @Column(name = "plantBusinessName")
+            var plantBusinessName: String,
+
             @Column(name = "owner")
             var owner: String,
 
             @Column(name = "counterpart")
             var counterpart: String,
+
+            @Column(name = "remiCode")
+            var remiCode: String,
+
+            @Column(name = "averageDailyCapacity")
+            var averageDailyCapacity: Double,
+
+            @Column(name = "maxDailyCapacity")
+            var maxDailyCapacity: Double,
+
+            @Column(name = "energyEstimation")
+            var energyEstimation: Double,
 
             @Column(name = "tso")
             var tso: String,
@@ -69,6 +90,9 @@ object AgreementSchemaV1 : MappedSchema(
             @Column(name = "agreementNote")
             var agreementNote: String,
 
+            @Column(name = "invoicingCode")
+            var invoicingCode: String,
+
             @Column(name = "energy")
             var energy: Double,
 
@@ -84,6 +108,9 @@ object AgreementSchemaV1 : MappedSchema(
             @Column(name = "validTo")
             var validTo: Instant,
 
+            @Column(name = "agreementStatus")
+            var agreementStatus: String,
+
             @Column(name = "agreementDate")
             var agreementDate: Instant,
 
@@ -95,6 +122,6 @@ object AgreementSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", ownerParty = "", counterpartParty = "", agreementID = "", agreementCode = "", agreementDescription = "", agreementType = "", agreementSubType = "", owner = "", counterpart = "", tso = "", portfolio = "", sourceSystem = "", programmingMethod = "", agreementNote = "", energy = 0.0, dcq = 0.0, price = 0.0, validFrom = Instant.now(), validTo = Instant.now(), agreementDate = Instant.now(), agreementLastUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(GSE = "", ownerParty = "", counterpartParty = "", agreementID = "", agreementCode = "", agreementDescription = "", agreementType = "", agreementSubType = "", plantID = "", plantAddress = "", plantBusinessName = "", owner = "", counterpart = "", remiCode = "", averageDailyCapacity = 0.0, maxDailyCapacity = 0.0, energyEstimation = 0.0, tso = "", portfolio = "", sourceSystem = "", programmingMethod = "", agreementNote = "", invoicingCode = "", energy = 0.0, dcq = 0.0, price = 0.0, validFrom = Instant.now(), validTo = Instant.now(), agreementStatus = "", agreementDate = Instant.now(), agreementLastUpdate = Instant.now(), linearId = UUID.randomUUID())
     }
 }
