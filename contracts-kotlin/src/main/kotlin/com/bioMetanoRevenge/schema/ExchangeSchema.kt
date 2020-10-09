@@ -105,13 +105,19 @@ object ExchangeSchemaV1 : MappedSchema(
             @Column(name = "docDate")
             var docDate: String,
 
-            @Column(name = "batchStatus")
+            @Column(name = "exchangeStatus")
             var exchangeStatus: String,
 
-            @Column(name = "batchDate")
+            @Column(name = "supportField")
+            var supportField: String,
+
+            @Column(name = "auctionStatus")
+            var auctionStatus: String,
+
+            @Column(name = "exchangeDate")
             var exchangeDate: Instant,
 
-            @Column(name = "lastBatchUpdate")
+            @Column(name = "lastExchangeUpdate")
             var lastExchangeUpdate: Instant,
 
             @Column(name = "linear_id")
@@ -148,6 +154,8 @@ object ExchangeSchemaV1 : MappedSchema(
                 docRef = "",
                 docDate = "",
                 exchangeStatus = "",
+                supportField = "",
+                auctionStatus = "",
                 exchangeDate = Instant.now(),
                 lastExchangeUpdate = Instant.now(),
                 linearId = UUID.randomUUID()

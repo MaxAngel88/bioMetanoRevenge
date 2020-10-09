@@ -29,5 +29,7 @@ data class ExchangePojo(
         val arrivalPosition: String = "",
         val docRef: String = "",
         val docDate: String = "",
-        val exchangeStatus: String = ""
+        val exchangeStatus: String = "",
+        val supportField: String = "",
+        val auctionStatus: String = ""
 )

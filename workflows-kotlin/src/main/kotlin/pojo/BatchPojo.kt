@@ -27,5 +27,7 @@ data class BatchPojo(
         val arrivalPosition: String = "",
         val docRef: String = "",
         val docDate: String = "",
-        val batchStatus: String = ""
+        val batchStatus: String = "",
+        val supportField: String = "",
+        val auctionStatus: String = ""
 )

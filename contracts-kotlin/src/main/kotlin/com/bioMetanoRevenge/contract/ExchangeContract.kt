@@ -22,6 +22,7 @@ class ExchangeContract : Contract {
             when(command.value){
                 is Commands.Issue -> verifyIssue(tx, setOfSigners)
                 is Commands.Update -> verifyUpdate(tx, setOfSigners)
+                is Commands.UpdateAuction -> verifyUpdateAuction(tx, setOfSigners)
                 else -> throw IllegalArgumentException("Unrecognised command.")
             }
         }
@@ -79,12 +80,38 @@ class ExchangeContract : Contract {
         }
     }
 
+    private fun verifyUpdateAuction(tx: LedgerTransaction, signers: Set<PublicKey>){
+        tx.commands.requireSingleCommand<Commands.UpdateAuction>()
+        requireThat {
+            // Generic constraints around the old Exchange transaction.
+            "there must be only one exchange input." using (tx.inputs.size == 1)
+            val oldExchangeState = tx.inputsOfType<ExchangeState>().single()
+
+            // Generic constraints around the generic update transaction.
+            "Only one transaction state should be created." using (tx.outputs.size == 1)
+            val newExchangeState = tx.outputsOfType<ExchangeState>().single()
+            "All of the participants must be signers." using (signers.containsAll(newExchangeState.participants.map { it.owningKey }))
+
+            // Generic constraints around the new Exchange transaction
+            "GSE from old and new Exchange cannot change." using (oldExchangeState.GSE == newExchangeState.GSE)
+            "seller from old and new Exchange cannot change." using (oldExchangeState.seller == newExchangeState.seller)
+            "buyer from old and new Exchange cannot change." using (oldExchangeState.buyer == newExchangeState.buyer)
+            "parentBatchID from old and new Exchange cannot change." using (oldExchangeState.parentBatchID == newExchangeState.parentBatchID)
+            "exchangeCode from old and new Exchange cannot change." using (oldExchangeState.exchangeCode == newExchangeState.exchangeCode)
+            "month from old and new Exchange cannot change." using (oldExchangeState.month == newExchangeState.month)
+            "quantity must be greater or equal than zero." using (newExchangeState.quantity >= 0.0)
+            "supportField cannot be empty." using (newExchangeState.supportField.isNotEmpty())
+            "auctionStatus cannot be empty." using (newExchangeState.auctionStatus.isNotEmpty())
+        }
+    }
+
 
     /**
-     * This contract only implements two commands: Issue, Update.
+     * This contract only implements three commands: Issue, Update, UpdateAuction.
      */
     interface Commands : CommandData {
         class Issue : Commands, TypeOnlyCommandData()
         class Update: Commands, TypeOnlyCommandData()
+        class UpdateAuction: Commands, TypeOnlyCommandData()
     }
 }

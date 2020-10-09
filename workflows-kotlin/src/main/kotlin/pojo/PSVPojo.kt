@@ -22,5 +22,7 @@ data class PSVPojo(
         val pci: Double = 0.0,
         val docRef: String = "",
         val docDate: String = "",
-        val transactionStatus: String = ""
+        val transactionStatus: String = "",
+        val supportField: String = "",
+        val auctionStatus: String = ""
 )

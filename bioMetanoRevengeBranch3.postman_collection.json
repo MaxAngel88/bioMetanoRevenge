@@ -592,7 +592,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"produttore\": \"Produttore_A\",\r\n    \"counterpart\": \"Counterpart_A\",\r\n    \"idProducer\": \"idProducer_A\",\r\n    \"idCounterpart\": \"idCounterpart_A\",\r\n    \"transactionType\": \"test\",\r\n    \"batchID\": \"batch12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"remi12345\",\r\n    \"plantAddress\": \"via Roma\",\r\n    \"plantCode\": \"plant12345\",\r\n    \"initialQuantity\": 200.0,\r\n    \"quantity\": 200.0,\r\n    \"energy\": 30.0,\r\n    \"price\": 25.0,\r\n    \"averageProductionCapacity\": 50.0,\r\n    \"maxProductionCapacity\": 60.0,\r\n    \"annualEstimate\": 100.0,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"startingPosition\": \"Biancavilla\",\r\n    \"arrivalPosition\": \"Roma\",\r\n    \"docRef\": \"docRef12345\",\r\n    \"docDate\": \"310820\",\r\n    \"batchStatus\": \"open\"\r\n}",
+							"raw": "{\r\n    \"produttore\": \"Produttore_A\",\r\n    \"counterpart\": \"Counterpart_A\",\r\n    \"idProducer\": \"idProducer_A\",\r\n    \"idCounterpart\": \"idCounterpart_A\",\r\n    \"transactionType\": \"test\",\r\n    \"batchID\": \"batch12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"remi12345\",\r\n    \"plantAddress\": \"via Roma\",\r\n    \"plantCode\": \"plant12345\",\r\n    \"initialQuantity\": 200.0,\r\n    \"quantity\": 200.0,\r\n    \"energy\": 30.0,\r\n    \"price\": 25.0,\r\n    \"averageProductionCapacity\": 50.0,\r\n    \"maxProductionCapacity\": 60.0,\r\n    \"annualEstimate\": 100.0,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"startingPosition\": \"Biancavilla\",\r\n    \"arrivalPosition\": \"Roma\",\r\n    \"docRef\": \"docRef12345\",\r\n    \"docDate\": \"310820\",\r\n    \"batchStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"avaiable\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -640,6 +640,36 @@
 								"api",
 								"bioMetanoRevenge",
 								"update-batch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-batch-auction",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"batchID\": \"batch12345\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"not avaiable\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50015/api/bioMetanoRevenge/update-batch-auction",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50015",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-batch-auction"
 							]
 						}
 					},
@@ -967,7 +997,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"seller\": \"Produttore_A\",\r\n    \"buyer\": \"Shipper_A\",\r\n    \"exchangeType\": \"vendita\",\r\n    \"PIVASeller\": \"PIVASeller1234\",\r\n    \"PIVABuyer\": \"PIVABuyer1234\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"exchangeCode\": \"e12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"xxxx1\",\r\n    \"plantAddress\": \"Verona\",\r\n    \"plantCode\": \"Verona01\",\r\n    \"hauler\": \"N/A\",\r\n    \"PIVAHauler\": \"N/A\",\r\n    \"trackCode\": \"N/A\",\r\n    \"pickupDate\": \"12/08/2020\",\r\n    \"deliveryDate\": \"18/08/2020\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 12.0,\r\n    \"price\": 14.5,\r\n    \"pcs\": 0.98,\r\n    \"pci\": 0.85,\r\n    \"startingPosition\": \"Verona\",\r\n    \"arrivalPosition\": \"Milano\",\r\n    \"docRef\": \"docRefABCD\",\r\n    \"docDate\": \"22062020\",\r\n    \"exchangeStatus\": \"open\"\r\n}",
+							"raw": "{\r\n    \"seller\": \"Produttore_A\",\r\n    \"buyer\": \"Shipper_A\",\r\n    \"exchangeType\": \"vendita\",\r\n    \"PIVASeller\": \"PIVASeller1234\",\r\n    \"PIVABuyer\": \"PIVABuyer1234\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"exchangeCode\": \"e12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"xxxx1\",\r\n    \"plantAddress\": \"Verona\",\r\n    \"plantCode\": \"Verona01\",\r\n    \"hauler\": \"N/A\",\r\n    \"PIVAHauler\": \"N/A\",\r\n    \"trackCode\": \"N/A\",\r\n    \"pickupDate\": \"12/08/2020\",\r\n    \"deliveryDate\": \"18/08/2020\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 12.0,\r\n    \"price\": 14.5,\r\n    \"pcs\": 0.98,\r\n    \"pci\": 0.85,\r\n    \"startingPosition\": \"Verona\",\r\n    \"arrivalPosition\": \"Milano\",\r\n    \"docRef\": \"docRefABCD\",\r\n    \"docDate\": \"22062020\",\r\n    \"exchangeStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"avaiable\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1015,6 +1045,36 @@
 								"api",
 								"bioMetanoRevenge",
 								"update-exchange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-exchange-auction",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"exchangeCode\": \"e12345\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"not avaiable\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/update-exchange-auction",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-exchange-auction"
 							]
 						}
 					},
@@ -1298,7 +1358,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"seller\": \"Shipper_A\",\r\n    \"buyer\": \"Shipper_B\",\r\n    \"transactionType\": \"scambio PSV\",\r\n    \"PIVASeller\": \"PIVA1234\",\r\n    \"PIVABuyer\": \"PIVA5678\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"transactionCode\": \"t12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"r12345\",\r\n    \"plantAddress\": \"Catania\",\r\n    \"plantCode\": \"Catania01\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 110.0,\r\n    \"price\": 12.6,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"docRef\": \"documentABC\",\r\n    \"docDate\": \"22082020\",\r\n    \"transactionStatus\": \"open\"\r\n}",
+							"raw": "{\r\n    \"seller\": \"Shipper_A\",\r\n    \"buyer\": \"Shipper_B\",\r\n    \"transactionType\": \"scambio PSV\",\r\n    \"PIVASeller\": \"PIVA1234\",\r\n    \"PIVABuyer\": \"PIVA5678\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"transactionCode\": \"t12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"r12345\",\r\n    \"plantAddress\": \"Catania\",\r\n    \"plantCode\": \"Catania01\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 110.0,\r\n    \"price\": 12.6,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"docRef\": \"documentABC\",\r\n    \"docDate\": \"22082020\",\r\n    \"transactionStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"avaiable\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1346,6 +1406,36 @@
 								"api",
 								"bioMetanoRevenge",
 								"update-psv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-psv-auction",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"transactionCode\": \"t12345\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"not avaiable\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/update-psv-auction",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-psv-auction"
 							]
 						}
 					},

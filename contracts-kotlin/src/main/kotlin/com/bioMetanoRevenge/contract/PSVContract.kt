@@ -22,6 +22,7 @@ class PSVContract : Contract {
             when(command.value){
                 is Commands.Issue -> verifyIssue(tx, setOfSigners)
                 is Commands.Update -> verifyUpdate(tx, setOfSigners)
+                is Commands.UpdateAuction -> verifyUpdateAuction(tx, setOfSigners)
                 else -> throw IllegalArgumentException("Unrecognised command.")
             }
         }
@@ -83,12 +84,39 @@ class PSVContract : Contract {
         }
     }
 
+    private fun verifyUpdateAuction(tx: LedgerTransaction, signers: Set<PublicKey>){
+        tx.commands.requireSingleCommand<Commands.UpdateAuction>()
+        requireThat {
+            // Generic constraints around the old Exchange transaction.
+            "there must be only one exchange input." using (tx.inputs.size == 1)
+            val oldPSVState = tx.inputsOfType<PSVState>().single()
+
+            // Generic constraints around the generic update transaction.
+            "Only one transaction state should be created." using (tx.outputs.size == 1)
+            val newPSVState = tx.outputsOfType<PSVState>().single()
+            "All of the participants must be signers." using (signers.containsAll(newPSVState.participants.map { it.owningKey }))
+
+            // Generic constraints around the new PSVState transaction
+            "GSE from old and new PSVState cannot change." using (oldPSVState.GSE == newPSVState.GSE)
+            "seller from old and new PSVState cannot change." using (oldPSVState.seller == newPSVState.seller)
+            "buyer from old and new PSVState cannot change." using (oldPSVState.buyer == newPSVState.buyer)
+            "Snam from old and new PSVState cannot change." using (oldPSVState.Snam == newPSVState.Snam)
+            "parentBatchID from old and new PSVState cannot change." using (oldPSVState.parentBatchID == newPSVState.parentBatchID)
+            "transactionCode from old and new PSVState cannot change." using (oldPSVState.transactionCode == newPSVState.transactionCode)
+            "month from old and new PSVState cannot change." using (oldPSVState.month == newPSVState.month)
+            "quantity must be greater or equal than zero." using (newPSVState.quantity >= 0.0)
+            "supportField cannot be empty." using (newPSVState.supportField.isNotEmpty())
+            "auctionStatus cannot be empty." using (newPSVState.auctionStatus.isNotEmpty())
+        }
+    }
+
 
     /**
-     * This contract only implements two commands: Issue, Update.
+     * This contract only implements three commands: Issue, Update, UpdateAuction.
      */
     interface Commands : CommandData {
         class Issue : Commands, TypeOnlyCommandData()
         class Update: Commands, TypeOnlyCommandData()
+        class UpdateAuction: Commands, TypeOnlyCommandData()
     }
 }

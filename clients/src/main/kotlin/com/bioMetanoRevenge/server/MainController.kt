@@ -5,13 +5,16 @@ import com.bioMetanoRevenge.flow.AgreementFlow.UpdaterAgreement
 import com.bioMetanoRevenge.flow.AgreementFlow.UpdaterAgreementStatus
 import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
+import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatchAuction
 import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterOCREnroll
 import com.bioMetanoRevenge.flow.ExchangeFlow.IssuerExchange
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchange
+import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchangeAuction
 import com.bioMetanoRevenge.flow.PSVFlow.IssuerPSVState
 import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVState
+import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVStateAuction
 import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgrammingDoc
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgrammingStatus
@@ -1002,6 +1005,7 @@ class MainController(rpc: NodeRPCConnection) {
         val month = issueBatchPojo.month
         val initialQuantity = issueBatchPojo.initialQuantity
         val quantity = issueBatchPojo.quantity
+        val auctionStatus = issueBatchPojo.auctionStatus
 
         if(produttore.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "produttore (organization name) cannot be empty", data = null))
@@ -1025,6 +1029,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(quantity.isNaN()){
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
+        }
+
+        if(auctionStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "auctionStatus cannot be empty", data = null))
         }
 
         return try {
@@ -1070,6 +1078,41 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateBatch = proxy.startTrackedFlow(::UpdaterBatch, updateBatchPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Batch with id: $batchId update correctly. New BatchState with id: ${updateBatch.linearId.id} created.. ledger updated.", data = updateBatch))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update Batch Auction
+     *
+     */
+    @PostMapping(value = [ "update-batch-auction" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateBatchAuction(
+            @RequestBody
+            updateAuctionBatchPojo: BatchUpdateAuctionPojo): ResponseEntity<ResponsePojo> {
+
+        val batchId = updateAuctionBatchPojo.batchID
+        val batchSupportField = updateAuctionBatchPojo.supportField
+        val batchAuctionStatus = updateAuctionBatchPojo.auctionStatus
+
+        if(batchId.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchId cannot be empty", data = null))
+        }
+
+        if(batchSupportField.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "supportField cannot be empty", data = null))
+        }
+
+        if(batchAuctionStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "auctionStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updateBatchAuction = proxy.startTrackedFlow(::UpdaterBatchAuction, updateAuctionBatchPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Batch with id: $batchId update correctly. New BatchState with id: ${updateBatchAuction.linearId.id} created.. ledger updated.", data = updateBatchAuction))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
@@ -1346,6 +1389,7 @@ class MainController(rpc: NodeRPCConnection) {
         val quantity = issueExchangePojo.quantity
         val pcs = issueExchangePojo.pcs
         val pci = issueExchangePojo.pci
+        val auctionStatus = issueExchangePojo.auctionStatus
 
         if(seller.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "seller (organization name) cannot be empty", data = null))
@@ -1381,6 +1425,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(pci.isNaN()){
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "pci must be a number", data = null))
+        }
+
+        if(auctionStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "auctionStatus cannot be empty", data = null))
         }
 
         return try {
@@ -1426,6 +1474,41 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateExchange = proxy.startTrackedFlow(::UpdaterExchange, updateExchangePojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Exchange with id: $exchangeCode update correctly. New ExchangeState with id: ${updateExchange.linearId.id} created.. ledger updated.", data = updateExchange))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update Exchange Auction
+     *
+     */
+    @PostMapping(value = [ "update-exchange-auction" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateExchangeAuction(
+            @RequestBody
+            updateAuctionExchangePojo: ExchangeUpdateAuctionPojo): ResponseEntity<ResponsePojo> {
+
+        val exchangeCode = updateAuctionExchangePojo.exchangeCode
+        val exchangeSupportField = updateAuctionExchangePojo.supportField
+        val exchangeAuctionStatus = updateAuctionExchangePojo.auctionStatus
+
+        if(exchangeCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "exchangeCode cannot be empty", data = null))
+        }
+
+        if(exchangeSupportField.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "supportField cannot be empty", data = null))
+        }
+
+        if(exchangeAuctionStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "auctionStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updateAuctionExchange = proxy.startTrackedFlow(::UpdaterExchangeAuction, updateAuctionExchangePojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Exchange with id: $exchangeCode update correctly. New ExchangeState with id: ${updateAuctionExchange.linearId.id} created.. ledger updated.", data = updateAuctionExchange))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
@@ -1700,6 +1783,7 @@ class MainController(rpc: NodeRPCConnection) {
         val parentBatchID = issuePSVPojo.parentBatchID
         val initialQuantity = issuePSVPojo.initialQuantity
         val quantity = issuePSVPojo.quantity
+        val auctionStatus = issuePSVPojo.auctionStatus
 
         if(seller.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "seller (organization name) cannot be empty", data = null))
@@ -1727,6 +1811,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(quantity.isNaN()){
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
+        }
+
+        if(auctionStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "auctionStatus cannot be empty", data = null))
         }
 
         return try {
@@ -1772,6 +1860,41 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updatePSVState = proxy.startTrackedFlow(::UpdaterPSVState, updatePSVPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "PSV with id: $transactionCode update correctly. New PSVState with id: ${updatePSVState.linearId.id} created.. ledger updated.", data = updatePSVState))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update PSVState Auction
+     *
+     */
+    @PostMapping(value = [ "update-psv-auction" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updatePSVStateAuction(
+            @RequestBody
+            updateAuctionPSVPojo: PSVUpdateAuctionPojo): ResponseEntity<ResponsePojo> {
+
+        val transactionCode = updateAuctionPSVPojo.transactionCode
+        val transactionSupportField = updateAuctionPSVPojo.supportField
+        val transactionAuctionStatus = updateAuctionPSVPojo.auctionStatus
+
+        if(transactionCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "transactionCode cannot be empty", data = null))
+        }
+
+        if(transactionSupportField.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "supportField cannot be empty", data = null))
+        }
+
+        if(transactionAuctionStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "auctionStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updateAuctionPSVState = proxy.startTrackedFlow(::UpdaterPSVStateAuction, updateAuctionPSVPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "PSV with id: $transactionCode update correctly. New PSVState with id: ${updateAuctionPSVState.linearId.id} created.. ledger updated.", data = updateAuctionPSVState))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
