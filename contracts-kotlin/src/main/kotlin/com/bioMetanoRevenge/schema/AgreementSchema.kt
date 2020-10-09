@@ -122,6 +122,39 @@ object AgreementSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", ownerParty = "", counterpartParty = "", agreementID = "", agreementCode = "", agreementDescription = "", agreementType = "", agreementSubType = "", plantID = "", plantAddress = "", plantBusinessName = "", owner = "", counterpart = "", remiCode = "", averageDailyCapacity = 0.0, maxDailyCapacity = 0.0, energyEstimation = 0.0, tso = "", portfolio = "", sourceSystem = "", programmingMethod = "", agreementNote = "", invoicingCode = "", energy = 0.0, dcq = 0.0, price = 0.0, validFrom = Instant.now(), validTo = Instant.now(), agreementStatus = "", agreementDate = Instant.now(), agreementLastUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(
+                GSE = "",
+                ownerParty = "",
+                counterpartParty = "",
+                agreementID = "",
+                agreementCode = "",
+                agreementDescription = "",
+                agreementType = "",
+                agreementSubType = "",
+                plantID = "",
+                plantAddress = "",
+                plantBusinessName = "",
+                owner = "",
+                counterpart = "",
+                remiCode = "",
+                averageDailyCapacity = 0.0,
+                maxDailyCapacity = 0.0,
+                energyEstimation = 0.0,
+                tso = "",
+                portfolio = "",
+                sourceSystem = "",
+                programmingMethod = "",
+                agreementNote = "",
+                invoicingCode = "",
+                energy = 0.0,
+                dcq = 0.0,
+                price = 0.0,
+                validFrom = Instant.now(),
+                validTo = Instant.now(),
+                agreementStatus = "",
+                agreementDate = Instant.now(),
+                agreementLastUpdate = Instant.now(),
+                linearId = UUID.randomUUID()
+        )
     }
 }

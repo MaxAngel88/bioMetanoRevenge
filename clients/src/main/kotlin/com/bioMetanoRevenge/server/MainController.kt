@@ -771,43 +771,43 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
-     * Displays last BatchState that exist in the node's vault for selected shipper (organization name).
+     * Displays last BatchState that exist in the node's vault for selected counterpart (organization name).
      */
-    @GetMapping(value = [ "getLastBatchStateByShipper/{shipperName}" ], produces = [ APPLICATION_JSON_VALUE ])
-    fun getLastBatchStateByShipper(
-            @PathVariable("shipperName")
-            shipperName : String ) : ResponseEntity<ResponsePojo> {
+    @GetMapping(value = [ "getLastBatchStateByCounterpart/{counterpartName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchStateByCounterpart(
+            @PathVariable("counterpartName")
+            counterpartName : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive UNCONSUMED state AND filter it for shipper organization name
+        // setting the criteria for retrive UNCONSUMED state AND filter it for counterpart organization name
         val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
 
-        val foundShipperBatch = proxy.vaultQueryBy<BatchState>(
+        val foundCounterpartBatch = proxy.vaultQueryBy<BatchState>(
                 generalUnconsumedStateCriteria,
                 PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
                 Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
-        ).states.filter { it.state.data.shipper.name.organisation == shipperName }
+        ).states.filter { it.state.data.counterpart.name.organisation == counterpartName }
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last BatchState by shipper $shipperName .", data = foundShipperBatch))
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last BatchState by counterpart $counterpartName .", data = foundCounterpartBatch))
     }
 
     /**
-     * Displays History BatchState that exist in the node's vault for selected shipper (organization name).
+     * Displays History BatchState that exist in the node's vault for selected counterpart (organization name).
      */
-    @GetMapping(value = [ "getHistoryBatchStateByShipper/{shipperName}" ], produces = [ APPLICATION_JSON_VALUE ])
-    fun getHistoryBatchStateByShipper(
-            @PathVariable("shipperName")
-            shipperName : String ) : ResponseEntity<ResponsePojo> {
+    @GetMapping(value = [ "getHistoryBatchStateByCounterpart/{counterpartName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByCounterpart(
+            @PathVariable("counterpartName")
+            counterpartName : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for shipper organization name
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for counterpart organization name
         val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
 
-        val foundShipperBatchHistory = proxy.vaultQueryBy<BatchState>(
+        val foundCounterpartBatchHistory = proxy.vaultQueryBy<BatchState>(
                 generalAllStateCriteria,
                 PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
                 Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
-        ).states.filter { it.state.data.shipper.name.organisation == shipperName }
+        ).states.filter { it.state.data.counterpart.name.organisation == counterpartName }
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $shipperName", data = foundShipperBatchHistory))
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $counterpartName", data = foundCounterpartBatchHistory))
     }
 
     /**
@@ -875,25 +875,25 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
-     * Displays History BatchState that exist in the node's vault for selected shipper (organization name) and month.
+     * Displays History BatchState that exist in the node's vault for selected counterpart (organization name) and month.
      */
-    @GetMapping(value = [ "getHistoryBatchStateByMonthShipper/{month}/{shipperName}" ], produces = [ APPLICATION_JSON_VALUE ])
-    fun getHistoryBatchStateByMonthShipper(
+    @GetMapping(value = [ "getHistoryBatchStateByMonthCounterpart/{month}/{counterpartName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByMonthCounterpart(
             @PathVariable("month")
             month : String,
-            @PathVariable("shipperName")
-            shipperName : String ) : ResponseEntity<ResponsePojo> {
+            @PathVariable("counterpartName")
+            counterpartName : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for shipper organization name and month
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for counterpart organization name and month
         var monthCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::month.equal(month)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
 
-        val foundMonthShipperBatchHistory = proxy.vaultQueryBy<BatchState>(
+        val foundMonthCounterpartBatchHistory = proxy.vaultQueryBy<BatchState>(
                 monthCriteria,
                 PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
                 Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
-        ).states.filter { it.state.data.shipper.name.organisation == shipperName }
+        ).states.filter { it.state.data.counterpart.name.organisation == counterpartName }
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $shipperName in $month.", data = foundMonthShipperBatchHistory))
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $counterpartName in $month.", data = foundMonthCounterpartBatchHistory))
     }
 
     /**
@@ -939,45 +939,45 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
-     * Displays last BatchState that exist in the node's vault for selected idShipper.
+     * Displays last BatchState that exist in the node's vault for selected idCounterpart.
      */
-    @GetMapping(value = [ "getLastBatchByIdShipper/{idShipper}" ], produces = [ APPLICATION_JSON_VALUE ])
-    fun getLastBatchByIdShipper(
-            @PathVariable("idProducer")
-            idShipper : String ) : ResponseEntity<ResponsePojo> {
+    @GetMapping(value = [ "getLastBatchByIdCounterpart/{idCounterpart}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchByIdCounterpart(
+            @PathVariable("idCounterpart")
+            idCounterpart : String ) : ResponseEntity<ResponsePojo> {
 
         // setting the criteria for retrive UNCONSUMED state AND filter it for idShipper
-        var idShipperCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::idShipper.equal(idShipper)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+        var idCounterpartCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::idCounterpart.equal(idCounterpart)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
 
-        val foundBatchIdShipper = proxy.vaultQueryBy<BatchState>(
-                idShipperCriteria,
+        val foundBatchIdCounterpart = proxy.vaultQueryBy<BatchState>(
+                idCounterpartCriteria,
                 PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
                 Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
         ).states
         //.filter { it.state.data.macAddress == macAddress }
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last batch by idShipper $idShipper .", data = foundBatchIdShipper))
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last batch by idCounterpart $idCounterpart .", data = foundBatchIdCounterpart))
     }
 
     /**
-     * Displays History BatchState that exist in the node's vault for selected idShipper.
+     * Displays History BatchState that exist in the node's vault for selected idCounterpart.
      */
-    @GetMapping(value = [ "getHistoryBatchStateByIdShipper/{idShipper}" ], produces = [ APPLICATION_JSON_VALUE ])
-    fun getHistoryBatchStateByIdShipper(
-            @PathVariable("idShipper")
-            idShipper : String ) : ResponseEntity<ResponsePojo> {
+    @GetMapping(value = [ "getHistoryBatchStateByIdCounterpart/{idCounterpart}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryBatchStateByIdCounterpart(
+            @PathVariable("idCounterpart")
+            idCounterpart : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for idShipper
-        var batchIdShipperCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::idShipper.equal(idShipper)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for idCounterpart
+        var batchIdCounterpartCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::idCounterpart.equal(idCounterpart)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(BatchState::class.java))
 
-        val foundBatchIdShipperHistory = proxy.vaultQueryBy<BatchState>(
-                batchIdShipperCriteria,
+        val foundBatchIdCounterpartHistory = proxy.vaultQueryBy<BatchState>(
+                batchIdCounterpartCriteria,
                 PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
                 Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
         ).states
         //.filter { it.state.data.macAddress == macAddress }
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $idShipper", data = foundBatchIdShipperHistory))
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of batch state for $idCounterpart", data = foundBatchIdCounterpartHistory))
     }
 
     /**
@@ -997,7 +997,7 @@ class MainController(rpc: NodeRPCConnection) {
             issueBatchPojo : BatchPojo): ResponseEntity<ResponsePojo> {
 
         val produttore = issueBatchPojo.produttore
-        val shipper = issueBatchPojo.shipper
+        val counterpart = issueBatchPojo.counterpart
         val batchID = issueBatchPojo.batchID
         val month = issueBatchPojo.month
         val initialQuantity = issueBatchPojo.initialQuantity
@@ -1007,8 +1007,8 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "produttore (organization name) cannot be empty", data = null))
         }
 
-        if(shipper.isEmpty()) {
-            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "shipper (organization name) cannot be empty", data = null))
+        if(counterpart.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "counterpart (organization name) cannot be empty", data = null))
         }
 
         if(batchID.isEmpty()) {

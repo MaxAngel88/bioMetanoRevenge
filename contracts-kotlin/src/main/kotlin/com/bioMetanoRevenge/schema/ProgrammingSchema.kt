@@ -66,6 +66,20 @@ object ProgrammingSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", produttore = "", sendDate = "", monthYear = "", programmingType = "", versionFile = "", bioAgreementCode = "", remiCode = "", docRef = "", docName = "", programmingStatus = "", programmingDate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(
+                GSE = "",
+                produttore = "",
+                sendDate = "",
+                monthYear = "",
+                programmingType = "",
+                versionFile = "",
+                bioAgreementCode = "",
+                remiCode = "",
+                docRef = "",
+                docName = "",
+                programmingStatus = "",
+                programmingDate = Instant.now(),
+                linearId = UUID.randomUUID()
+        )
     }
 }

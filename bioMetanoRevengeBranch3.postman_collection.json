@@ -592,7 +592,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"produttore\": \"Produttore_A\",\r\n    \"shipper\": \"Shipper_A\",\r\n    \"idProducer\": \"idProducer_A\",\r\n    \"idShipper\": \"idShipper_A\",\r\n    \"transactionType\": \"test\",\r\n    \"batchID\": \"batch12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"remi12345\",\r\n    \"plantAddress\": \"via Roma\",\r\n    \"plantCode\": \"plant12345\",\r\n    \"initialQuantity\": 200.0,\r\n    \"quantity\": 200.0,\r\n    \"energy\": 30.0,\r\n    \"price\": 25.0,\r\n    \"averageProductionCapacity\": 50.0,\r\n    \"maxProductionCapacity\": 60.0,\r\n    \"annualEstimate\": 100.0,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"startingPosition\": \"Biancavilla\",\r\n    \"arrivalPosition\": \"Roma\",\r\n    \"docRef\": \"docRef12345\",\r\n    \"docDate\": \"310820\",\r\n    \"batchStatus\": \"open\"\r\n}",
+							"raw": "{\r\n    \"produttore\": \"Produttore_A\",\r\n    \"counterpart\": \"Counterpart_A\",\r\n    \"idProducer\": \"idProducer_A\",\r\n    \"idCounterpart\": \"idCounterpart_A\",\r\n    \"transactionType\": \"test\",\r\n    \"batchID\": \"batch12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"remi12345\",\r\n    \"plantAddress\": \"via Roma\",\r\n    \"plantCode\": \"plant12345\",\r\n    \"initialQuantity\": 200.0,\r\n    \"quantity\": 200.0,\r\n    \"energy\": 30.0,\r\n    \"price\": 25.0,\r\n    \"averageProductionCapacity\": 50.0,\r\n    \"maxProductionCapacity\": 60.0,\r\n    \"annualEstimate\": 100.0,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"startingPosition\": \"Biancavilla\",\r\n    \"arrivalPosition\": \"Roma\",\r\n    \"docRef\": \"docRef12345\",\r\n    \"docDate\": \"310820\",\r\n    \"batchStatus\": \"open\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -733,12 +733,12 @@
 					"response": []
 				},
 				{
-					"name": "getLastBatchStateByShipper",
+					"name": "getLastBatchStateByCounterpart",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchStateByShipper/Shipper_A",
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchStateByCounterpart/counterpartName",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -747,20 +747,20 @@
 							"path": [
 								"api",
 								"bioMetanoRevenge",
-								"getLastBatchStateByShipper",
-								"Shipper_A"
+								"getLastBatchStateByCounterpart",
+								"counterpartName"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "getHistoryBatchStateByShipper",
+					"name": "getHistoryBatchStateByCounterpart",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByShipper/Shipper_A",
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByCounterpart/counterpartName",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -769,8 +769,8 @@
 							"path": [
 								"api",
 								"bioMetanoRevenge",
-								"getHistoryBatchStateByShipper",
-								"Shipper_A"
+								"getHistoryBatchStateByCounterpart",
+								"counterpartName"
 							]
 						}
 					},
@@ -865,12 +865,12 @@
 					"response": []
 				},
 				{
-					"name": "getLastBatchByIdShipper",
+					"name": "getLastBatchByIdCounterpart",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchByIdShipper/idShipper_A",
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchByIdCounterpart/idCounterpart",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -879,20 +879,20 @@
 							"path": [
 								"api",
 								"bioMetanoRevenge",
-								"getLastBatchByIdShipper",
-								"idShipper_A"
+								"getLastBatchByIdCounterpart",
+								"idCounterpart"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "getHistoryBatchStateByIdShipper",
+					"name": "getHistoryBatchStateByIdCounterpart",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByIdShipper/idShipper_A",
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByIdCounterpart/idCounterpart",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -901,8 +901,8 @@
 							"path": [
 								"api",
 								"bioMetanoRevenge",
-								"getHistoryBatchStateByIdShipper",
-								"idShipper_A"
+								"getHistoryBatchStateByIdCounterpart",
+								"idCounterpart"
 							]
 						}
 					},
@@ -932,12 +932,12 @@
 					"response": []
 				},
 				{
-					"name": "getHistoryBatchStateByMonthShipper",
+					"name": "getHistoryBatchStateByMonthCounterpart",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByMonthShipper/Agosto/Shipper_A",
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getHistoryBatchStateByMonthCounterpart/Agosto/counterpartName",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -946,9 +946,9 @@
 							"path": [
 								"api",
 								"bioMetanoRevenge",
-								"getHistoryBatchStateByMonthShipper",
+								"getHistoryBatchStateByMonthCounterpart",
 								"Agosto",
-								"Shipper_A"
+								"counterpartName"
 							]
 						}
 					},

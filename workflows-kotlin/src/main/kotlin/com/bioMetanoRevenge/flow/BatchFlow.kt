@@ -95,9 +95,9 @@ object BatchFlow {
             var produttoreX500Name = CordaX500Name(organisation = batchProperty.produttore, locality = "Milan", country = "IT")
             var produttoreParty = serviceHub.networkMapCache.getPeerByLegalName(produttoreX500Name)!!
 
-            // set Party value for Shipper
-            var shipperX500Name = CordaX500Name(organisation = batchProperty.shipper, locality = "Milan", country = "IT")
-            var shipperParty = serviceHub.networkMapCache.getPeerByLegalName(shipperX500Name)!!
+            // set Party value for Counterpart
+            var counterpartX500Name = CordaX500Name(organisation = batchProperty.counterpart, locality = "Milan", country = "IT")
+            var counterpartParty = serviceHub.networkMapCache.getPeerByLegalName(counterpartX500Name)!!
 
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
@@ -107,9 +107,9 @@ object BatchFlow {
                     myLegalIdentity,
                     snamParty,
                     produttoreParty,
-                    shipperParty,
+                    counterpartParty,
                     batchProperty.idProducer,
-                    batchProperty.idShipper,
+                    batchProperty.idCounterpart,
                     batchProperty.transactionType,
                     batchProperty.batchID,
                     batchProperty.month,
@@ -156,13 +156,13 @@ object BatchFlow {
             // Send the state to the other nodes, and receive it back with their signature.
             val snamSession = initiateFlow(snamParty)
             val produttoreSession = initiateFlow(produttoreParty)
-            val shipperSession = initiateFlow(shipperParty)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(snamSession, produttoreSession, shipperSession), GATHERING_SIGS.childProgressTracker()))
+            val counterpartSession = initiateFlow(counterpartParty)
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(snamSession, produttoreSession, counterpartSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(snamSession, produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(snamSession, produttoreSession, counterpartSession), FINALISING_TRANSACTION.childProgressTracker()))
 
             return batchState
         }
@@ -180,7 +180,7 @@ object BatchFlow {
                     /* "other rule batch" using (batch is new rule) */
                     "batchID cannot be empty" using (batchState.batchID.isNotEmpty())
                     "idProducer cannot be empty" using (batchState.idProducer.isNotEmpty())
-                    "idShipper cannot be empty" using (batchState.idShipper.isNotEmpty())
+                    "idCounterpart cannot be empty" using (batchState.idCounterpart.isNotEmpty())
                 }
             }
             val txId = subFlow(signTransactionFlow).id
@@ -274,9 +274,9 @@ object BatchFlow {
                     myLegalIdentity,
                     oldBatchState.Snam,
                     oldBatchState.produttore,
-                    oldBatchState.shipper,
+                    oldBatchState.counterpart,
                     oldBatchState.idProducer,
-                    oldBatchState.idShipper,
+                    oldBatchState.idCounterpart,
                     oldBatchState.transactionType,
                     oldBatchState.batchID,
                     oldBatchState.month,
@@ -325,13 +325,13 @@ object BatchFlow {
             // Send the state to the other nodes, and receive it back with their signature.
             val snamSession = initiateFlow(oldBatchState.Snam)
             val produttoreSession = initiateFlow(oldBatchState.produttore)
-            val shipperSession = initiateFlow(oldBatchState.shipper)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(snamSession, produttoreSession, shipperSession), GATHERING_SIGS.childProgressTracker()))
+            val counterpartSession = initiateFlow(oldBatchState.counterpart)
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(snamSession, produttoreSession, counterpartSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(snamSession, produttoreSession, shipperSession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(snamSession, produttoreSession, counterpartSession), FINALISING_TRANSACTION.childProgressTracker()))
 
             return newBatchState
         }

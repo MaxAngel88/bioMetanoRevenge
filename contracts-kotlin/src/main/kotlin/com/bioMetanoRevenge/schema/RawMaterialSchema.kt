@@ -62,6 +62,19 @@ object RawMaterialSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", produttore = "", rawMaterialChar = "", rawMaterialType = "", CERCode = "", quantity = 0.0, originCountry = "", secondaryHarvest = false, degradedLand = false, sustainabilityCode = "", rawMaterialDate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(
+                GSE = "",
+                produttore = "",
+                rawMaterialChar = "",
+                rawMaterialType = "",
+                CERCode = "",
+                quantity = 0.0,
+                originCountry = "",
+                secondaryHarvest = false,
+                degradedLand = false,
+                sustainabilityCode = "",
+                rawMaterialDate = Instant.now(),
+                linearId = UUID.randomUUID()
+        )
     }
 }

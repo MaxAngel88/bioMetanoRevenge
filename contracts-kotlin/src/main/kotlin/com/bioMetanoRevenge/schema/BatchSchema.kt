@@ -33,14 +33,14 @@ object BatchSchemaV1 : MappedSchema(
             @Column(name = "produttore")
             var produttore: String,
 
-            @Column(name = "shipper")
-            var shipper: String,
+            @Column(name = "counterpart")
+            var counterpart: String,
 
             @Column(name = "idProducer")
             var idProducer: String,
 
-            @Column(name = "idShipper")
-            var idShipper: String,
+            @Column(name = "idCounterpart")
+            var idCounterpart: String,
 
             @Column(name = "transactionType")
             var transactionType: String,
@@ -120,9 +120,9 @@ object BatchSchemaV1 : MappedSchema(
                 GSE = "",
                 Snam = "",
                 produttore = "",
-                shipper = "",
+                counterpart = "",
                 idProducer = "",
-                idShipper = "",
+                idCounterpart = "",
                 transactionType = "",
                 batchID = "",
                 month = "",

@@ -113,6 +113,36 @@ object EnrollSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", owner = "", enrollType = "", subjectFirstName = "", subjectLastName = "", subjectAddress = "", subjectBusiness = "", qualificationCode = "", businessName = "", PIVA = "", birthPlace = "", remiCode = "", remiAddress = "", idPlant = "", plantAddress = "", username = "", role = "", partner = "", docRefAutodichiarazione = "", docRefAttestazioniTecniche = "", docDeadLineAuto = "", docDeadLineTech = "", enrollStatus = "", enrollDate = Instant.now(), bioGasAmount = 0.0, gasAmount = 0.0, uuid = "", lastUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(
+                GSE = "",
+                owner = "",
+                enrollType = "",
+                subjectFirstName = "",
+                subjectLastName = "",
+                subjectAddress = "",
+                subjectBusiness = "",
+                qualificationCode = "",
+                businessName = "",
+                PIVA = "",
+                birthPlace = "",
+                remiCode = "",
+                remiAddress = "",
+                idPlant = "",
+                plantAddress = "",
+                username = "",
+                role = "",
+                partner = "",
+                docRefAutodichiarazione = "",
+                docRefAttestazioniTecniche = "",
+                docDeadLineAuto = "",
+                docDeadLineTech = "",
+                enrollStatus = "",
+                enrollDate = Instant.now(),
+                bioGasAmount = 0.0,
+                gasAmount = 0.0,
+                uuid = "",
+                lastUpdate = Instant.now(),
+                linearId = UUID.randomUUID()
+        )
     }
 }

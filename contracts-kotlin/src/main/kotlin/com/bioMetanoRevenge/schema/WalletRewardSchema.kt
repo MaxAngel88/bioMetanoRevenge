@@ -50,6 +50,15 @@ object WalletRewardSchemaV1 : MappedSchema(
 
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this(GSE = "", owner = "", walletID = "", rewardPoint = 0, reason = "", walletDate = Instant.now(), walletLastUpdate = Instant.now(), linearId = UUID.randomUUID())
+        constructor(): this(
+                GSE = "",
+                owner = "",
+                walletID = "",
+                rewardPoint = 0,
+                reason = "",
+                walletDate = Instant.now(),
+                walletLastUpdate = Instant.now(),
+                linearId = UUID.randomUUID()
+        )
     }
 }

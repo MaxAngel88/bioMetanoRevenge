@@ -17,9 +17,9 @@ import java.time.Instant
 data class BatchState(val GSE: Party,
                       val Snam: Party,
                       val produttore: Party,
-                      val shipper: Party,
+                      val counterpart: Party,
                       val idProducer: String,
-                      val idShipper: String,
+                      val idCounterpart: String,
                       val transactionType: String,
                       val batchID: String,
                       val month: String,
@@ -47,7 +47,7 @@ data class BatchState(val GSE: Party,
         LinearState, QueryableState {
 
     /** The public keys of the involved parties. */
-    override val participants: List<AbstractParty> get() = listOf(GSE, Snam, produttore, shipper)
+    override val participants: List<AbstractParty> get() = listOf(GSE, Snam, produttore, counterpart)
 
     override fun generateMappedObject(schema: MappedSchema): PersistentState {
         return when (schema) {
@@ -55,9 +55,9 @@ data class BatchState(val GSE: Party,
                     this.GSE.name.toString(),
                     this.Snam.name.toString(),
                     this.produttore.name.toString(),
-                    this.shipper.name.toString(),
+                    this.counterpart.name.toString(),
                     this.idProducer,
-                    this.idShipper,
+                    this.idCounterpart,
                     this.transactionType,
                     this.batchID,
                     this.month,
