@@ -134,8 +134,8 @@ object BatchFlow {
                     batchProperty.batchStatus,
                     batchProperty.supportField,
                     batchProperty.auctionStatus,
-                    Instant.now(),
-                    Instant.now(),
+                    batchProperty.batchDate,
+                    batchProperty.batchDate,
                     UniqueIdentifier(id = UUID.randomUUID()))
 
             val txCommand = Command(BatchContract.Commands.Issue(), batchState.participants.map { it.owningKey })

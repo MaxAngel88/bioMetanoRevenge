@@ -1006,6 +1006,7 @@ class MainController(rpc: NodeRPCConnection) {
         val initialQuantity = issueBatchPojo.initialQuantity
         val quantity = issueBatchPojo.quantity
         val auctionStatus = issueBatchPojo.auctionStatus
+        val batchDate = issueBatchPojo.batchDate
 
         if(produttore.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "produttore (organization name) cannot be empty", data = null))
@@ -1033,6 +1034,10 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(auctionStatus.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "auctionStatus cannot be empty", data = null))
+        }
+
+        if(batchDate.toString().isNullOrBlank()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchDate cannot be empty", data = null))
         }
 
         return try {

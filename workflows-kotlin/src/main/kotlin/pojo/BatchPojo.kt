@@ -1,6 +1,7 @@
 package pojo
 
 import net.corda.core.serialization.CordaSerializable
+import java.time.Instant
 
 @CordaSerializable
 data class BatchPojo(
@@ -29,5 +30,6 @@ data class BatchPojo(
         val docDate: String = "",
         val batchStatus: String = "",
         val supportField: String = "",
-        val auctionStatus: String = ""
+        val auctionStatus: String = "",
+        val batchDate: Instant = Instant.now()
 )
