@@ -99,6 +99,27 @@
 					"response": []
 				},
 				{
+					"name": "getLastEnrollments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastEnrollments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastEnrollments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getLastAgreementStateByOwner",
 					"request": {
 						"method": "GET",
@@ -2125,6 +2146,225 @@
 								"bioMetanoRevenge",
 								"getHistoryAgreementStateByID",
 								"agreement0001"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Report",
+			"item": [
+				{
+					"name": "issue-report",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"ownerNode\": \"KalabriaMaceri\",\r\n    \"ownerID\": \"ownerID0001\",\r\n    \"reportID\": \"reportID0001\",\r\n    \"reportType\": \"Verbali di Misura\",\r\n    \"remiCode\": \"remiCode0001\",\r\n    \"remiAddress\": \"remiAddress0001\",\r\n    \"measuredQuantity\":  10.0,\r\n    \"measuredEnergy\":  20.5,\r\n    \"measuredPcs\":  16.4,\r\n    \"measuredPci\":  14.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{KALABRIAPORT}}/api/bioMetanoRevenge/issue-report",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{KALABRIAPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-report"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-report",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reportID\": \"reportID0001\",\r\n    \"measuredQuantity\":  10.0,\r\n    \"measuredEnergy\":  20.5,\r\n    \"measuredPcs\":  16.4,\r\n    \"measuredPci\":  14.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{KALABRIAPORT}}/api/bioMetanoRevenge/update-report",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{KALABRIAPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-report"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastReport",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastReport",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastReport"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastReportStateByOwnerID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastReportStateByOwnerID/owner0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastReportStateByOwnerID",
+								"owner0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryReportStateByOwnerID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryReportStateByOwnerID/owner0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryReportStateByOwnerID",
+								"owner0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastReportStateByReportID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastReportStateByReportID/report0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastReportStateByReportID",
+								"report0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryReportStateByReportID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryReportStateByReportID/report0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryReportStateByReportID",
+								"report0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastReportStateByRemiCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastReportStateByRemiCode/remiCode0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastReportStateByRemiCode",
+								"remiCode0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryReportStateByRemiCode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryReportStateByRemiCode/remiCode0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryReportStateByRemiCode",
+								"remiCode0001"
 							]
 						}
 					},

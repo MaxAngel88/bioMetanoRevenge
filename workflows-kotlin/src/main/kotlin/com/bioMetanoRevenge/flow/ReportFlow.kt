@@ -1,9 +1,9 @@
 package com.bioMetanoRevenge.flow
 
 import co.paralleluniverse.fibers.Suspendable
-import com.bioMetanoRevenge.contract.WalletRewardContract
-import com.bioMetanoRevenge.schema.WalletRewardSchemaV1
-import com.bioMetanoRevenge.state.WalletRewardState
+import com.bioMetanoRevenge.contract.ReportContract
+import com.bioMetanoRevenge.schema.ReportSchemaV1
+import com.bioMetanoRevenge.state.ReportState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
@@ -17,27 +17,27 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
-import pojo.WalletRewardPojo
-import pojo.WalletRewardUpdatePojo
+import pojo.ReportPojo
+import pojo.ReportUpdatePojo
 import java.time.Instant
 import java.util.*
 
-object WalletRewardFlow {
+object ReportFlow {
 
     /**
      *
-     * Issue WalletReward Flow ------------------------------------------------------------------------------------
+     * Issue ReportState Flow ------------------------------------------------------------------------------------
      *
      * */
     @InitiatingFlow
     @StartableByRPC
-    class IssuerWalletReward(val walletRewardProperty: WalletRewardPojo) : FlowLogic<WalletRewardState>() {
+    class IssuerReport(val reportProperty: ReportPojo) : FlowLogic<ReportState>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : Step("Generating transaction based on new WalletReward.")
+            object GENERATING_TRANSACTION : Step("Generating transaction based on new Report.")
             object VERIFYING_TRANSACTION : Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : Step("Signing transaction with our private key.")
             object GATHERING_SIGS : Step("Gathering the other Party signature.") {
@@ -63,7 +63,7 @@ object WalletRewardFlow {
          * The flow logic is encapsulated within the call() method.
          */
         @Suspendable
-        override fun call(): WalletRewardState {
+        override fun call(): ReportState {
 
             // Obtain a reference from a notary we wish to use.
             /**
@@ -78,25 +78,49 @@ object WalletRewardFlow {
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
 
-            val owner: Party = serviceHub.myInfo.legalIdentities.first()
+            /**
+             *
+             * This flow can only be started from the Snam node
+             *
+             */
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
+            if (myLegalIdentityNameOrg != "Snam") {
+                throw FlowException("Node $myLegalIdentity cannot start the issue-report flow. This flow can only be started from the Snam node")
+            }
+
+            val Snam: Party = myLegalIdentity
+
+            // fixed Party value for GSE
             var GSEX500Name = CordaX500Name(organisation = "GSE", locality = "Milan", country = "IT")
             var GSEParty = serviceHub.networkMapCache.getPeerByLegalName(GSEX500Name)!!
 
+            // set Party value for owner
+            var ownerX500Name = CordaX500Name(organisation = reportProperty.ownerNode, locality = "Milan", country = "IT")
+            var ownerParty = serviceHub.networkMapCache.getPeerByLegalName(ownerX500Name)!!
+
             // Generate an unsigned transaction.
-            val walletRewardState = WalletRewardState(
+            val reportState = ReportState(
                     GSEParty,
-                    owner,
-                    walletRewardProperty.walletID,
-                    walletRewardProperty.rewardPoint,
-                    walletRewardProperty.reason,
+                    Snam,
+                    ownerParty,
+                    reportProperty.ownerID,
+                    reportProperty.reportID,
+                    reportProperty.reportType,
+                    reportProperty.remiCode,
+                    reportProperty.remiAddress,
+                    reportProperty.measuredQuantity,
+                    reportProperty.measuredEnergy,
+                    reportProperty.measuredPcs,
+                    reportProperty.measuredPci,
                     Instant.now(),
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID()))
 
-            val txCommand = Command(WalletRewardContract.Commands.Issue(), walletRewardState.participants.map { it.owningKey })
+            val txCommand = Command(ReportContract.Commands.Issue(), reportState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(walletRewardState, WalletRewardContract.ID)
+                    .addOutputState(reportState, ReportContract.ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -114,28 +138,35 @@ object WalletRewardFlow {
 
             // Send the state to the other node, and receive it back with their signature.
             val GSESession = initiateFlow(GSEParty)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(GSESession), GATHERING_SIGS.childProgressTracker()))
+            val ownerSession = initiateFlow(ownerParty)
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(GSESession, ownerSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(GSESession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(GSESession, ownerSession), FINALISING_TRANSACTION.childProgressTracker()))
 
-            return walletRewardState
+            return reportState
         }
     }
 
-    @InitiatedBy(IssuerWalletReward::class)
-    class ReceiverWalletReward(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+    @InitiatedBy(IssuerReport::class)
+    class ReceiverReport(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
             val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val output = stx.tx.outputs.single().data
-                    "This must be an walletReward transaction." using (output is WalletRewardState)
-                    val walletRewardState = output as WalletRewardState
-                    /* "other rule walletReward" using (walletReward is new rule) */
-                    "walletID cannot be empty" using (walletRewardState.walletID.isNotEmpty())
+                    "This must be an ReportState transaction." using (output is ReportState)
+                    val reportState = output as ReportState
+                    /* "other rule reportState" using (reportState is new rule) */
+                    "reportID cannot be empty" using (reportState.reportID.isNotEmpty())
+                    "ownerID cannot be empty" using (reportState.ownerID.isNotEmpty())
+                    "remiCode cannot be empty" using (reportState.remiCode.isNotEmpty())
+                    "measuredQuantity must be a number" using (!reportState.measuredQuantity.isNaN())
+                    "measuredEnergy must be a number" using (!reportState.measuredEnergy.isNaN())
+                    "measuredPcs must be a number" using (!reportState.measuredPcs.isNaN())
+                    "measuredPci must be a number" using (!reportState.measuredPci.isNaN())
                 }
             }
             val txId = subFlow(signTransactionFlow).id
@@ -146,18 +177,18 @@ object WalletRewardFlow {
 
     /***
      *
-     * Update WalletReward Flow -----------------------------------------------------------------------------------
+     * Update ReportState Flow -----------------------------------------------------------------------------------
      *
      * */
     @InitiatingFlow
     @StartableByRPC
-    class UpdaterWalletReward(val walletRewardUpdateProperty: WalletRewardUpdatePojo) : FlowLogic<WalletRewardState>() {
+    class UpdaterReportState(val reportUpdateProperty: ReportUpdatePojo) : FlowLogic<ReportState>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update WalletReward.")
+            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update ReportState.")
             object VERIFYIGN_TRANSACTION : ProgressTracker.Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : ProgressTracker.Step("Signing transaction with our private key.")
             object GATHERING_SIGS : ProgressTracker.Step("Gathering the other Party signature.") {
@@ -183,7 +214,7 @@ object WalletRewardFlow {
          * The flow logic is encapsulated within the call() method.
          */
         @Suspendable
-        override fun call(): WalletRewardState {
+        override fun call(): ReportState {
 
             // Obtain a reference from a notary we wish to use.
             /**
@@ -195,44 +226,60 @@ object WalletRewardFlow {
             val notary = serviceHub.networkMapCache.notaryIdentities.single() // METHOD 1
             // val notary = serviceHub.networkMapCache.getNotary(CordaX500Name.parse("O=Notary,L=London,C=GB")) // METHOD 2
 
-            val owner: Party = serviceHub.myInfo.legalIdentities.first()
+            /**
+             *
+             * This flow can only be started from the Snam node
+             *
+             */
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
-            var GSEX500Name = CordaX500Name(organisation = "GSE", locality = "Milan", country = "IT")
-            var GSEParty = serviceHub.networkMapCache.getPeerByLegalName(GSEX500Name)!!
+            if (myLegalIdentityNameOrg != "Snam") {
+                throw FlowException("Node $myLegalIdentity cannot start the update-report flow. This flow can only be started from the Snam node")
+            }
+
+            val Snam: Party = myLegalIdentity
 
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
 
-            // setting the criteria for retrive UNCONSUMED state AND filter it for uuid
-            var walletIDCriteria: QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder { WalletRewardSchemaV1.PersistentWalletReward::walletID.equal(walletRewardUpdateProperty.walletID) }, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(WalletRewardState::class.java))
+            // setting the criteria for retrive UNCONSUMED state AND filter it for ID
+            var reportIDCriteria: QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder { ReportSchemaV1.PersistentReport::reportID.equal(reportUpdateProperty.reportID) }, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ReportState::class.java))
 
-            val oldWalletRewardStateList = serviceHub.vaultService.queryBy<WalletRewardState>(
-                    walletIDCriteria,
+            val oldReportStateList = serviceHub.vaultService.queryBy<ReportState>(
+                    reportIDCriteria,
                     PageSpecification(1, MAX_PAGE_SIZE),
                     Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
             ).states
 
-            if (oldWalletRewardStateList.size > 1 || oldWalletRewardStateList.isEmpty()) throw FlowException("No walletReward state with uuid: ${walletRewardUpdateProperty.walletID} found.")
+            if (oldReportStateList.size > 1 || oldReportStateList.isEmpty()) throw FlowException("No report state with ID: ${reportUpdateProperty.reportID} found.")
 
-            val oldWalletRewardStateRef = oldWalletRewardStateList[0]
-            val oldWalletRewardState = oldWalletRewardStateRef.state.data
+            val oldReportStateRef = oldReportStateList[0]
+            val oldReportState = oldReportStateRef.state.data
 
             // Generate an unsigned transaction.
-            val newWalletRewardState = WalletRewardState(
-                    GSEParty,
-                    owner,
-                    oldWalletRewardState.walletID,
-                    walletRewardUpdateProperty.rewardPoint,
-                    walletRewardUpdateProperty.reason,
-                    oldWalletRewardState.walletDate,
+            val newReportState = ReportState(
+                    oldReportState.GSE,
+                    Snam,
+                    oldReportState.owner,
+                    oldReportState.ownerID,
+                    oldReportState.reportID,
+                    oldReportState.reportType,
+                    oldReportState.remiCode,
+                    oldReportState.remiAddress,
+                    reportUpdateProperty.measuredQuantity,
+                    reportUpdateProperty.measuredEnergy,
+                    reportUpdateProperty.measuredPcs,
+                    reportUpdateProperty.measuredPci,
+                    oldReportState.reportDate,
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID())
             )
 
-            val txCommand = Command(WalletRewardContract.Commands.Update(), newWalletRewardState.participants.map { it.owningKey })
+            val txCommand = Command(ReportContract.Commands.Update(), newReportState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addInputState(oldWalletRewardStateRef)
-                    .addOutputState(newWalletRewardState, WalletRewardContract.ID)
+                    .addInputState(oldReportStateRef)
+                    .addOutputState(newReportState, ReportContract.ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -248,31 +295,36 @@ object WalletRewardFlow {
             // Stage 4.
             progressTracker.currentStep = GATHERING_SIGS
 
-            val GSESession = initiateFlow(GSEParty)
+            val GSESession = initiateFlow(oldReportState.GSE)
+            val ownerSession = initiateFlow(oldReportState.owner)
 
             // Send the state to the counterparty, and receive it back with their signature.
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(GSESession), GATHERING_SIGS.childProgressTracker()))
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(GSESession, ownerSession), GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
-            subFlow(FinalityFlow(fullySignedTx, setOf(GSESession), FINALISING_TRANSACTION.childProgressTracker()))
+            subFlow(FinalityFlow(fullySignedTx, setOf(GSESession, ownerSession), FINALISING_TRANSACTION.childProgressTracker()))
 
-            return newWalletRewardState
+            return newReportState
         }
     }
 
-    @InitiatedBy(UpdaterWalletReward::class)
-    class UpdateAcceptorWalletReward(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+    @InitiatedBy(UpdaterReportState::class)
+    class UpdateAcceptorReport(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
             val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val output = stx.tx.outputs.single().data
-                    "This must be an walletReward transaction." using (output is WalletRewardState)
-                    val walletRewardState = output as WalletRewardState
-                    /* "other rule walletReward" using (output is new rule) */
-                    "walletID cannot be empty on update" using (walletRewardState.walletID.isNotEmpty())
+                    "This must be an reportState transaction." using (output is ReportState)
+                    val newReportState = output as ReportState
+                    /* "other rule reportState" using (output is new rule) */
+                    "reportID cannot be empty on update" using (newReportState.reportID.isNotEmpty())
+                    "measuredQuantity must be a number on update" using (!newReportState.measuredQuantity.isNaN())
+                    "measuredEnergy must be a number on update" using (!newReportState.measuredEnergy.isNaN())
+                    "measuredPcs must be a number on update" using (!newReportState.measuredPcs.isNaN())
+                    "measuredPci must be a number on update" using (!newReportState.measuredPci.isNaN())
                 }
             }
             val txId = subFlow(signTransactionFlow).id

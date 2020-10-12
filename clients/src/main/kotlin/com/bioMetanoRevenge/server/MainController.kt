@@ -19,6 +19,8 @@ import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgrammingDoc
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgrammingStatus
 import com.bioMetanoRevenge.flow.RawMaterialFlow.IssuerRawMaterial
+import com.bioMetanoRevenge.flow.ReportFlow.IssuerReport
+import com.bioMetanoRevenge.flow.ReportFlow.UpdaterReportState
 import com.bioMetanoRevenge.flow.WalletRewardFlow.IssuerWalletReward
 import com.bioMetanoRevenge.flow.WalletRewardFlow.UpdaterWalletReward
 import com.bioMetanoRevenge.schema.*
@@ -2404,10 +2406,272 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementStatus cannot be empty", data = null))
         }
 
-
         return try {
             val updateAgreement = proxy.startTrackedFlow(::UpdaterAgreementStatus, updateAgreementStatusPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Agreement with id: $agreementID update correctly. New AgreementState with id: ${updateAgreement.linearId.id} created.. ledger updated.", data = updateAgreement))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * REPORT API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all ReportState that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastReport" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastReport() : ResponseEntity<ResponsePojo> {
+        var foundLastReportStates = proxy.vaultQueryBy<ReportState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "ReportState list", data = foundLastReportStates))
+    }
+
+    /**
+     * Displays last ReportState that exist in the node's vault for selected ownerID.
+     */
+    @GetMapping(value = [ "getLastReportStateByOwnerID/{ownerID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastReportStateByOwnerID(
+            @PathVariable("ownerID")
+            ownerID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for ownerID
+        var ownerIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ReportSchemaV1.PersistentReport::ownerID.equal(ownerID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ReportState::class.java))
+
+        val foundOwnerIDLastReport = proxy.vaultQueryBy<ReportState>(
+                ownerIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last ReportState by ownerID $ownerID .", data = foundOwnerIDLastReport))
+    }
+
+    /**
+     * Displays History ReportState that exist in the node's vault for selected ownerID.
+     */
+    @GetMapping(value = [ "getHistoryReportStateByOwnerID/{ownerID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryReportStateByOwnerID(
+            @PathVariable("ownerID")
+            ownerID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for ownerID
+        var ownerIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ReportSchemaV1.PersistentReport::ownerID.equal(ownerID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(ReportState::class.java))
+
+        val foundOwnerIDReportHistory = proxy.vaultQueryBy<ReportState>(
+                ownerIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of report state for $ownerID", data = foundOwnerIDReportHistory))
+    }
+
+    /**
+     * Displays last ReportState that exist in the node's vault for selected reportID.
+     */
+    @GetMapping(value = [ "getLastReportStateByReportID/{reportID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastReportStateByReportID(
+            @PathVariable("reportID")
+            reportID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for reportID
+        var reportIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ReportSchemaV1.PersistentReport::reportID.equal(reportID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ReportState::class.java))
+
+        val foundReportIDLastReport = proxy.vaultQueryBy<ReportState>(
+                reportIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last ReportState by reportID $reportID .", data = foundReportIDLastReport))
+    }
+
+    /**
+     * Displays History ReportState that exist in the node's vault for selected reportID.
+     */
+    @GetMapping(value = [ "getHistoryReportStateByReportID/{reportID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryReportStateByReportID(
+            @PathVariable("reportID")
+            reportID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for reportID
+        var reportIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ReportSchemaV1.PersistentReport::reportID.equal(reportID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(ReportState::class.java))
+
+        val foundReportIDReportHistory = proxy.vaultQueryBy<ReportState>(
+                reportIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of report state for $reportID", data = foundReportIDReportHistory))
+    }
+
+    /**
+     * Displays last ReportState that exist in the node's vault for selected remiCode.
+     */
+    @GetMapping(value = [ "getLastReportStateByRemiCode/{remiCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastReportStateByRemiCode(
+            @PathVariable("remiCode")
+            remiCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for remiCode
+        var remiCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ReportSchemaV1.PersistentReport::remiCode.equal(remiCode)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ReportState::class.java))
+
+        val foundRemiCodeLastReport = proxy.vaultQueryBy<ReportState>(
+                remiCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last ReportState by remiCode $remiCode .", data = foundRemiCodeLastReport))
+    }
+
+    /**
+     * Displays History ReportState that exist in the node's vault for selected remiCode.
+     */
+    @GetMapping(value = [ "getHistoryReportStateByRemiCode/{remiCode}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryReportStateByRemiCode(
+            @PathVariable("remiCode")
+            remiCode : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for remiCode
+        var remiCodeCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ReportSchemaV1.PersistentReport::remiCode.equal(remiCode)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(ReportState::class.java))
+
+        val foundRemiCodeReportHistory = proxy.vaultQueryBy<ReportState>(
+                remiCodeCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of report state for $remiCode", data = foundRemiCodeReportHistory))
+    }
+
+    /**
+     * Initiates a flow to agree an ReportState between two nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-report" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueReport(
+            @RequestBody
+            issueReportpojo : ReportPojo): ResponseEntity<ResponsePojo> {
+
+        val ownerNodeParty = issueReportpojo.ownerNode
+        val ownerID = issueReportpojo.ownerID
+        val reportID = issueReportpojo.reportID
+        val reportType = issueReportpojo.reportType
+        val remiCode = issueReportpojo.remiCode
+        val remiAddress = issueReportpojo.remiAddress
+        val measuredQuantity = issueReportpojo.measuredQuantity
+        val measuredEnergy = issueReportpojo.measuredEnergy
+        val measuredPcs = issueReportpojo.measuredPcs
+        val measuredPci = issueReportpojo.measuredPci
+
+        if(ownerNodeParty.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "ownerNodeParty cannot be empty", data = null))
+        }
+
+        if(ownerID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "ownerID cannot be empty", data = null))
+        }
+
+        if(reportID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "reportID cannot be empty", data = null))
+        }
+
+        if(reportType.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "reportType cannot be empty", data = null))
+        }
+
+        if(remiCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "remiCode cannot be empty", data = null))
+        }
+
+        if(remiAddress.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "remiAddress cannot be empty", data = null))
+        }
+
+        if(measuredQuantity.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "measuredQuantity must be a number", data = null))
+        }
+
+        if(measuredEnergy.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "measuredEnergy must be a number", data = null))
+        }
+
+        if(measuredPcs.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "measuredPcs must be a number", data = null))
+        }
+
+        if(measuredPci.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "measuredPci must be a number", data = null))
+        }
+
+        return try {
+            val report = proxy.startTrackedFlow(::IssuerReport, issueReportpojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${report.linearId.id} committed to ledger.\n", data = report))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update ReportState
+     *
+     */
+    @PostMapping(value = [ "update-report" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateReport(
+            @RequestBody
+            updateReportPojo: ReportUpdatePojo): ResponseEntity<ResponsePojo> {
+
+        val updateReportID = updateReportPojo.reportID
+        val updateMeasuredQuantity = updateReportPojo.measuredQuantity
+        val updateMeasuredEnergy = updateReportPojo.measuredEnergy
+        val updateMeasuredPcs = updateReportPojo.measuredPcs
+        val updateMeasuredPci = updateReportPojo.measuredPci
+
+        if(updateReportID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "reportID cannot be empty", data = null))
+        }
+
+        if(updateMeasuredQuantity.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "measuredQuantity cannot be empty", data = null))
+        }
+
+        if(updateMeasuredEnergy.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "updateMeasuredEnergy cannot be empty", data = null))
+        }
+
+        if(updateMeasuredPcs.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "measuredPcs cannot be empty", data = null))
+        }
+
+        if(updateMeasuredPci.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "measuredPci cannot be empty", data = null))
+        }
+
+        return try {
+            val updateReportState = proxy.startTrackedFlow(::UpdaterReportState, updateReportPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Report with id: $updateReportID update correctly. New ReportState with id: ${updateReportState.linearId.id} created.. ledger updated.", data = updateReportState))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
