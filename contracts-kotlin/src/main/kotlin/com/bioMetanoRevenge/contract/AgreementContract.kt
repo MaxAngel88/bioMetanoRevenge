@@ -55,9 +55,9 @@ class AgreementContract : Contract {
             "energy must be greater than zero." using (agreement.energy > 0.0)
             "dcq must be greater than zero." using (agreement.dcq > 0.0)
             "price must be greater than zero." using (agreement.price > 0.0)
-            "validFrom cannot be empty." using (agreement.validFrom.toString().isBlank())
-            "validTo cannot be empty." using (agreement.validTo.toString().isBlank())
             "validFrom must be before validTo." using (agreement.validFrom.isBefore(agreement.validTo))
+            "validTo must be after validFrom." using (agreement.validTo.isAfter(agreement.validFrom))
+            "validFrom cannot be equal to validTo." using (agreement.validFrom != agreement.validTo)
             "agreementStatus cannot be empty." using (agreement.agreementStatus.isNotEmpty())
         }
     }
@@ -85,9 +85,9 @@ class AgreementContract : Contract {
             "energy must be greater than zero." using (newAgreementState.energy > 0.0)
             "dcq must be greater than zero." using (newAgreementState.dcq > 0.0)
             "price must be greater than zero." using (newAgreementState.price > 0.0)
-            "validFrom cannot be empty." using (newAgreementState.validFrom.toString().isBlank())
-            "validTo cannot be empty." using (newAgreementState.validTo.toString().isBlank())
             "validFrom must be before validTo." using (newAgreementState.validFrom.isBefore(newAgreementState.validTo))
+            "validTo must be after validFrom." using (newAgreementState.validTo.isAfter(newAgreementState.validFrom))
+            "validFrom cannot be equal to validTo." using (newAgreementState.validFrom != newAgreementState.validTo)
             "agreementStatus cannot be empty." using (newAgreementState.agreementStatus.isNotEmpty())
         }
     }

@@ -1011,7 +1011,6 @@ class MainController(rpc: NodeRPCConnection) {
         val initialQuantity = issueBatchPojo.initialQuantity
         val quantity = issueBatchPojo.quantity
         val auctionStatus = issueBatchPojo.auctionStatus
-        val batchDate = issueBatchPojo.batchDate
 
         if(produttore.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "produttore (organization name) cannot be empty", data = null))
@@ -1039,10 +1038,6 @@ class MainController(rpc: NodeRPCConnection) {
 
         if(auctionStatus.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "auctionStatus cannot be empty", data = null))
-        }
-
-        if(batchDate.toString().isNullOrBlank()){
-            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchDate cannot be empty", data = null))
         }
 
         return try {
@@ -2422,12 +2417,16 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "price must be a number", data = null))
         }
 
-        if(validFrom.toString().isBlank()){
-            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be empty", data = null))
+        if(validFrom.isAfter(validTo)){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be after validTo", data = null))
         }
 
-        if(validTo.toString().isBlank()){
-            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validTo cannot be empty", data = null))
+        if(validTo.isBefore(validFrom)){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validTo cannot be before validFrom", data = null))
+        }
+
+        if(validFrom == validTo){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be equal to validTo", data = null))
         }
 
         if(agreementStatus.isEmpty()) {
@@ -2476,12 +2475,16 @@ class MainController(rpc: NodeRPCConnection) {
             return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "price must be a number", data = null))
         }
 
-        if(agreementValidFrom.toString().isBlank()){
-            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be empty", data = null))
+        if(agreementValidFrom.isAfter(agreementValidTo)){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be after validTo", data = null))
         }
 
-        if(agreementValidTo.toString().isBlank()){
-            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validTo cannot be empty", data = null))
+        if(agreementValidTo.isBefore(agreementValidFrom)){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validTo cannot be before validFrom", data = null))
+        }
+
+        if(agreementValidFrom == agreementValidTo){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be equal to validTo", data = null))
         }
 
         return try {
