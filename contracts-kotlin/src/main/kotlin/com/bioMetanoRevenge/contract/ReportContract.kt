@@ -66,7 +66,7 @@ class ReportContract : Contract {
 
             // Generic constraints around the new ReportState transaction
             "GSE from old and new ReportState cannot change." using (oldReportState.GSE == newReportState.GSE)
-            "Snam from old and new ReportState cannot change." using (oldReportState.Snam == newReportState.GSE)
+            "Snam from old and new ReportState cannot change." using (oldReportState.Snam == newReportState.Snam)
             "owner from old and new ReportState cannot change." using (oldReportState.owner == newReportState.owner)
             "reportID from old and new ReportState cannot change." using (oldReportState.reportID == newReportState.reportID)
             "ownerID from old and new ReportState cannot change." using (oldReportState.ownerID == newReportState.ownerID)

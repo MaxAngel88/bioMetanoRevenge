@@ -114,6 +114,12 @@ object ExchangeSchemaV1 : MappedSchema(
             @Column(name = "auctionStatus")
             var auctionStatus: String,
 
+            @Column(name = "snamCheck")
+            var snamCheck: String,
+
+            @Column(name = "financialCheck")
+            var financialCheck: String,
+
             @Column(name = "exchangeDate")
             var exchangeDate: Instant,
 
@@ -156,6 +162,8 @@ object ExchangeSchemaV1 : MappedSchema(
                 exchangeStatus = "",
                 supportField = "",
                 auctionStatus = "",
+                snamCheck = "",
+                financialCheck = "",
                 exchangeDate = Instant.now(),
                 lastExchangeUpdate = Instant.now(),
                 linearId = UUID.randomUUID()

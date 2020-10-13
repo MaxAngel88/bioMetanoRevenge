@@ -96,6 +96,12 @@ object PSVSchemaV1 : MappedSchema(
             @Column(name = "auctionStatus")
             var auctionStatus: String,
 
+            @Column(name = "snamCheck")
+            var snamCheck: String,
+
+            @Column(name = "financialCheck")
+            var financialCheck: String,
+
             @Column(name = "transactionDate")
             var exchangeDate: Instant,
 
@@ -132,6 +138,8 @@ object PSVSchemaV1 : MappedSchema(
                 transactionStatus = "",
                 supportField = "",
                 auctionStatus = "",
+                snamCheck = "",
+                financialCheck = "",
                 exchangeDate = Instant.now(),
                 lastExchangeUpdate = Instant.now(),
                 linearId = UUID.randomUUID()

@@ -19,6 +19,7 @@ import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
 import pojo.ExchangePojo
 import pojo.ExchangeUpdateAuctionPojo
+import pojo.ExchangeUpdateCheckPojo
 import pojo.ExchangeUpdatePojo
 import java.time.Instant
 import java.util.*
@@ -131,6 +132,8 @@ object ExchangeFlow {
                     exchangeProperty.exchangeStatus,
                     exchangeProperty.supportField,
                     exchangeProperty.auctionStatus,
+                    "toCheck",
+                    "toCheck",
                     Instant.now(),
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID()))
@@ -299,6 +302,8 @@ object ExchangeFlow {
                     exchangeUpdateProperty.exchangeStatus,
                     oldExchangeState.supportField,
                     oldExchangeState.auctionStatus,
+                    oldExchangeState.snamCheck,
+                    oldExchangeState.financialCheck,
                     oldExchangeState.exchangeDate,
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID())
@@ -418,7 +423,7 @@ object ExchangeFlow {
             var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
 
             if (myLegalIdentityNameOrg != "GSE") {
-                throw FlowException("Node $myLegalIdentity cannot start the update-exchange flow. This flow can only be started from the GSE node")
+                throw FlowException("Node $myLegalIdentity cannot start the update-exchange-auction flow. This flow can only be started from the GSE node")
             }
 
             // Stage 1.
@@ -470,6 +475,8 @@ object ExchangeFlow {
                     oldExchangeState.exchangeStatus,
                     exchangeUpdateAuctionProperty.supportField,
                     exchangeUpdateAuctionProperty.auctionStatus,
+                    oldExchangeState.snamCheck,
+                    oldExchangeState.financialCheck,
                     oldExchangeState.exchangeDate,
                     Instant.now(),
                     UniqueIdentifier(id = UUID.randomUUID())
@@ -522,6 +529,180 @@ object ExchangeFlow {
                     "exchangeCode cannot be empty" using (exchangeState.exchangeCode.isNotEmpty())
                     "supportField cannot be empty" using (exchangeState.supportField.isNotEmpty())
                     "auctionStatus cannot be empty" using (exchangeState.auctionStatus.isNotEmpty())
+                }
+            }
+            val txId = subFlow(signTransactionFlow).id
+
+            return subFlow(ReceiveFinalityFlow(otherPartySession, expectedTxId = txId))
+        }
+    }
+
+    /***
+     *
+     * Update Exchange Check Flow -----------------------------------------------------------------------------------
+     *
+     * */
+    @InitiatingFlow
+    @StartableByRPC
+    class UpdaterExchangeCheck(val exchangeUpdateCheckProperty: ExchangeUpdateCheckPojo) : FlowLogic<ExchangeState>() {
+        /**
+         * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
+         * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
+         */
+        companion object {
+            object GENERATING_TRANSACTION : ProgressTracker.Step("Generating transaction based on update Exchange Check.")
+            object VERIFYIGN_TRANSACTION : ProgressTracker.Step("Verifying contract constraints.")
+            object SIGNING_TRANSACTION : ProgressTracker.Step("Signing transaction with our private key.")
+            object GATHERING_SIGS : ProgressTracker.Step("Gathering the other Party signature.") {
+                override fun childProgressTracker() = CollectSignaturesFlow.tracker()
+            }
+
+            object FINALISING_TRANSACTION : Step("Obtaining notary signature and recording transaction.") {
+                override fun childProgressTracker() = FinalityFlow.tracker()
+            }
+
+            fun tracker() = ProgressTracker(
+                    GENERATING_TRANSACTION,
+                    VERIFYIGN_TRANSACTION,
+                    SIGNING_TRANSACTION,
+                    GATHERING_SIGS,
+                    FINALISING_TRANSACTION
+            )
+        }
+
+        override val progressTracker = tracker()
+
+        /**
+         * The flow logic is encapsulated within the call() method.
+         */
+        @Suspendable
+        override fun call(): ExchangeState {
+
+            // Obtain a reference from a notary we wish to use.
+            /**
+             *  METHOD 1: Take first notary on network, WARNING: use for test, non-prod environments, and single-notary networks only!*
+             *  METHOD 2: Explicit selection of notary by CordaX500Name - argument can by coded in flow or parsed from config (Preferred)
+             *
+             *  * - For production you always want to use Method 2 as it guarantees the expected notary is returned.
+             */
+            val notary = serviceHub.networkMapCache.notaryIdentities.single() // METHOD 1
+            // val notary = serviceHub.networkMapCache.getNotary(CordaX500Name.parse("O=Notary,L=London,C=GB")) // METHOD 2
+
+            /**
+             *
+             * This flow can only be started from the GSE node
+             *
+             */
+            val myLegalIdentity: Party = serviceHub.myInfo.legalIdentities.first()
+            var myLegalIdentityNameOrg: String = myLegalIdentity.name.organisation
+
+            if (myLegalIdentityNameOrg != "GSE") {
+                throw FlowException("Node $myLegalIdentity cannot start the update-exchange-check flow. This flow can only be started from the GSE node")
+            }
+
+            // Stage 1.
+            progressTracker.currentStep = GENERATING_TRANSACTION
+
+            // setting the criteria for retrive UNCONSUMED state AND filter it for exchangeCode
+            var exchangeCodeCriteria: QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder { ExchangeSchemaV1.PersistentExchange::exchangeCode.equal(exchangeUpdateCheckProperty.exchangeCode) }, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+
+            val oldExchangeStateList = serviceHub.vaultService.queryBy<ExchangeState>(
+                    exchangeCodeCriteria,
+                    PageSpecification(1, MAX_PAGE_SIZE),
+                    Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+            ).states
+
+            if (oldExchangeStateList.size > 1 || oldExchangeStateList.isEmpty()) throw FlowException("No exchange state with exchangeCode: ${exchangeUpdateCheckProperty.exchangeCode} found.")
+
+            val oldExchangeStateRef = oldExchangeStateList[0]
+            val oldExchangeState = oldExchangeStateRef.state.data
+
+            // Generate an unsigned transaction.
+            val newExchangeState = ExchangeState(
+                    myLegalIdentity,
+                    oldExchangeState.seller,
+                    oldExchangeState.buyer,
+                    oldExchangeState.exchangeType,
+                    oldExchangeState.PIVASeller,
+                    oldExchangeState.PIVABuyer,
+                    oldExchangeState.parentBatchID,
+                    oldExchangeState.exchangeCode,
+                    oldExchangeState.month,
+                    oldExchangeState.remiCode,
+                    oldExchangeState.plantAddress,
+                    oldExchangeState.plantCode,
+                    oldExchangeState.hauler,
+                    oldExchangeState.PIVAHauler,
+                    oldExchangeState.trackCode,
+                    oldExchangeState.pickupDate,
+                    oldExchangeState.deliveryDate,
+                    oldExchangeState.initialQuantity,
+                    oldExchangeState.quantity,
+                    oldExchangeState.price,
+                    oldExchangeState.sellingPrice,
+                    oldExchangeState.pcs,
+                    oldExchangeState.pci,
+                    oldExchangeState.startingPosition,
+                    oldExchangeState.arrivalPosition,
+                    oldExchangeState.docRef,
+                    oldExchangeState.docDate,
+                    oldExchangeState.exchangeStatus,
+                    oldExchangeState.supportField,
+                    oldExchangeState.auctionStatus,
+                    exchangeUpdateCheckProperty.snamCheck,
+                    exchangeUpdateCheckProperty.financialCheck,
+                    oldExchangeState.exchangeDate,
+                    Instant.now(),
+                    UniqueIdentifier(id = UUID.randomUUID())
+            )
+
+            val txCommand = Command(ExchangeContract.Commands.UpdateCheck(), newExchangeState.participants.map { it.owningKey })
+            val txBuilder = TransactionBuilder(notary)
+                    .addInputState(oldExchangeStateRef)
+                    .addOutputState(newExchangeState, ExchangeContract.ID)
+                    .addCommand(txCommand)
+
+            // Stage 2.
+            progressTracker.currentStep = VERIFYIGN_TRANSACTION
+            // Verify that the transaction is valid.
+            txBuilder.verify(serviceHub)
+
+            // Stage 3.
+            progressTracker.currentStep = SIGNING_TRANSACTION
+            // Sign the transaction.
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+
+            // Stage 4.
+            progressTracker.currentStep = GATHERING_SIGS
+
+            // Send the state to the other nodes, and receive it back with their signature.
+            val sellerSession = initiateFlow(oldExchangeState.seller)
+            val buyerSession = initiateFlow(oldExchangeState.buyer)
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(sellerSession, buyerSession), GATHERING_SIGS.childProgressTracker()))
+
+            // Stage 5.
+            progressTracker.currentStep = FINALISING_TRANSACTION
+            // Notarise and record the transaction in both parties' vaults.
+            subFlow(FinalityFlow(fullySignedTx, setOf(sellerSession, buyerSession), FINALISING_TRANSACTION.childProgressTracker()))
+
+            return newExchangeState
+        }
+    }
+
+    @InitiatedBy(UpdaterExchangeCheck::class)
+    class UpdateCheckAcceptorExchange(val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+        @Suspendable
+        override fun call(): SignedTransaction {
+            val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
+                override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                    val output = stx.tx.outputs.single().data
+                    "This must be an exchange transaction." using (output is ExchangeState)
+                    val exchangeState = output as ExchangeState
+                    /* "other rule exchange" using (output is new rule) */
+                    "parentBatchID cannot be empty" using (exchangeState.parentBatchID.isNotEmpty())
+                    "exchangeCode cannot be empty" using (exchangeState.exchangeCode.isNotEmpty())
+                    "snamCheck cannot be empty" using (exchangeState.snamCheck.isNotEmpty())
+                    "financialCheck cannot be empty" using (exchangeState.financialCheck.isNotEmpty())
                 }
             }
             val txId = subFlow(signTransactionFlow).id

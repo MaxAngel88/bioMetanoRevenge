@@ -697,6 +697,36 @@
 					"response": []
 				},
 				{
+					"name": "update-batch-check",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"batchID\": \"batch12345\",\r\n    \"snamCheck\": \"OK\",\r\n    \"financialCheck\": \"OK\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50015/api/bioMetanoRevenge/update-batch-check",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50015",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-batch-check"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getLastBatch",
 					"request": {
 						"method": "GET",
@@ -1102,6 +1132,36 @@
 					"response": []
 				},
 				{
+					"name": "update-exchange-check",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"exchangeCode\": \"e12345\",\r\n    \"snamCheck\": \"OK\",\r\n    \"financialCheck\": \"OK\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/update-exchange-check",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-exchange-check"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getLastExchange",
 					"request": {
 						"method": "GET",
@@ -1457,6 +1517,36 @@
 								"api",
 								"bioMetanoRevenge",
 								"update-psv-auction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-psv-check",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"transactionCode\": \"t12345\",\r\n    \"snamCheck\": \"OK\",\r\n    \"financialCheck\": \"OK\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/update-psv-check",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-psv-check"
 							]
 						}
 					},

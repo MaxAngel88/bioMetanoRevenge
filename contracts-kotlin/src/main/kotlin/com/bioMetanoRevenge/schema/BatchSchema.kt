@@ -111,6 +111,12 @@ object BatchSchemaV1 : MappedSchema(
             @Column(name = "auctionStatus")
             var auctionStatus: String,
 
+            @Column(name = "snamCheck")
+            var snamCheck: String,
+
+            @Column(name = "financialCheck")
+            var financialCheck: String,
+
             @Column(name = "batchDate")
             var batchDate: Instant,
 
@@ -152,6 +158,8 @@ object BatchSchemaV1 : MappedSchema(
                 batchStatus = "",
                 supportField = "",
                 auctionStatus = "",
+                snamCheck = "",
+                financialCheck = "",
                 batchDate = Instant.now(),
                 lastBatchUpdate = Instant.now(),
                 linearId = UUID.randomUUID()

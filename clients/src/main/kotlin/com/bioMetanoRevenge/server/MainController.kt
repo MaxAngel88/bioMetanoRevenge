@@ -6,15 +6,18 @@ import com.bioMetanoRevenge.flow.AgreementFlow.UpdaterAgreementStatus
 import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatchAuction
+import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatchCheck
 import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterOCREnroll
 import com.bioMetanoRevenge.flow.ExchangeFlow.IssuerExchange
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchange
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchangeAuction
+import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchangeCheck
 import com.bioMetanoRevenge.flow.PSVFlow.IssuerPSVState
 import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVState
 import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVStateAuction
+import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVStateCheck
 import com.bioMetanoRevenge.flow.ProgrammingFlow.IssuerProgramming
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgrammingDoc
 import com.bioMetanoRevenge.flow.ProgrammingFlow.UpdaterProgrammingStatus
@@ -1126,6 +1129,41 @@ class MainController(rpc: NodeRPCConnection) {
         }
     }
 
+    /***
+     *
+     * Update Batch Check
+     *
+     */
+    @PostMapping(value = [ "update-batch-check" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateBatchCheck(
+            @RequestBody
+            updateCheckBatchPojo: BatchUpdateCheckPojo): ResponseEntity<ResponsePojo> {
+
+        val batchId = updateCheckBatchPojo.batchID
+        val batchSnamCheck = updateCheckBatchPojo.snamCheck
+        val batchFinancialCheck = updateCheckBatchPojo.financialCheck
+
+        if(batchId.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "batchId cannot be empty", data = null))
+        }
+
+        if(batchSnamCheck.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "snamCheck cannot be empty", data = null))
+        }
+
+        if(batchFinancialCheck.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "financialCheck cannot be empty", data = null))
+        }
+
+        return try {
+            val updateBatchCheck = proxy.startTrackedFlow(::UpdaterBatchCheck, updateCheckBatchPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Batch with id: $batchId update correctly. New BatchState with id: ${updateBatchCheck.linearId.id} created.. ledger updated.", data = updateBatchCheck))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
     /**
      *
      * EXCHANGE API **********************************************************************************************
@@ -1522,6 +1560,41 @@ class MainController(rpc: NodeRPCConnection) {
         }
     }
 
+    /***
+     *
+     * Update Exchange Check
+     *
+     */
+    @PostMapping(value = [ "update-exchange-check" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateExchangeAuction(
+            @RequestBody
+            updateCheckExchangePojo: ExchangeUpdateCheckPojo): ResponseEntity<ResponsePojo> {
+
+        val exchangeCode = updateCheckExchangePojo.exchangeCode
+        val exchangeSnamCheck = updateCheckExchangePojo.snamCheck
+        val exchangeFinancialCheck = updateCheckExchangePojo.financialCheck
+
+        if(exchangeCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "exchangeCode cannot be empty", data = null))
+        }
+
+        if(exchangeSnamCheck.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "snamCheck cannot be empty", data = null))
+        }
+
+        if(exchangeFinancialCheck.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "financialCheck cannot be empty", data = null))
+        }
+
+        return try {
+            val updateCheckExchange = proxy.startTrackedFlow(::UpdaterExchangeCheck, updateCheckExchangePojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Exchange with id: $exchangeCode update correctly. New ExchangeState with id: ${updateCheckExchange.linearId.id} created.. ledger updated.", data = updateCheckExchange))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
     /**
      *
      * PSVSTATE API **********************************************************************************************
@@ -1902,6 +1975,41 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateAuctionPSVState = proxy.startTrackedFlow(::UpdaterPSVStateAuction, updateAuctionPSVPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "PSV with id: $transactionCode update correctly. New PSVState with id: ${updateAuctionPSVState.linearId.id} created.. ledger updated.", data = updateAuctionPSVState))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update PSVState Check
+     *
+     */
+    @PostMapping(value = [ "update-psv-check" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updatePSVStateCheck(
+            @RequestBody
+            updateCheckPSVPojo: PSVUpdateCheckPojo): ResponseEntity<ResponsePojo> {
+
+        val transactionCode = updateCheckPSVPojo.transactionCode
+        val transactionSnamCheck = updateCheckPSVPojo.snamCheck
+        val transactionFinancialCheck = updateCheckPSVPojo.financialCheck
+
+        if(transactionCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "transactionCode cannot be empty", data = null))
+        }
+
+        if(transactionSnamCheck.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "snamCheck cannot be empty", data = null))
+        }
+
+        if(transactionFinancialCheck.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "financialCheck cannot be empty", data = null))
+        }
+
+        return try {
+            val updateCheckPSVState = proxy.startTrackedFlow(::UpdaterPSVStateCheck, updateCheckPSVPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "PSV with id: $transactionCode update correctly. New PSVState with id: ${updateCheckPSVState.linearId.id} created.. ledger updated.", data = updateCheckPSVState))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
