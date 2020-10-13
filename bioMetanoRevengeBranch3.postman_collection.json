@@ -792,6 +792,28 @@
 					"response": []
 				},
 				{
+					"name": "getLastBatchStateByProducerToCheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchStateByProducerToCheck/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatchStateByProducerToCheck",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getHistoryBatchStateByProducer",
 					"request": {
 						"method": "GET",
@@ -829,6 +851,28 @@
 								"api",
 								"bioMetanoRevenge",
 								"getLastBatchStateByCounterpart",
+								"counterpartName"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastBatchStateByCounterpartToCheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastBatchStateByCounterpartToCheck/counterpartName",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastBatchStateByCounterpartToCheck",
 								"counterpartName"
 							]
 						}
@@ -1227,6 +1271,28 @@
 					"response": []
 				},
 				{
+					"name": "getLastExchangeStateBySellerToCheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastExchangeStateBySellerToCheck/Produttore_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastExchangeStateBySellerToCheck",
+								"Produttore_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getHistoryExchangeStateBySeller",
 					"request": {
 						"method": "GET",
@@ -1264,6 +1330,28 @@
 								"api",
 								"bioMetanoRevenge",
 								"getLastExchangeStateByBuyer",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastExchangeStateByBuyerToCheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50018/api/bioMetanoRevenge/getLastExchangeStateByBuyerToCheck/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50018",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastExchangeStateByBuyerToCheck",
 								"Shipper_A"
 							]
 						}
@@ -1618,6 +1706,28 @@
 					"response": []
 				},
 				{
+					"name": "getLastPSVStateBySellerToCheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getLastPSVStateBySellerToCheck/Shipper_A",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastPSVStateBySellerToCheck",
+								"Shipper_A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getHistoryPSVStateBySeller",
 					"request": {
 						"method": "GET",
@@ -1655,6 +1765,28 @@
 								"api",
 								"bioMetanoRevenge",
 								"getLastPSVStateByBuyer",
+								"Shipper_B"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastPSVStateByBuyerToCheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50019/api/bioMetanoRevenge/getLastPSVStateByBuyerToCheck/Shipper_B",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50019",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastPSVStateByBuyerToCheck",
 								"Shipper_B"
 							]
 						}
