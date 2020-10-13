@@ -759,6 +759,26 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
+     * Displays last BatchState that exist in the node's vault for selected produttore (organization name) and snamCheck.
+     */
+    @GetMapping(value = [ "getLastBatchStateByProducerToCheck/{producerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchStateByProducerToCheck(
+            @PathVariable("producerName")
+            producerName : String) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for producer organization name and snamCheck = "toCheck"
+        var snamCheckCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::snamCheck.equal("toCheck")}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundProducerBatchToCheck = proxy.vaultQueryBy<BatchState>(
+                snamCheckCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.produttore.name.organisation == producerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last BatchState by produttore $producerName toCheck.", data = foundProducerBatchToCheck))
+    }
+
+    /**
      * Displays History BatchState that exist in the node's vault for selected produttore (organization name).
      */
     @GetMapping(value = [ "getHistoryBatchStateByProducer/{producerName}" ], produces = [ APPLICATION_JSON_VALUE ])
@@ -796,6 +816,26 @@ class MainController(rpc: NodeRPCConnection) {
         ).states.filter { it.state.data.counterpart.name.organisation == counterpartName }
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last BatchState by counterpart $counterpartName .", data = foundCounterpartBatch))
+    }
+
+    /**
+     * Displays last BatchState that exist in the node's vault for selected counterpart (organization name) and snamCheck.
+     */
+    @GetMapping(value = [ "getLastBatchStateByCounterpartToCheck/{counterpartName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastBatchStateByCounterpartToCheck(
+            @PathVariable("counterpartName")
+            counterpartName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for counterpart organization name and snamCheck = "toCheck"
+        var snamCheckCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {BatchSchemaV1.PersistentBatch::snamCheck.equal("toCheck")}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(BatchState::class.java))
+
+        val foundCounterpartBatchToCheck = proxy.vaultQueryBy<BatchState>(
+                snamCheckCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.counterpart.name.organisation == counterpartName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last BatchState by counterpart $counterpartName toCheck.", data = foundCounterpartBatchToCheck))
     }
 
     /**
@@ -1217,6 +1257,26 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
+     * Displays last ExchangeState that exist in the node's vault for selected seller (organization name) and snamCheck.
+     */
+    @GetMapping(value = [ "getLastExchangeStateBySellerToCheck/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastExchangeStateBySellerToCheck(
+            @PathVariable("sellerName")
+            sellerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for seller organization name and snamCheck
+        var snamCheckCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::snamCheck.equal("toCheck")}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundSellerExchangeToCheck = proxy.vaultQueryBy<ExchangeState>(
+                snamCheckCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.seller.name.organisation == sellerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last ExchangeState by seller $sellerName and snamCheck.", data = foundSellerExchangeToCheck))
+    }
+
+    /**
      * Displays History ExchangeState that exist in the node's vault for selected seller (organization name).
      */
     @GetMapping(value = [ "getHistoryExchangeStateBySeller/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
@@ -1254,6 +1314,26 @@ class MainController(rpc: NodeRPCConnection) {
         ).states.filter { it.state.data.buyer.name.organisation == buyerName }
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last ExchangeState by buyer $buyerName .", data = foundBuyerExchange))
+    }
+
+    /**
+     * Displays last ExchangeState that exist in the node's vault for selected buyer (organization name) and snamCheck.
+     */
+    @GetMapping(value = [ "getLastExchangeStateByBuyerToCheck/{buyerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastExchangeStateByBuyerToCheck(
+            @PathVariable("buyerName")
+            buyerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for buyer organization name and snamCheck
+        var snamCheckCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {ExchangeSchemaV1.PersistentExchange::snamCheck.equal("toCheck")}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(ExchangeState::class.java))
+
+        val foundBuyerExchangeToCheck = proxy.vaultQueryBy<ExchangeState>(
+                snamCheckCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.buyer.name.organisation == buyerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last ExchangeState by buyer $buyerName toCheck.", data = foundBuyerExchangeToCheck))
     }
 
     /**
@@ -1648,6 +1728,26 @@ class MainController(rpc: NodeRPCConnection) {
     }
 
     /**
+     * Displays last PSVState that exist in the node's vault for selected seller (organization name) and snamCheck.
+     */
+    @GetMapping(value = [ "getLastPSVStateBySellerToCheck/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastPSVStateBySellerToCheck(
+            @PathVariable("sellerName")
+            sellerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for seller organization name and snamCheck
+        var snamCheckCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::snamCheck.equal("toCheck")}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundSellerPSVStateToCheck = proxy.vaultQueryBy<PSVState>(
+                snamCheckCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.seller.name.organisation == sellerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last PSVState by seller $sellerName toCheck.", data = foundSellerPSVStateToCheck))
+    }
+
+    /**
      * Displays History PSVState that exist in the node's vault for selected seller (organization name).
      */
     @GetMapping(value = [ "getHistoryPSVStateBySeller/{sellerName}" ], produces = [ APPLICATION_JSON_VALUE ])
@@ -1685,6 +1785,26 @@ class MainController(rpc: NodeRPCConnection) {
         ).states.filter { it.state.data.buyer.name.organisation == buyerName }
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last PSVState by buyer $buyerName .", data = foundBuyerPSVState))
+    }
+
+    /**
+     * Displays last PSVState that exist in the node's vault for selected buyer (organization name) and snamCheck.
+     */
+    @GetMapping(value = [ "getLastPSVStateByBuyerToCheck/{buyerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastPSVStateByBuyerToCheck(
+            @PathVariable("buyerName")
+            buyerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for buyer organization name and snamCheck
+        var snamCheckCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {PSVSchemaV1.PersistentPSV::snamCheck.equal("toCheck")}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(PSVState::class.java))
+
+        val foundBuyerPSVStateToCheck = proxy.vaultQueryBy<PSVState>(
+                snamCheckCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.buyer.name.organisation == buyerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last PSVState by buyer $buyerName toCheck.", data = foundBuyerPSVStateToCheck))
     }
 
     /**
