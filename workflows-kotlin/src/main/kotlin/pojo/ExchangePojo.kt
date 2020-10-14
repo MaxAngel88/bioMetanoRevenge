@@ -31,5 +31,6 @@ data class ExchangePojo(
         val docDate: String = "",
         val exchangeStatus: String = "",
         val supportField: String = "",
+        val snamChek: String = "toCheck",
         val auctionStatus: String = ""
 )

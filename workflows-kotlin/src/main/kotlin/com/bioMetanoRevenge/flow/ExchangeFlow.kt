@@ -132,7 +132,7 @@ object ExchangeFlow {
                     exchangeProperty.exchangeStatus,
                     exchangeProperty.supportField,
                     exchangeProperty.auctionStatus,
-                    "toCheck",
+                    exchangeProperty.snamChek,
                     "toCheck",
                     Instant.now(),
                     Instant.now(),

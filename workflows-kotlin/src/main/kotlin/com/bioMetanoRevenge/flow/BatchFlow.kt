@@ -135,7 +135,7 @@ object BatchFlow {
                     batchProperty.batchStatus,
                     batchProperty.supportField,
                     batchProperty.auctionStatus,
-                    "toCheck",
+                    batchProperty.snamChek,
                     "toCheck",
                     batchProperty.batchDate,
                     batchProperty.batchDate,

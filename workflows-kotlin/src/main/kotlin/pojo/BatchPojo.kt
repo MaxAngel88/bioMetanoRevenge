@@ -31,5 +31,6 @@ data class BatchPojo(
         val batchStatus: String = "",
         val supportField: String = "",
         val auctionStatus: String = "",
+        val snamChek: String = "toCheck",
         val batchDate: Instant = Instant.now()
 )
