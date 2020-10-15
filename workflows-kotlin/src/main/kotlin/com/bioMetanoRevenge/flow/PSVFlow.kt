@@ -130,7 +130,7 @@ object PSVFlow {
                     psvStateProperty.transactionStatus,
                     psvStateProperty.supportField,
                     psvStateProperty.auctionStatus,
-                    psvStateProperty.snamChek,
+                    psvStateProperty.snamCheck,
                     "toCheck",
                     Instant.now(),
                     Instant.now(),

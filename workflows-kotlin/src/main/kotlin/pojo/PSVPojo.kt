@@ -24,6 +24,6 @@ data class PSVPojo(
         val docDate: String = "",
         val transactionStatus: String = "",
         val supportField: String = "",
-        val snamChek: String = "toCheck",
+        val snamCheck: String = "toCheck",
         val auctionStatus: String = ""
 )
