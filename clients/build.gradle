@@ -134,3 +134,9 @@ task runColosseumServer(type: JavaExec, dependsOn: jar) {
     main = 'com.bioMetanoRevenge.server.ServerKt'
     args '--server.port=15017', '--config.rpc.host=localhost', '--config.rpc.port=10053', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
+
+task runPartnersServer(type: JavaExec, dependsOn: jar) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.bioMetanoRevenge.server.ServerKt'
+    args '--server.port=15018', '--config.rpc.host=localhost', '--config.rpc.port=10057', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
