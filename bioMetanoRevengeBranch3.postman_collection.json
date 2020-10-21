@@ -613,7 +613,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"produttore\": \"Produttore_A\",\r\n    \"counterpart\": \"Counterpart_A\",\r\n    \"idProducer\": \"idProducer_A\",\r\n    \"idCounterpart\": \"idCounterpart_A\",\r\n    \"transactionType\": \"test\",\r\n    \"batchID\": \"batch12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"remi12345\",\r\n    \"plantAddress\": \"via Roma\",\r\n    \"plantCode\": \"plant12345\",\r\n    \"initialQuantity\": 200.0,\r\n    \"quantity\": 200.0,\r\n    \"energy\": 30.0,\r\n    \"price\": 25.0,\r\n    \"averageProductionCapacity\": 50.0,\r\n    \"maxProductionCapacity\": 60.0,\r\n    \"annualEstimate\": 100.0,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"startingPosition\": \"Biancavilla\",\r\n    \"arrivalPosition\": \"Roma\",\r\n    \"docRef\": \"docRef12345\",\r\n    \"docDate\": \"310820\",\r\n    \"batchStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"avaiable\",\r\n    \"batchDate\": \"2020-10-07T12:39:42.777Z\"\r\n}",
+							"raw": "{\r\n    \"produttore\": \"Produttore_A\",\r\n    \"counterpart\": \"Counterpart_A\",\r\n    \"idProducer\": \"idProducer_A\",\r\n    \"idCounterpart\": \"idCounterpart_A\",\r\n    \"transactionType\": \"test\",\r\n    \"batchID\": \"batch12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"remi12345\",\r\n    \"plantAddress\": \"via Roma\",\r\n    \"plantCode\": \"plant12345\",\r\n    \"initialQuantity\": 200.0,\r\n    \"quantity\": 200.0,\r\n    \"energy\": 30.0,\r\n    \"price\": 25.0,\r\n    \"averageProductionCapacity\": 50.0,\r\n    \"maxProductionCapacity\": 60.0,\r\n    \"annualEstimate\": 100.0,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"startingPosition\": \"Biancavilla\",\r\n    \"arrivalPosition\": \"Roma\",\r\n    \"docRef\": \"docRef12345\",\r\n    \"docDate\": \"310820\",\r\n    \"batchStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"avaiable\",\r\n    \"snamCheck\": \"OK\",\r\n    \"batchDate\": \"2020-10-07T12:39:42.777Z\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1092,7 +1092,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"seller\": \"Produttore_A\",\r\n    \"buyer\": \"Shipper_A\",\r\n    \"exchangeType\": \"vendita\",\r\n    \"PIVASeller\": \"PIVASeller1234\",\r\n    \"PIVABuyer\": \"PIVABuyer1234\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"exchangeCode\": \"e12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"xxxx1\",\r\n    \"plantAddress\": \"Verona\",\r\n    \"plantCode\": \"Verona01\",\r\n    \"hauler\": \"N/A\",\r\n    \"PIVAHauler\": \"N/A\",\r\n    \"trackCode\": \"N/A\",\r\n    \"pickupDate\": \"12/08/2020\",\r\n    \"deliveryDate\": \"18/08/2020\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 12.0,\r\n    \"price\": 14.5,\r\n    \"pcs\": 0.98,\r\n    \"pci\": 0.85,\r\n    \"startingPosition\": \"Verona\",\r\n    \"arrivalPosition\": \"Milano\",\r\n    \"docRef\": \"docRefABCD\",\r\n    \"docDate\": \"22062020\",\r\n    \"exchangeStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"avaiable\"\r\n}",
+							"raw": "{\r\n    \"seller\": \"Produttore_A\",\r\n    \"buyer\": \"Shipper_A\",\r\n    \"exchangeType\": \"vendita\",\r\n    \"PIVASeller\": \"PIVASeller1234\",\r\n    \"PIVABuyer\": \"PIVABuyer1234\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"exchangeCode\": \"e12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"xxxx1\",\r\n    \"plantAddress\": \"Verona\",\r\n    \"plantCode\": \"Verona01\",\r\n    \"hauler\": \"N/A\",\r\n    \"PIVAHauler\": \"N/A\",\r\n    \"trackCode\": \"N/A\",\r\n    \"pickupDate\": \"12/08/2020\",\r\n    \"deliveryDate\": \"18/08/2020\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 12.0,\r\n    \"price\": 14.5,\r\n    \"pcs\": 0.98,\r\n    \"pci\": 0.85,\r\n    \"startingPosition\": \"Verona\",\r\n    \"arrivalPosition\": \"Milano\",\r\n    \"docRef\": \"docRefABCD\",\r\n    \"docDate\": \"22062020\",\r\n    \"exchangeStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"snamCheck\": \"OK\",\r\n    \"auctionStatus\": \"avaiable\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1527,7 +1527,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"seller\": \"Shipper_A\",\r\n    \"buyer\": \"Shipper_B\",\r\n    \"transactionType\": \"scambio PSV\",\r\n    \"PIVASeller\": \"PIVA1234\",\r\n    \"PIVABuyer\": \"PIVA5678\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"transactionCode\": \"t12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"r12345\",\r\n    \"plantAddress\": \"Catania\",\r\n    \"plantCode\": \"Catania01\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 110.0,\r\n    \"price\": 12.6,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"docRef\": \"documentABC\",\r\n    \"docDate\": \"22082020\",\r\n    \"transactionStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"avaiable\"\r\n}",
+							"raw": "{\r\n    \"seller\": \"Shipper_A\",\r\n    \"buyer\": \"Shipper_B\",\r\n    \"transactionType\": \"scambio PSV\",\r\n    \"PIVASeller\": \"PIVA1234\",\r\n    \"PIVABuyer\": \"PIVA5678\",\r\n    \"parentBatchID\": \"p12345\",\r\n    \"transactionCode\": \"t12345\",\r\n    \"month\": \"Agosto\",\r\n    \"remiCode\": \"r12345\",\r\n    \"plantAddress\": \"Catania\",\r\n    \"plantCode\": \"Catania01\",\r\n    \"initialQuantity\": 150.0,\r\n    \"quantity\": 110.0,\r\n    \"price\": 12.6,\r\n    \"pcs\": 150.0,\r\n    \"pci\": 125.0,\r\n    \"docRef\": \"documentABC\",\r\n    \"docDate\": \"22082020\",\r\n    \"transactionStatus\": \"open\",\r\n    \"supportField\": \"example\",\r\n    \"auctionStatus\": \"avaiable\",\r\n    \"snamCheck\": \"OK\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2137,7 +2137,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"counterpartParty\": \"Edison\",\r\n    \"agreementID\": \"agreement0001\",\r\n    \"agreementCode\": \"agreementCode0001\",\r\n    \"agreementDescription\": \"Description of Agreement\",\r\n    \"agreementType\": \"Vendita\",\r\n    \"agrementSubType\": \"PSV\",\r\n    \"plantID\": \"plant0001\",\r\n    \"plantAddress\": \"via Roma 15, Biancavilla, CT\",\r\n    \"plantBusinessName\": \"Kalabria Maceri\",\r\n    \"owner\": \"Kalabria Maceri\",\r\n    \"counterpart\": \"Edison\",\r\n    \"remiCode\": \"remiCode00001\",\r\n    \"averageDailyCapacity\": 10.1,\r\n    \"maxDailyCapacity\": 12.0,\r\n    \"energyEstimation\": 13.1, \r\n    \"tso\": \"SRG - Snam Rete Gas SpA\",\r\n    \"portfolio\": \"Gas Supply\",\r\n    \"sourceSystem\": \"Endur\",\r\n    \"programmingMethod\": \"Flat\",\r\n    \"agreementNote\": \"Agreement Note\",\r\n    \"invoicingCode\": \"invoicing0001\",\r\n    \"energy\": 150.0,\r\n    \"dcq\": 120.0,\r\n    \"price\": 1.5,\r\n    \"validFrom\": \"2020-10-07T12:39:42.777Z\",\r\n    \"validTo\": \"2020-11-07T12:39:42.777Z\",\r\n    \"agreementStatus\": \"active\"\r\n}",
+							"raw": "{\r\n    \"counterpartParty\": \"Edison\",\r\n    \"agreementID\": \"agreement0001\",\r\n    \"agreementCode\": \"agreementCode0001\",\r\n    \"agreementDescription\": \"Description of Agreement\",\r\n    \"agreementType\": \"Vendita\",\r\n    \"agreementSubType\": \"Supply\",\r\n    \"plantID\": \"plant0001\",\r\n    \"plantAddress\": \"via Roma 15, Biancavilla, CT\",\r\n    \"plantBusinessName\": \"plantBusinessName: Kalabria Maceri\",\r\n    \"owner\": \"Kalabria Maceri\",\r\n    \"counterpart\": \"Edison\",\r\n    \"remiCode\": \"remiCode00001\",\r\n    \"averageDailyCapacity\": 10.1,\r\n    \"maxDailyCapacity\": 12.0,\r\n    \"energyEstimation\": 13.1, \r\n    \"tso\": \"SRG - Snam Rete Gas SpA\",\r\n    \"portfolio\": \"Gas Supply\",\r\n    \"sourceSystem\": \"Endur\",\r\n    \"programmingMethod\": \"Flat\",\r\n    \"agreementNote\": \"Agreement Note\",\r\n    \"invoicingCode\": \"invoicing0001\",\r\n    \"energy\": 150.0,\r\n    \"dcq\": 100.0,\r\n    \"price\": 1.5,\r\n    \"validFrom\": \"2020-10-16T12:39:42.777Z\",\r\n    \"validTo\": \"2020-11-16T12:39:42.777Z\",\r\n    \"agreementStatus\": \"active\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2145,12 +2145,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{PUBLICHOST}}:{{KALABRIAPORT}}/api/bioMetanoRevenge/issue-agreement",
+							"raw": "http://localhost:15007/api/bioMetanoRevenge/issue-agreement",
 							"protocol": "http",
 							"host": [
-								"{{PUBLICHOST}}"
+								"localhost"
 							],
-							"port": "{{KALABRIAPORT}}",
+							"port": "15007",
 							"path": [
 								"api",
 								"bioMetanoRevenge",
@@ -2587,6 +2587,181 @@
 								"bioMetanoRevenge",
 								"getHistoryReportStateByRemiCode",
 								"remiCode0001"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "CICWallet",
+			"item": [
+				{
+					"name": "issue-cic-wallet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"CICWalletID\": \"CICWalletProd1234\",\r\n    \"CICAmount\": 250.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/issue-cic-wallet",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-cic-wallet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-cic-wallet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"CICWalletID\": \"CICWalletProd1234\",\r\n    \"CICAddAmount\": 30.45\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/update-cic-wallet",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-cic-wallet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastCICWallet",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastCICWallet",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastCICWallet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastCICWalletStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastCICWalletStateByOwner/KalabriaMaceri",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastCICWalletStateByOwner",
+								"KalabriaMaceri"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryCICWalletStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryCICWalletStateByOwner/KalabriaMaceri",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryCICWalletStateByOwner",
+								"KalabriaMaceri"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastCICWalletByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getLastCICWalletByID/CICWalletProd1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastCICWalletByID",
+								"CICWalletProd1234"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryCICWalletByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50005/api/bioMetanoRevenge/getHistoryCICWalletByID/CICWalletProd1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50005",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryCICWalletByID",
+								"CICWalletProd1234"
 							]
 						}
 					},

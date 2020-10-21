@@ -7,6 +7,8 @@ import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatchAuction
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatchCheck
+import com.bioMetanoRevenge.flow.CICWalletFlow.IssuerCICWallet
+import com.bioMetanoRevenge.flow.CICWalletFlow.UpdaterCICWallet
 import com.bioMetanoRevenge.flow.EnrollFlow.IssuerEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterEnroll
 import com.bioMetanoRevenge.flow.EnrollFlow.UpdaterOCREnroll
@@ -2903,6 +2905,170 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateReportState = proxy.startTrackedFlow(::UpdaterReportState, updateReportPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Report with id: $updateReportID update correctly. New ReportState with id: ${updateReportState.linearId.id} created.. ledger updated.", data = updateReportState))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * CICWALLET API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all CICWalletState that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastCICWallet" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastCICWallet() : ResponseEntity<ResponsePojo> {
+        var foundLastCICWalletStates = proxy.vaultQueryBy<CICWalletState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "CICWalletState list", data = foundLastCICWalletStates))
+    }
+
+    /**
+     * Displays last CICWalletState that exist in the node's vault for selected owner.
+     */
+    @GetMapping(value = [ "getLastCICWalletStateByOwner/{ownerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastCICWalletStateByOwner(
+            @PathVariable("ownerName")
+            ownerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for owner organization name
+        val generalUnconsumedStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(CICWalletState::class.java))
+
+        val foundOwnerCICWalletState = proxy.vaultQueryBy<CICWalletState>(
+                generalUnconsumedStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.owner.name.organisation == ownerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last CICWalletState by owner $ownerName .", data = foundOwnerCICWalletState))
+    }
+
+    /**
+     * Displays History CICWalletState that exist in the node's vault for selected owner (organization name).
+     */
+    @GetMapping(value = [ "getHistoryCICWalletStateByOwner/{ownerName}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryCICWalletStateByOwner(
+            @PathVariable("ownerName")
+            ownerName : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for owner organization name
+        val generalAllStateCriteria : QueryCriteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.ALL, contractStateTypes = setOf(CICWalletState::class.java))
+
+        val foundOwnerCICWalletHistory = proxy.vaultQueryBy<CICWalletState>(
+                generalAllStateCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states.filter { it.state.data.owner.name.organisation == ownerName }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of CICWallet state for $ownerName", data = foundOwnerCICWalletHistory))
+    }
+
+    /**
+     * Displays last CICWalletState that exist in the node's vault for selected CICWalletID.
+     */
+    @GetMapping(value = [ "getLastCICWalletByID/{CICWalletID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastCICWalletByID(
+            @PathVariable("CICWalletID")
+            CICWalletID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for CICWalletID
+        var cicWalletIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {CICWalletSchemaV1.PersistentCICWallet::CICWalletID.equal(CICWalletID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(CICWalletState::class.java))
+
+        val foundLastCICWalletID = proxy.vaultQueryBy<CICWalletState>(
+                cicWalletIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last CICWalletState by CICWalletID $CICWalletID .", data = foundLastCICWalletID))
+    }
+
+    /**
+     * Displays History CICWalletState that exist in the node's vault for selected CICWalletID.
+     */
+    @GetMapping(value = [ "getHistoryCICWalletByID/{CICWalletID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryCICWalletByID(
+            @PathVariable("CICWalletID")
+            CICWalletID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for CICWalletID
+        var cicWalletIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {CICWalletSchemaV1.PersistentCICWallet::CICWalletID.equal(CICWalletID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(CICWalletState::class.java))
+
+        val foundCICWalletIDHistory = proxy.vaultQueryBy<CICWalletState>(
+                cicWalletIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of CICWallet state for $CICWalletID", data = foundCICWalletIDHistory))
+    }
+
+    /**
+     * Initiates a flow to agree an CICWallet between two nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-cic-wallet" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueCICWallet(
+            @RequestBody
+            issueCICWallet : CICWalletPojo): ResponseEntity<ResponsePojo> {
+
+        val cicWalletID = issueCICWallet.CICWalletID
+        val cicAmount = issueCICWallet.CICAmount
+
+        if(cicWalletID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "CICWalletID cannot be empty", data = null))
+        }
+
+        if(cicAmount < 0.0) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "CICAmount must be greater or equal than zero", data = null))
+        }
+
+        return try {
+            val cicWallet = proxy.startTrackedFlow(::IssuerCICWallet, issueCICWallet).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${cicWallet.linearId.id} committed to ledger.\n", data = cicWallet))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update CICWallet
+     *
+     */
+    @PostMapping(value = [ "update-cic-wallet" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateCICWallet(
+            @RequestBody
+            updateCICWalletPojo: CICWalletUpdatePojo): ResponseEntity<ResponsePojo> {
+
+        val cicWalletID = updateCICWalletPojo.CICWalletID
+        val cicAddAmount = updateCICWalletPojo.CICAddAmount
+
+        if(cicWalletID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "CICWalletID cannot be empty", data = null))
+        }
+
+        if(cicAddAmount.isNaN()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "CICAddAmount must be a number", data = null))
+        }
+
+        return try {
+            val updateCICWallet = proxy.startTrackedFlow(::UpdaterCICWallet, updateCICWalletPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "CICWallet with id: $cicWalletID update correctly. New CICWalletState with id: ${updateCICWallet.linearId.id} created.. ledger updated.", data = updateCICWallet))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
