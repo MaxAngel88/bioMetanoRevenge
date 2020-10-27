@@ -48,6 +48,15 @@ object ReportSchemaV1 : MappedSchema(
             @Column(name = "remiAddress")
             var remiAddress: String,
 
+            @Column(name = "offerCode")
+            var offerCode: String,
+
+            @Column(name = "transactionCode")
+            var transactionCode: String,
+
+            @Column(name = "operation")
+            var operation: String,
+
             @Column(name = "measuredQuantity")
             var measuredQuantity: Double,
 
@@ -80,6 +89,9 @@ object ReportSchemaV1 : MappedSchema(
                 reportType = "",
                 remiCode = "",
                 remiAddress = "",
+                offerCode = "",
+                transactionCode = "",
+                operation = "",
                 measuredQuantity= 0.0,
                 measuredEnergy = 0.0,
                 measuredPcs = 0.0,

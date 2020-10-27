@@ -2386,7 +2386,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"ownerNode\": \"KalabriaMaceri\",\r\n    \"ownerID\": \"ownerID0001\",\r\n    \"reportID\": \"reportID0001\",\r\n    \"reportType\": \"Verbali di Misura\",\r\n    \"remiCode\": \"remiCode0001\",\r\n    \"remiAddress\": \"remiAddress0001\",\r\n    \"measuredQuantity\":  10.0,\r\n    \"measuredEnergy\":  20.5,\r\n    \"measuredPcs\":  16.4,\r\n    \"measuredPci\":  14.0\r\n}",
+							"raw": "{\r\n    \"ownerNode\": \"KalabriaMaceri\",\r\n    \"ownerID\": \"ownerID0001\",\r\n    \"reportID\": \"reportID0001\",\r\n    \"reportType\": \"Verbali di Misura\",\r\n    \"remiCode\": \"remiCode0001\",\r\n    \"remiAddress\": \"remiAddress0001\",\r\n    \"offerCode\": \"offerCode0001\",\r\n    \"transactionCode\": \"transactionCode0001\",\r\n    \"operation\": \"Cessione\",\r\n    \"measuredQuantity\":  10.0,\r\n    \"measuredEnergy\":  20.5,\r\n    \"measuredPcs\":  16.4,\r\n    \"measuredPci\":  14.0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
