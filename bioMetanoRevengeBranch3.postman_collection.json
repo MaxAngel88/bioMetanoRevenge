@@ -2771,6 +2771,225 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "AgreementQuadrio",
+			"item": [
+				{
+					"name": "issue-agreement-quadrio",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"counterpartParty\": \"Partner\",\r\n    \"agreementQuadrioID\": \"agreementQuadrio0001\",\r\n    \"agreementQuadrioCode\": \"agreementQuadrioCode0001\",\r\n    \"agreementQuadrioType\": \"Vendita\",\r\n    \"owner\": \"Colosseum\",\r\n    \"counterpart\": \"DDL\",\r\n    \"remiCode\": \"remiCode00001\",\r\n    \"yearRef\": \"\",\r\n    \"supportField\": \"\",\r\n    \"yearQuantity\": 100.0,\r\n    \"validFrom\": \"2020-10-16T12:39:42.777Z\",\r\n    \"validTo\": \"2020-11-16T12:39:42.777Z\",\r\n    \"agreementQuadrioStatus\": \"active\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:15007/api/bioMetanoRevenge/issue-agreement-quadrio",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "15007",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-agreement-quadrio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-agreement-quadrio-status",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"agreementQuadrioID\": \"agreementQuadrio0001\",\r\n    \"agreementQuadrioStatus\": \"deactive\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{KALABRIAPORT}}/api/bioMetanoRevenge/update-agreement-quadrio-status",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{KALABRIAPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"update-agreement-quadrio-status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreementQuadrio",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastAgreementQuadrio",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastAgreementQuadrio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreementQuadrioStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastAgreementQuadrioStateByOwner/Kalabria",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastAgreementQuadrioStateByOwner",
+								"Kalabria"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryAgreementQuadrioStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryAgreementQuadrioStateByOwner/Kalabria",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryAgreementQuadrioStateByOwner",
+								"Kalabria"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreementQuadrioStateByCounterpart",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastAgreementQuadrioStateByCounterpart/Edison",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastAgreementQuadrioStateByCounterpart",
+								"Edison"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryAgreementQuadrioStateByCounterpart",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryAgreementQuadrioStateByCounterpart/Edison",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryAgreementQuadrioStateByCounterpart",
+								"Edison"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastAgreementQuadrioStateByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastAgreementQuadrioStateByID/agreementQuadrio0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastAgreementQuadrioStateByID",
+								"agreementQuadrio0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryAgreementQuadrioStateByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getHistoryAgreementQuadrioStateByID/agreementQuadrio0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getHistoryAgreementQuadrioStateByID",
+								"agreementQuadrio0001"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "me",
 			"request": {
 				"method": "GET",

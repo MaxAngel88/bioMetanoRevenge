@@ -3,6 +3,8 @@ package com.bioMetanoRevenge.server
 import com.bioMetanoRevenge.flow.AgreementFlow.IssuerAgreement
 import com.bioMetanoRevenge.flow.AgreementFlow.UpdaterAgreement
 import com.bioMetanoRevenge.flow.AgreementFlow.UpdaterAgreementStatus
+import com.bioMetanoRevenge.flow.AgreementQuadrioFlow.IssuerAgreementQuadrio
+import com.bioMetanoRevenge.flow.AgreementQuadrioFlow.UpdaterAgreementQuadrioStatus
 import com.bioMetanoRevenge.flow.BatchFlow.IssuerBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatch
 import com.bioMetanoRevenge.flow.BatchFlow.UpdaterBatchAuction
@@ -2415,7 +2417,7 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("agreementID")
             agreementID : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive UNCONSUMED state AND filter it for counterpart
+        // setting the criteria for retrive UNCONSUMED state AND filter it for agreementID
         var agreementIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementSchemaV1.PersistentAgreement::agreementID.equal(agreementID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(AgreementState::class.java))
 
         val foundIDLastAgreement = proxy.vaultQueryBy<AgreementState>(
@@ -2436,7 +2438,7 @@ class MainController(rpc: NodeRPCConnection) {
             @PathVariable("agreementID")
             agreementID : String ) : ResponseEntity<ResponsePojo> {
 
-        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for counterpart
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for agreementID
         var agreementIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementSchemaV1.PersistentAgreement::agreementID.equal(agreementID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(AgreementState::class.java))
 
         val foundIDAgreementHistory = proxy.vaultQueryBy<AgreementState>(
@@ -3069,6 +3071,268 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateCICWallet = proxy.startTrackedFlow(::UpdaterCICWallet, updateCICWalletPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "CICWallet with id: $cicWalletID update correctly. New CICWalletState with id: ${updateCICWallet.linearId.id} created.. ledger updated.", data = updateCICWallet))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * AGREEMENT QUADRIO API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all AgreementQuadrioState that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastAgreementQuadrio" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastAgreementQuadrio() : ResponseEntity<ResponsePojo> {
+        var foundLastAgreementQuadrioStates = proxy.vaultQueryBy<AgreementQuadrioState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "AgreementQuadrioState list", data = foundLastAgreementQuadrioStates))
+    }
+
+    /**
+     * Displays last AgreementQuadrioState that exist in the node's vault for selected owner.
+     */
+    @GetMapping(value = [ "getLastAgreementQuadrioStateByOwner/{owner}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastAgreementQuadrioStateByOwner(
+            @PathVariable("owner")
+            owner : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for owner
+        var ownerCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementQuadrioSchemaV1.PersistentAgreementQuadrio::owner.equal(owner)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(AgreementQuadrioState::class.java))
+
+        val foundOwnerLastAgreementQuadrio = proxy.vaultQueryBy<AgreementQuadrioState>(
+                ownerCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last AgreementQuadrioState by owner $owner .", data = foundOwnerLastAgreementQuadrio))
+    }
+
+    /**
+     * Displays History AgreementQuadrioState that exist in the node's vault for selected owner.
+     */
+    @GetMapping(value = [ "getHistoryAgreementQuadrioStateByOwner/{owner}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryAgreementQuadrioStateByOwner(
+            @PathVariable("owner")
+            owner : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for owner
+        var ownerCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementQuadrioSchemaV1.PersistentAgreementQuadrio::owner.equal(owner)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(AgreementQuadrioState::class.java))
+
+        val foundOwnerAgreementQuadrioHistory = proxy.vaultQueryBy<AgreementQuadrioState>(
+                ownerCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of agreement quadrio state for $owner", data = foundOwnerAgreementQuadrioHistory))
+    }
+
+    /**
+     * Displays last AgreementQuadrioState that exist in the node's vault for selected counterpart.
+     */
+    @GetMapping(value = [ "getLastAgreementQuadrioStateByCounterpart/{counterpart}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastAgreementQuadrioStateByCounterpart(
+            @PathVariable("counterpart")
+            counterpart : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for counterpart
+        var counterpartCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementQuadrioSchemaV1.PersistentAgreementQuadrio::counterpart.equal(counterpart)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(AgreementQuadrioState::class.java))
+
+        val foundCounterpartLastAgreementQuadrio = proxy.vaultQueryBy<AgreementQuadrioState>(
+                counterpartCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last AgreementQuadrioState by counterpart $counterpart .", data = foundCounterpartLastAgreementQuadrio))
+    }
+
+    /**
+     * Displays History AgreementQuadrioState that exist in the node's vault for selected counterpart.
+     */
+    @GetMapping(value = [ "getHistoryAgreementQuadrioStateByCounterpart/{counterpart}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryAgreementQuadrioStateByCounterpart(
+            @PathVariable("counterpart")
+            counterpart : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for counterpart
+        var counterpartCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementQuadrioSchemaV1.PersistentAgreementQuadrio::counterpart.equal(counterpart)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(AgreementState::class.java))
+
+        val foundCounterpartAgreementQuadrioHistory = proxy.vaultQueryBy<AgreementQuadrioState>(
+                counterpartCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of agreement quadrio state for $counterpart", data = foundCounterpartAgreementQuadrioHistory))
+    }
+
+    /**
+     * Displays last AgreementQuadrioState that exist in the node's vault for selected agreementQuadrioID.
+     */
+    @GetMapping(value = [ "getLastAgreementQuadrioStateByID/{agreementQuadrioID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastAgreementQuadrioStateByID(
+            @PathVariable("agreementQuadrioID")
+            agreementQuadrioID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for agreementQuadrioID
+        var agreementQuadrioIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementQuadrioSchemaV1.PersistentAgreementQuadrio::agreementQuadrioID.equal(agreementQuadrioID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(AgreementQuadrioState::class.java))
+
+        val foundIDLastAgreementQuadrio = proxy.vaultQueryBy<AgreementQuadrioState>(
+                agreementQuadrioIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last AgreementQuadrioState by agreementQuadrioID $agreementQuadrioID .", data = foundIDLastAgreementQuadrio))
+    }
+
+    /**
+     * Displays History AgreementQuadrioState that exist in the node's vault for selected agreementQuadrioID.
+     */
+    @GetMapping(value = [ "getHistoryAgreementQuadrioStateByID/{agreementQuadrioID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getHistoryAgreementQuadrioStateByID(
+            @PathVariable("agreementQuadrioID")
+            agreementQuadrioID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive CONSUMED - UNCONSUMED state AND filter it for agreementID
+        var agreementQuadrioIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {AgreementQuadrioSchemaV1.PersistentAgreementQuadrio::agreementQuadrioID.equal(agreementQuadrioID)}, status = Vault.StateStatus.ALL, contractStateTypes = setOf(AgreementQuadrioState::class.java))
+
+        val foundIDAgreementQuadrioHistory = proxy.vaultQueryBy<AgreementQuadrioState>(
+                agreementQuadrioIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "History of agreement quadrio state for $agreementQuadrioID", data = foundIDAgreementQuadrioHistory))
+    }
+
+    /**
+     * Initiates a flow to agree an AgreementQuadrioState between two nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-agreement-quadrio" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueAgreementQuadrio(
+            @RequestBody
+            issueAgreementQuadrio : AgreementQuadrioPojo): ResponseEntity<ResponsePojo> {
+
+        val counterpartParty = issueAgreementQuadrio.counterpartParty
+        val agreementQuadrioID = issueAgreementQuadrio.agreementQuadrioID
+        val agreementQuadrioCode = issueAgreementQuadrio.agreementQuadrioCode
+        val agreementQuadrioType = issueAgreementQuadrio.agreementQuadrioType
+        val owner = issueAgreementQuadrio.owner
+        val counterpart = issueAgreementQuadrio.counterpart
+        val remiCode = issueAgreementQuadrio.remiCode
+        val yearRef = issueAgreementQuadrio.yearRef
+        val yearQuantity = issueAgreementQuadrio.yearQuantity
+        val validFrom = issueAgreementQuadrio.validFrom
+        val validTo = issueAgreementQuadrio.validTo
+        val agreementQuadrioStatus = issueAgreementQuadrio.agreementQuadrioStatus
+
+        if(counterpartParty.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "counterpartParty cannot be empty", data = null))
+        }
+
+        if(agreementQuadrioID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementQuadrioID cannot be empty", data = null))
+        }
+
+        if(agreementQuadrioCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementQuadrioCode cannot be empty", data = null))
+        }
+
+        if(agreementQuadrioType.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementQuadrioType cannot be empty", data = null))
+        }
+
+        if(owner.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "owner cannot be empty", data = null))
+        }
+
+        if(counterpart.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "counterpart cannot be empty", data = null))
+        }
+
+        if(remiCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "remiCode cannot be empty", data = null))
+        }
+
+        if(yearRef.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "yearRef cannot be empty", data = null))
+        }
+
+        if(yearQuantity.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "yearQuantity must be a number", data = null))
+        }
+
+        if(validFrom.isAfter(validTo)){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be after validTo", data = null))
+        }
+
+        if(validTo.isBefore(validFrom)){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validTo cannot be before validFrom", data = null))
+        }
+
+        if(validFrom == validTo){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "validFrom cannot be equal to validTo", data = null))
+        }
+
+        if(agreementQuadrioStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val agreementQuadrio = proxy.startTrackedFlow(::IssuerAgreementQuadrio, issueAgreementQuadrio).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${agreementQuadrio.linearId.id} committed to ledger.\n", data = agreementQuadrio))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update AgreementQuadrio Status
+     *
+     */
+    @PostMapping(value = [ "update-agreement-quadrio-status" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateAgreementQuadrioStatus(
+            @RequestBody
+            updateAgreementQuadrioStatusPojo: AgreementQuadrioUpdateStatusPojo): ResponseEntity<ResponsePojo> {
+
+        val agreementQuadrioID = updateAgreementQuadrioStatusPojo.agreementQuadrioID
+        val agreementQuadrioStatus = updateAgreementQuadrioStatusPojo.agreementQuadrioStatus
+
+        if(agreementQuadrioID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementQuadrioID cannot be empty", data = null))
+        }
+
+        if(agreementQuadrioStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "agreementQuadrioStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updateAgreementQuadrio = proxy.startTrackedFlow(::UpdaterAgreementQuadrioStatus, updateAgreementQuadrioStatusPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "AgreementQuadrio with id: $agreementQuadrioID update correctly. New AgreementQuadrioState with id: ${updateAgreementQuadrio.linearId.id} created.. ledger updated.", data = updateAgreementQuadrio))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
