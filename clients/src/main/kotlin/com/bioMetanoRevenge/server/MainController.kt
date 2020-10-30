@@ -18,6 +18,7 @@ import com.bioMetanoRevenge.flow.ExchangeFlow.IssuerExchange
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchange
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchangeAuction
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchangeCheck
+import com.bioMetanoRevenge.flow.InvoiceFlow.IssuerInvoice
 import com.bioMetanoRevenge.flow.PSVFlow.IssuerPSVState
 import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVState
 import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVStateAuction
@@ -3333,6 +3334,167 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val updateAgreementQuadrio = proxy.startTrackedFlow(::UpdaterAgreementQuadrioStatus, updateAgreementQuadrioStatusPojo).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "AgreementQuadrio with id: $agreementQuadrioID update correctly. New AgreementQuadrioState with id: ${updateAgreementQuadrio.linearId.id} created.. ledger updated.", data = updateAgreementQuadrio))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /**
+     *
+     * INVOICE API **********************************************************************************************
+     *
+     */
+
+    /**
+     * Displays all InvoiceState that exist in the node's vault.
+     */
+    @GetMapping(value = [ "getLastInvoice" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastInvoice() : ResponseEntity<ResponsePojo> {
+        var foundLastInvoiceStates = proxy.vaultQueryBy<InvoiceState>(
+                paging = PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000)).states
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "InvoiceState list", data = foundLastInvoiceStates))
+    }
+
+    /**
+     * Displays last InvoiceState that exist in the node's vault for selected ownerID.
+     */
+    @GetMapping(value = [ "getLastInvoiceStateByOwner/{owner}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastInvoiceStateByOwner(
+            @PathVariable("ownerID")
+            ownerID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for ownerID
+        var ownerIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {InvoiceSchemaV1.PersistentInvoice::ownerID.equal(ownerID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(InvoiceState::class.java))
+
+        val foundOwnerLastInvoice = proxy.vaultQueryBy<InvoiceState>(
+                ownerIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last InvoiceState by ownerID $ownerID .", data = foundOwnerLastInvoice))
+    }
+
+    /**
+     * Displays last InvoiceState that exist in the node's vault for selected invoiceID.
+     */
+    @GetMapping(value = [ "getLastInvoiceStateByInvoiceID/{invoiceID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastInvoiceStateByInvoiceID(
+            @PathVariable("invoiceID")
+            invoiceID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for invoiceID
+        var invoiceIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {InvoiceSchemaV1.PersistentInvoice::invoiceID.equal(invoiceID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(InvoiceState::class.java))
+
+        val foundInvoiceIDLastInvoice = proxy.vaultQueryBy<InvoiceState>(
+                invoiceIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last InvoiceState by invoiceID $invoiceID .", data = foundInvoiceIDLastInvoice))
+    }
+
+    /**
+     * Displays last InvoiceState that exist in the node's vault for selected invoiceRef.
+     */
+    @GetMapping(value = [ "getLastInvoiceStateByInvoiceRef/{invoiceRef}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastInvoiceStateByInvoiceRef(
+            @PathVariable("invoiceRef")
+            invoiceRef : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for invoiceRef
+        var invoiceRefCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {InvoiceSchemaV1.PersistentInvoice::invoiceRef.equal(invoiceRef)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(InvoiceState::class.java))
+
+        val foundInvoiceRefLastInvoice = proxy.vaultQueryBy<InvoiceState>(
+                invoiceRefCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last InvoiceState by invoiceRef $invoiceRef .", data = foundInvoiceRefLastInvoice))
+    }
+
+    /**
+     * Displays last InvoiceState that exist in the node's vault for selected parentQuadrioID.
+     */
+    @GetMapping(value = [ "getLastInvoiceStateByParentQuadrioID/{parentQuadrioID}" ], produces = [ APPLICATION_JSON_VALUE ])
+    fun getLastInvoiceStateByParentQuadrioID(
+            @PathVariable("parentQuadrioID")
+            parentQuadrioID : String ) : ResponseEntity<ResponsePojo> {
+
+        // setting the criteria for retrive UNCONSUMED state AND filter it for parentQuadrioID
+        var parentQuadrioIDCriteria : QueryCriteria = QueryCriteria.VaultCustomQueryCriteria(expression = builder {InvoiceSchemaV1.PersistentInvoice::parentQuadrioID.equal(parentQuadrioID)}, status = Vault.StateStatus.UNCONSUMED, contractStateTypes = setOf(InvoiceState::class.java))
+
+        val foundParentQuadrioIDLastInvoice = proxy.vaultQueryBy<InvoiceState>(
+                parentQuadrioIDCriteria,
+                PageSpecification(pageNumber = DEFAULT_PAGE_NUM, pageSize = 4000),
+                Sort(setOf(Sort.SortColumn(SortAttribute.Standard(Sort.VaultStateAttribute.RECORDED_TIME), Sort.Direction.DESC)))
+        ).states
+        //.filter { it.state.data.macAddress == macAddress }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponsePojo(outcome = "SUCCESS", message = "Last InvoiceState by parentQuadrioID $parentQuadrioID .", data = foundParentQuadrioIDLastInvoice))
+    }
+
+    /**
+     * Initiates a flow to agree an InvoiceState between two nodes.
+     *
+     * Once the flow finishes it will have written the Measure to ledger. Both NodeA, NodeB are able to
+     * see it when calling /api/bioMetanoRevenge/ on their respective nodes.
+     *
+     * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
+     * in its network map cache, it will return an HTTP bad request.
+     *
+     * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
+     */
+    @PostMapping(value = [ "issue-invoice" ], produces = [ APPLICATION_JSON_VALUE ], headers = [ "Content-Type=application/json" ])
+    fun issueInvoice(
+            @RequestBody
+            issueInvoice : InvoicePojo): ResponseEntity<ResponsePojo> {
+
+        val ownerID = issueInvoice.ownerID
+        val invoiceID = issueInvoice.invoiceID
+        val invoiceRef = issueInvoice.invoiceRef
+        val parentQuadrioID = issueInvoice.parentQuadrioID
+        val unityPrice = issueInvoice.unityPrice
+        val quantity = issueInvoice.quantity
+        val productType = issueInvoice.productType
+
+        if(ownerID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "ownerID cannot be empty", data = null))
+        }
+
+        if(invoiceID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "invoiceID cannot be empty", data = null))
+        }
+
+        if(invoiceRef.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "invoiceRef cannot be empty", data = null))
+        }
+
+        if(parentQuadrioID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "parentQuadrioID cannot be empty", data = null))
+        }
+
+        if(unityPrice.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "unityPrice must be a number", data = null))
+        }
+
+        if(quantity.isNaN()){
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "quantity must be a number", data = null))
+        }
+
+        if(productType.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "productType cannot be empty", data = null))
+        }
+
+        return try {
+            val invoice = proxy.startTrackedFlow(::IssuerInvoice, issueInvoice).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${invoice.linearId.id} committed to ledger.\n", data = invoice))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))

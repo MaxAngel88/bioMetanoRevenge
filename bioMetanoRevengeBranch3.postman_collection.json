@@ -2990,6 +2990,151 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Invoice",
+			"item": [
+				{
+					"name": "issue-invoice",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"ownerID\": \"Bertolotti\",\r\n    \"invoiceID\": \"invoice0001\",\r\n    \"invoiceRef\": \"invoiceRef0001\",\r\n    \"parentQuadrioID\": \"agreementQuadrio0001\",\r\n    \"unityPrice\": 1.7,\r\n    \"quantity\": 260.0,\r\n    \"productType\": \"Bio\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:15007/api/bioMetanoRevenge/issue-invoice",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "15007",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"issue-invoice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastInvoice",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastInvoice",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastInvoice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastInvoiceStateByOwner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastInvoiceStateByOwner/ColosseumFuel",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastInvoiceStateByOwner",
+								"ColosseumFuel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastInvoiceStateByInvoiceID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastInvoiceStateByInvoiceID/invoice0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastInvoiceStateByInvoiceID",
+								"invoice0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastInvoiceStateByInvoiceRef",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastInvoiceStateByInvoiceRef/invoiceRef0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastInvoiceStateByInvoiceRef",
+								"invoiceRef0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLastInvoiceStateByParentQuadrioID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{PUBLICHOST}}:{{GSEPORT}}/api/bioMetanoRevenge/getLastInvoiceStateByParentQuadrioID/agreementQuadrio0001",
+							"protocol": "http",
+							"host": [
+								"{{PUBLICHOST}}"
+							],
+							"port": "{{GSEPORT}}",
+							"path": [
+								"api",
+								"bioMetanoRevenge",
+								"getLastInvoiceStateByParentQuadrioID",
+								"agreementQuadrio0001"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "me",
 			"request": {
 				"method": "GET",
