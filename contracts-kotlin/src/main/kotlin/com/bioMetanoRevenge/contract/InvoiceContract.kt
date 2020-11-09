@@ -21,6 +21,7 @@ class InvoiceContract : Contract {
             val setOfSigners = command.signers.toSet()
             when(command.value){
                 is Commands.Issue -> verifyIssue(tx, setOfSigners)
+                is Commands.UpdateStatus -> verifyUpdateStatus(tx, setOfSigners)
                 else -> throw IllegalArgumentException("Unrecognised command.")
             }
         }
@@ -47,11 +48,34 @@ class InvoiceContract : Contract {
         }
     }
 
+    private fun verifyUpdateStatus(tx: LedgerTransaction, signers: Set<PublicKey>) {
+        tx.commands.requireSingleCommand<Commands.UpdateStatus>()
+        requireThat {
+            // Generic constraints around the old Agreement transaction.
+            "there must be only one invoice input." using (tx.inputs.size == 1)
+            val oldInvoiceState = tx.inputsOfType<InvoiceState>().single()
+
+            // Generic constraints around the generic update transaction.
+            "Only one transaction state should be created." using (tx.outputs.size == 1)
+            val newInvoiceState = tx.outputsOfType<InvoiceState>().single()
+            "All of the participants must be signers." using (signers.containsAll(newInvoiceState.participants.map { it.owningKey }))
+
+            // Generic constraints around the new Agreement transaction
+            "GSE from old and new Invoice cannot change." using (oldInvoiceState.GSE == newInvoiceState.GSE)
+            "ownerParty from old and new Invoice cannot change." using (oldInvoiceState.ownerParty == newInvoiceState.ownerParty)
+            "ownerID from old and new Invoice cannot change." using (oldInvoiceState.ownerID == newInvoiceState.ownerID)
+            "invoiceID from old and new Invoice cannot change." using (oldInvoiceState.invoiceID == newInvoiceState.invoiceID)
+            "invoiceRef from old and new Invoice cannot change." using (oldInvoiceState.invoiceRef == newInvoiceState.invoiceRef)
+            "invoiceStatus cannot be empty." using (newInvoiceState.invoiceStatus.isNotEmpty())
+        }
+    }
+
 
     /**
-     * This contract only implements one command: Issue.
+     * This contract only implements two commands: Issue, UpdateStatus.
      */
     interface Commands : CommandData {
         class Issue : Commands, TypeOnlyCommandData()
+        class UpdateStatus: Commands, TypeOnlyCommandData()
     }
 }

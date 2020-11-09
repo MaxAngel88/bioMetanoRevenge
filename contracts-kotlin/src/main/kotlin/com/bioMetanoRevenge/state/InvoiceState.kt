@@ -24,7 +24,9 @@ data class InvoiceState(val GSE: Party,
                         val quantity: Double,
                         val totalPrice: Double,
                         val productType: String,
+                        val invoiceStatus: String,
                         val invoiceDate: Instant,
+                        val invoiceLastUpdate: Instant,
                         override val linearId: UniqueIdentifier = UniqueIdentifier()) :
         LinearState, QueryableState {
 
@@ -44,7 +46,9 @@ data class InvoiceState(val GSE: Party,
                     this.quantity,
                     this.totalPrice,
                     this.productType,
+                    this.invoiceStatus,
                     this.invoiceDate,
+                    this.invoiceLastUpdate,
                     this.linearId.id
             )
             else -> throw IllegalArgumentException("Unrecognised schema $schema")

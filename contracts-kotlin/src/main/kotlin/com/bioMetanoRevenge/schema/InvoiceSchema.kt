@@ -54,8 +54,14 @@ object InvoiceSchemaV1 : MappedSchema(
             @Column(name = "productType")
             var productType: String,
 
+            @Column(name = "invoiceStatus")
+            var invoiceStatus: String,
+
             @Column(name = "invoiceDate")
             var invoiceDate: Instant,
+
+            @Column(name = "invoiceLastUpdate")
+            var invoiceLastUpdate: Instant,
 
             @Column(name = "linear_id")
             var linearId: UUID
@@ -73,7 +79,9 @@ object InvoiceSchemaV1 : MappedSchema(
                 quantity = 0.0,
                 totalPrice = 0.0,
                 productType = "",
+                invoiceStatus = "",
                 invoiceDate = Instant.now(),
+                invoiceLastUpdate = Instant.now(),
                 linearId = UUID.randomUUID()
         )
     }

@@ -19,6 +19,7 @@ import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchange
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchangeAuction
 import com.bioMetanoRevenge.flow.ExchangeFlow.UpdaterExchangeCheck
 import com.bioMetanoRevenge.flow.InvoiceFlow.IssuerInvoice
+import com.bioMetanoRevenge.flow.InvoiceFlow.UpdaterInvoiceStatus
 import com.bioMetanoRevenge.flow.PSVFlow.IssuerPSVState
 import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVState
 import com.bioMetanoRevenge.flow.PSVFlow.UpdaterPSVStateAuction
@@ -3495,6 +3496,36 @@ class MainController(rpc: NodeRPCConnection) {
         return try {
             val invoice = proxy.startTrackedFlow(::IssuerInvoice, issueInvoice).returnValue.getOrThrow()
             ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Transaction id ${invoice.linearId.id} committed to ledger.\n", data = invoice))
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))
+        }
+    }
+
+    /***
+     *
+     * Update Invoice Status
+     *
+     */
+    @PostMapping(value = [ "update-invoice-status" ], consumes = [APPLICATION_JSON_VALUE], produces = [ APPLICATION_JSON_VALUE], headers = [ "Content-Type=application/json" ])
+    fun updateInvoiceStatus(
+            @RequestBody
+            updateInvoiceStatusPojo: InvoiceUpdateStatusPojo): ResponseEntity<ResponsePojo> {
+
+        val invoiceID = updateInvoiceStatusPojo.invoiceID
+        val invoiceStatus = updateInvoiceStatusPojo.invoiceStatus
+
+        if(invoiceID.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "invoiceID cannot be empty", data = null))
+        }
+
+        if(invoiceStatus.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = "invoiceStatus cannot be empty", data = null))
+        }
+
+        return try {
+            val updateInvoice = proxy.startTrackedFlow(::UpdaterInvoiceStatus, updateInvoiceStatusPojo).returnValue.getOrThrow()
+            ResponseEntity.status(HttpStatus.CREATED).body(ResponsePojo(outcome = "SUCCESS", message = "Invoice with id: $invoiceID update correctly. New InvoiceState with id: ${updateInvoice.linearId.id} created.. ledger updated.", data = updateInvoice))
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
             ResponseEntity.badRequest().body(ResponsePojo(outcome = "ERROR", message = ex.message!!, data = null))

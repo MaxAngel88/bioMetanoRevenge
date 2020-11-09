@@ -10,5 +10,6 @@ data class InvoicePojo(
         val parentQuadrioID: String = "",
         val unityPrice: Double = 0.0,
         val quantity: Double = 0.0,
-        val productType: String = ""
+        val productType: String = "",
+        val invoiceStatus: String = ""
 )
