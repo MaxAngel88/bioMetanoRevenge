@@ -71,14 +71,14 @@ task runSnamServer(type: JavaExec, dependsOn: jar) {
     args '--server.port=15006', '--config.rpc.host=localhost', '--config.rpc.port=10009', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runKalabriaServer(type: JavaExec, dependsOn: jar) {
+task runKhalabriaServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     jvmArgs("-Xmx2048m")
     args '--server.port=15007', '--config.rpc.host=localhost', '--config.rpc.port=10013', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runMondelloServer(type: JavaExec, dependsOn: jar) {
+task runMetanoBioServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     jvmArgs("-Xmx2048m")
@@ -106,7 +106,7 @@ task runNBAServer(type: JavaExec, dependsOn: jar) {
     args '--server.port=15011', '--config.rpc.host=localhost', '--config.rpc.port=10029', '--config.rpc.username=user1', '--config.rpc.password=test'
 }
 
-task runACSPOServer(type: JavaExec, dependsOn: jar) {
+task runCattaniServer(type: JavaExec, dependsOn: jar) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'com.bioMetanoRevenge.server.ServerKt'
     jvmArgs("-Xmx2048m")
